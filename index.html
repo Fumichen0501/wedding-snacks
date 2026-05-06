@@ -9,27 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="婚禮茶點">
 <meta name="theme-color" content="#4a6240">
 <title>婚禮茶點管家</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --sage:#8a9e7e;--sage-light:#c5d4bc;--sage-dark:#4a6240;
-  --cream:#faf7f2;--warm:#f0ead8;--gold-light:#f0ddb0;
-  --text:#2e2a22;--muted:#7a7060;--border:rgba(138,158,126,0.25);
-  --shadow:0 2px 16px rgba(74,98,64,0.10);
-  --safe-top:env(safe-area-inset-top,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);
-}
+:root{--sage:#8a9e7e;--sage-light:#c5d4bc;--sage-dark:#4a6240;--cream:#faf7f2;--warm:#f0ead8;--gold-light:#f0ddb0;--text:#2e2a22;--muted:#7a7060;--border:rgba(138,158,126,0.25);--shadow:0 2px 16px rgba(74,98,64,0.10);--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;}
 body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--text);}
-
-/* ── SCREENS ── */
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--cream);transition:transform 0.3s ease,opacity 0.3s;z-index:10;}
-.screen.hidden{transform:translateX(100%);pointer-events:none;}
-.screen.slide-left{transform:translateX(-30%);opacity:0.5;pointer-events:none;}
-
-/* ── AUTH SCREEN ── */
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--cream);z-index:10;}
+.screen.hidden{display:none;}
 #screen-auth{background:linear-gradient(160deg,var(--sage-dark) 0%,#2d3d28 100%);justify-content:center;align-items:center;padding:40px 24px;}
 .auth-logo{text-align:center;margin-bottom:40px;}
 .auth-logo h1{font-family:'Noto Serif TC',serif;color:#fff;font-size:26px;letter-spacing:3px;margin-bottom:6px;}
@@ -43,70 +30,48 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--t
 .btn-auth{width:100%;padding:13px;background:var(--sage-dark);color:#fff;border:none;border-radius:10px;font-size:15px;font-family:'Noto Serif TC',serif;cursor:pointer;margin-top:4px;}
 .auth-msg{font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
 .auth-msg.err{color:#c04020;}.auth-msg.ok{color:#2a7050;}
-
-/* ── HOME SCREEN ── */
-#screen-home{padding-top:calc(var(--safe-top) + 0px);}
+#screen-home{padding-top:calc(var(--safe-top));}
 .home-header{background:var(--sage-dark);padding:16px 16px 14px;display:flex;align-items:center;justify-content:space-between;}
 .home-title{font-family:'Noto Serif TC',serif;color:#fff;font-size:16px;}
 .home-user{color:rgba(255,255,255,0.7);font-size:12px;}
 .home-body{flex:1;overflow-y:auto;padding:16px;}
-.project-card{background:#fff;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;transition:transform 0.15s;}
-.project-card:active{transform:scale(0.98);}
+.project-card{background:#fff;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;}
 .project-name{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--sage-dark);margin-bottom:4px;}
 .project-meta{font-size:12px;color:var(--muted);}
 .project-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:#e8f0e4;color:var(--sage-dark);margin-left:6px;}
-.fab-home{position:fixed;bottom:calc(var(--safe-bottom) + 20px);right:20px;background:var(--sage-dark);color:#fff;border:none;border-radius:28px;padding:14px 20px;font-size:14px;font-family:'Noto Serif TC',serif;cursor:pointer;box-shadow:0 4px 20px rgba(74,98,64,0.4);z-index:50;display:flex;align-items:center;gap:8px;}
-
-/* ── PROJECT SCREEN ── */
+.fab-home{position:fixed;bottom:calc(var(--safe-bottom) + 20px);right:20px;background:var(--sage-dark);color:#fff;border:none;border-radius:28px;padding:14px 20px;font-size:14px;font-family:'Noto Serif TC',serif;cursor:pointer;box-shadow:0 4px 20px rgba(74,98,64,0.4);z-index:50;}
 #screen-project{padding-top:var(--safe-top);}
 .proj-header{background:var(--sage-dark);padding:12px 16px;display:flex;align-items:center;gap:12px;}
-.back-btn{color:#fff;font-size:20px;background:none;border:none;cursor:pointer;padding:4px;line-height:1;}
+.back-btn{color:#fff;font-size:22px;background:none;border:none;cursor:pointer;padding:4px;line-height:1;}
 .proj-header-info{flex:1;}
 .proj-header-name{font-family:'Noto Serif TC',serif;color:#fff;font-size:15px;}
 .proj-header-sub{color:rgba(255,255,255,0.6);font-size:11px;}
 .proj-mode-toggle{display:flex;gap:6px;}
 .mode-btn{padding:5px 10px;border-radius:16px;border:1.5px solid rgba(255,255,255,0.4);background:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
 .mode-btn.active{background:#fff;color:var(--sage-dark);border-color:#fff;font-weight:600;}
-
-/* ── TAB BAR ── */
 .tab-bar{background:#fff;border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);flex-shrink:0;}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:9px;font-family:'Noto Sans TC',sans-serif;transition:color 0.2s;gap:3px;}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:9px;font-family:'Noto Sans TC',sans-serif;gap:3px;}
 .tab-item.active{color:var(--sage-dark);}
 .tab-icon{font-size:20px;line-height:1;}
-
-/* ── TAB CONTENT ── */
 .tab-content{flex:1;overflow-y:auto;overscroll-behavior:contain;}
 .tab-pane{display:none;padding:14px;padding-bottom:80px;}
 .tab-pane.active{display:block;}
-
-/* ── CARDS ── */
 .card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
 .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .card-title{font-size:14px;font-weight:600;color:var(--sage-dark);}
 .section-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
-
-/* ── BUTTONS ── */
-.btn{padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:12px;transition:all 0.15s;}
+.btn{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:12px;}
 .btn-primary{background:var(--sage-dark);color:#fff;}
 .btn-outline{background:none;border:1.5px solid var(--sage-light);color:var(--sage-dark);}
 .btn-sm{padding:5px 10px;font-size:11px;border-radius:6px;}
 .btn-block{width:100%;padding:12px;font-size:14px;border-radius:10px;font-family:'Noto Serif TC',serif;}
-.btn-danger{background:#fee2e2;color:#c04020;border:none;}
-.bx{background:none;border:none;color:#bbb;font-size:16px;cursor:pointer;padding:2px 5px;line-height:1;}
-.bx:hover{color:#c0392b;}
+.bx{background:none;border:none;color:#bbb;font-size:15px;cursor:pointer;padding:2px 5px;line-height:1;}
 .btn-add-row{width:100%;padding:10px;border:1.5px dashed var(--sage-light);border-radius:10px;background:none;color:var(--sage);font-size:12px;cursor:pointer;margin-top:8px;}
-
-/* ── INPUTS ── */
-input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],textarea,select{
-  width:100%;padding:9px 12px;border:1.5px solid #ddd8cc;border-radius:8px;
-  font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--text);background:var(--cream);
-}
+input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],textarea,select{width:100%;padding:9px 12px;border:1.5px solid #ddd8cc;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--text);background:var(--cream);}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--sage);}
 textarea{resize:vertical;min-height:70px;}
 label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
 .ii{width:60px!important;padding:5px 7px!important;font-size:12px!important;}
-
-/* ── SUMMARY BOXES ── */
 .sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .sb{background:var(--warm);border-radius:10px;padding:12px;text-align:center;}
 .sb.hi{background:var(--sage-dark);}
@@ -119,32 +84,18 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
 .pw{margin:4px 0 10px;}
 .pl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;}
 .pb{height:7px;background:#e8e4dc;border-radius:99px;overflow:hidden;}
-.pf{height:100%;background:linear-gradient(90deg,var(--sage),var(--sage-dark));border-radius:99px;transition:width 0.4s;}
+.pf{height:100%;background:linear-gradient(90deg,var(--sage),var(--sage-dark));border-radius:99px;}
 .pf.over{background:linear-gradient(90deg,#e08060,#c04020);}
-
-/* ── LIST ITEMS ── */
-.list-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f0ece4;}
-.list-item:last-child{border-bottom:none;}
-.li-main{flex:1;}
-.li-title{font-size:14px;font-weight:500;}
-.li-sub{font-size:11px;color:var(--muted);margin-top:2px;}
-.li-right{font-size:13px;color:var(--sage-dark);font-weight:600;}
-
-/* ── TAGS ── */
-.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;}
-.tag-handmade{background:#e8f0e4;color:var(--sage-dark);}
-.tag-bought{background:#fdefd8;color:#a0700a;}
-.ctag{background:#e8f0e4;color:var(--sage-dark);border-radius:8px;padding:2px 7px;font-size:11px;margin:2px;display:inline-block;}
-
-/* ── CHECKLIST ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;}
+.tbl th{background:var(--warm);color:var(--muted);font-size:11px;font-weight:500;padding:6px 8px;text-align:left;}
+.tbl td{padding:8px;border-bottom:1px solid #f0ece4;vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.nr{text-align:right;}.hi{color:var(--sage-dark);font-weight:600;}
+.cwrap{overflow-x:auto;}
 .chk-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f5f0e8;}
 .chk-row:last-child{border-bottom:none;}
-.chk-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;transition:all 0.15s;margin-top:1px;}
+.chk-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;}
 .chk-box.on{background:var(--sage-dark);border-color:var(--sage-dark);color:#fff;font-size:13px;}
-.chk-label{flex:1;font-size:13px;}
-.chk-label.done{text-decoration:line-through;color:var(--muted);}
-
-/* ── TODO ── */
 .tl-phase{margin-bottom:14px;}
 .tl-head{padding:8px 12px;border-radius:10px 10px 0 0;color:#fff;display:flex;align-items:center;justify-content:space-between;}
 .tl-head-title{font-size:13px;font-weight:600;}
@@ -153,23 +104,18 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
 .tl-cat-label{font-size:12px;font-weight:600;color:var(--muted);}
 .todo-row{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-bottom:1px solid #f5f0e8;}
 .todo-row:last-child{border-bottom:none;}
-.todo-chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;transition:all 0.15s;margin-top:2px;}
+.todo-chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;margin-top:2px;}
 .todo-chk.on{background:var(--sage);border-color:var(--sage);color:#fff;font-size:10px;}
 .todo-text{font-size:13px;flex:1;line-height:1.5;}
 .todo-text.done{text-decoration:line-through;color:var(--muted);}
 .todo-meta{font-size:10px;color:var(--muted);margin-top:2px;}
-.ph-0{background:#7a6450;}.ph-1{background:#6a5878;}.ph-2{background:#3a6898;}
-.ph-3{background:#2a7858;}.ph-4{background:#983a3a;}.ph-5{background:#585858;}
-.ph-6{background:#4a6090;}.ph-7{background:#507050;}
-
-/* ── PERSON CHIPS ── */
-.person-chip{display:inline-flex;align-items:center;gap:5px;background:var(--warm);border-radius:20px;padding:4px 10px 4px 5px;margin:3px;cursor:pointer;border:1.5px solid transparent;font-size:12px;transition:all 0.15s;}
+.ph-0{background:#7a6450;}.ph-1{background:#6a5878;}.ph-2{background:#3a6898;}.ph-3{background:#2a7858;}.ph-4{background:#983a3a;}.ph-5{background:#585858;}.ph-6{background:#4a6090;}.ph-7{background:#507050;}
+.person-chip{display:inline-flex;align-items:center;gap:5px;background:var(--warm);border-radius:20px;padding:4px 10px 4px 5px;margin:3px;cursor:pointer;border:1.5px solid transparent;font-size:12px;}
 .person-chip.sel{background:var(--sage-dark);color:#fff;}
 .pav{width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
 .person-chip.sel .pav{background:rgba(255,255,255,0.3);color:#fff;}
-
-/* ── MODAL ── */
-.ovl{position:fixed;inset:0;background:rgba(20,16,10,0.55);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;backdrop-filter:blur(3px);}
+.ctag{background:#e8f0e4;color:var(--sage-dark);border-radius:8px;padding:2px 7px;font-size:11px;margin:2px;display:inline-block;}
+.ovl{position:fixed;inset:0;background:rgba(20,16,10,0.55);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;}
 .ovl.open{opacity:1;pointer-events:all;}
 .modal{background:#fff;border-radius:20px 20px 0 0;padding:16px 16px calc(var(--safe-bottom) + 32px);width:100%;max-width:600px;transform:translateY(100%);transition:transform 0.3s ease;max-height:92vh;overflow-y:auto;}
 .ovl.open .modal{transform:translateY(0);}
@@ -180,63 +126,36 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
 .tog-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
 .tog{padding:5px 12px;border-radius:18px;border:1.5px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted);}
 .tog.sel{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark);}
-
-/* ── INVITE ── */
 .invite-code{font-family:monospace;font-size:28px;font-weight:700;letter-spacing:4px;color:var(--sage-dark);text-align:center;background:var(--warm);padding:16px;border-radius:12px;margin:10px 0;}
-
-/* ── CONTACT ── */
-.contact-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:12px;}
-.contact-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--sage-light),var(--sage));color:var(--sage-dark);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.contact-info{flex:1;}
-.contact-name{font-size:14px;font-weight:600;}
-.contact-role{font-size:11px;color:var(--muted);}
-.contact-phone{font-size:13px;color:var(--sage-dark);}
 .call-btn{background:var(--sage-dark);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block;}
-
-/* ── DAY MODE ── */
 .day-section{margin-bottom:16px;}
 .day-section-head{background:var(--sage-dark);color:#fff;padding:8px 14px;border-radius:10px 10px 0 0;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
 .day-section-body{background:#fff;border-radius:0 0 10px 10px;border:1px solid var(--border);border-top:none;}
-
-/* ── EMPTY ── */
 .empty{text-align:center;padding:32px 16px;color:var(--muted);}
 .empty-icon{font-size:36px;margin-bottom:8px;}
 .empty-text{font-size:13px;}
-
-/* ── LOADING ── */
 #loading{position:fixed;inset:0;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
 #loading h1{font-family:'Noto Serif TC',serif;color:#fff;font-size:22px;letter-spacing:3px;margin-bottom:8px;}
 #loading p{color:rgba(255,255,255,0.6);font-size:13px;}
 .spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:20px;}
 @keyframes spin{to{transform:rotate(360deg);}}
-
-/* ── TOAST ── */
 #toast{position:fixed;bottom:calc(var(--safe-bottom) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:#2e2a22;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* ── TABLE ── */
-.tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.tbl th{background:var(--warm);color:var(--muted);font-size:11px;font-weight:500;padding:6px 8px;text-align:left;}
-.tbl td{padding:8px;border-bottom:1px solid #f0ece4;vertical-align:middle;}
-.tbl tr:last-child td{border-bottom:none;}
-.nr{text-align:right;}.hi{color:var(--sage-dark);font-weight:600;}
-.cwrap{overflow-x:auto;}
-.ctbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.cbtn{padding:14px 8px;border-radius:10px;border:none;background:#2a2a3e;color:#fff;font-size:17px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
+.cbtn-fn{background:#3a3a4e;color:#e0e0e0;}
+.cbtn-op{background:#4a6240;color:#fff;}
+.cbtn-eq{background:#c4963a;color:#fff;}
 </style>
 </head>
 <body>
 
-<!-- Loading -->
 <div id="loading">
   <div class="spinner"></div>
   <h1>婚禮茶點管家</h1>
   <p>載入中...</p>
 </div>
-
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- ══ AUTH SCREEN ══ -->
 <div class="screen hidden" id="screen-auth">
   <div class="auth-logo">
     <h1>🌿 婚禮茶點管家</h1>
@@ -264,7 +183,6 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
   </div>
 </div>
 
-<!-- ══ HOME SCREEN ══ -->
 <div class="screen hidden" id="screen-home">
   <div class="home-header">
     <div>
@@ -275,14 +193,13 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
   </div>
   <div class="home-body">
     <div style="margin-bottom:16px">
-      <button class="btn btn-primary btn-block" id="btn-join-project" style="margin-bottom:10px;background:rgba(74,98,64,0.15);color:var(--sage-dark);border:1.5px dashed var(--sage-light)">🔗 用邀請碼加入專案</button>
+      <button class="btn btn-block btn-outline" id="btn-join-project" style="margin-bottom:10px">🔗 用邀請碼加入專案</button>
     </div>
-    <div id="project-list"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">還沒有婚禮專案<br>點下方按鈕建立第一個</div></div></div>
+    <div id="project-list"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">還沒有婚禮專案</div></div></div>
   </div>
   <button class="fab-home" id="btn-new-project">＋ 新建婚禮專案</button>
 </div>
 
-<!-- ══ PROJECT SCREEN ══ -->
 <div class="screen hidden" id="screen-project">
   <div class="proj-header">
     <button class="back-btn" id="btn-back">‹</button>
@@ -296,7 +213,6 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
     </div>
   </div>
 
-  <!-- TAB BAR (籌備模式) -->
   <div id="plan-tabs" class="tab-bar">
     <button class="tab-item active" data-tab="venue"><div class="tab-icon">🏛️</div>場地</button>
     <button class="tab-item" data-tab="dishes"><div class="tab-icon">🍽️</div>餐點</button>
@@ -307,23 +223,16 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
     <button class="tab-item" data-tab="settings"><div class="tab-icon">⚙️</div>設定</button>
   </div>
 
-  <!-- TAB CONTENT -->
   <div class="tab-content" id="plan-content">
-
-    <!-- 場地確認 -->
     <div class="tab-pane active" id="pane-venue">
       <div class="card">
         <div class="card-head"><div class="card-title">🏛️ 場地確認清單</div><div id="venue-prog" style="font-size:11px;color:var(--muted)"></div></div>
         <div id="venue-list"></div>
       </div>
     </div>
-
-    <!-- 餐點規劃 -->
     <div class="tab-pane" id="pane-dishes">
       <div class="card">
-        <div class="card-head">
-          <div class="card-title">💰 預算設定</div>
-        </div>
+        <div class="card-head"><div class="card-title">💰 預算設定</div></div>
         <div style="display:flex;gap:10px">
           <div style="flex:1"><label>食物預算 NT$</label><input type="number" id="inp-budget" value="25000"></div>
           <div style="flex:1"><label>賓客人數</label><input type="number" id="inp-guests" value="150"></div>
@@ -347,16 +256,12 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
         <div class="pw"><div class="pl"><span>預算使用率</span><span id="s1-pct">0%</span></div><div class="pb"><div class="pf" id="s1-prog" style="width:0%"></div></div></div>
       </div>
     </div>
-
-    <!-- 食材比價 -->
     <div class="tab-pane" id="pane-compare">
       <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
         <button class="btn btn-outline btn-sm" id="btn-open-calc">🧮 計算機</button>
       </div>
       <div id="compare-list"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">請先在「餐點」新增手作點心</div></div></div>
     </div>
-
-    <!-- 採購預算 -->
     <div class="tab-pane" id="pane-procure">
       <div class="sg">
         <div class="sb hi"><div class="sl">採購預算</div><div class="sv" id="s4-total">—</div><div class="su">NT$</div></div>
@@ -370,8 +275,6 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
         <div id="buy-equip"></div>
       </div>
     </div>
-
-    <!-- 人力分工 -->
     <div class="tab-pane" id="pane-team">
       <div class="card">
         <div class="card-head"><div class="card-title">👥 幫忙人員</div><button class="btn btn-outline btn-sm" id="btn-add-person">＋ 新增</button></div>
@@ -379,8 +282,6 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
       </div>
       <div id="task-list"></div>
     </div>
-
-    <!-- 待辦時程 -->
     <div class="tab-pane" id="pane-todos">
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
         <button class="btn btn-primary btn-sm" id="btn-add-todo">＋ 新增待辦</button>
@@ -389,36 +290,25 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
       </div>
       <div id="timeline-list"></div>
     </div>
-
-    <!-- 設定 -->
     <div class="tab-pane" id="pane-settings">
       <div class="card">
         <div class="card-head"><div class="card-title">🔗 邀請小組成員</div></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">把邀請碼或連結分享給小組成員</div>
         <div class="invite-code" id="invite-code-display">------</div>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button class="btn btn-primary btn-sm" style="flex:1" id="btn-copy-code">複製邀請碼</button>
           <button class="btn btn-outline btn-sm" style="flex:1" id="btn-share-link">分享連結</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">👥 成員列表</div></div>
-        <div id="members-list"></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">📋 聯絡人</div><button class="btn btn-primary btn-sm" id="btn-add-contact">＋ 新增</button></div>
-        <div id="contacts-list"></div>
-      </div>
+      <div class="card"><div class="card-head"><div class="card-title">👥 成員列表</div></div><div id="members-list"></div></div>
+      <div class="card"><div class="card-head"><div class="card-title">📋 聯絡人</div><button class="btn btn-primary btn-sm" id="btn-add-contact">＋ 新增</button></div><div id="contacts-list"></div></div>
       <div class="card">
         <div class="card-head"><div class="card-title">⚙️ 專案設定</div></div>
         <div><label>婚禮日期</label><input type="date" id="inp-wedding-date"></div>
         <button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" id="btn-save-settings">儲存設定</button>
       </div>
     </div>
+  </div>
 
-  </div><!-- /tab-content -->
-
-  <!-- DAY MODE -->
   <div id="day-mode" style="display:none;flex:1;overflow-y:auto;padding:14px;padding-bottom:20px">
     <div class="day-section">
       <div class="day-section-head">✅ 當天工作清單 <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:none" id="btn-add-day-task">＋</button></div>
@@ -437,11 +327,9 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
       <div class="day-section-body" id="day-contacts-list"></div>
     </div>
   </div>
+</div>
 
-</div><!-- /screen-project -->
-
-<!-- ══ MODAL ══ -->
-<div class="ovl" id="ovl" onclick="ovlOutside(event)">
+<div class="ovl" id="ovl">
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-title"></div>
@@ -449,182 +337,170 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
   </div>
 </div>
 
-<script>
-(function(){
-'use strict';
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// ── SUPABASE ──
-const SB_URL='https://amgnhyomtdjyrknghukl.supabase.co';
-const SB_KEY='sb_publishable_FidwPg28NPTu5mmZEpweiw_2Mamon0c';
-const sb=supabase.createClient(SB_URL,SB_KEY);
+const SB_URL = 'https://amgnhyomtdjyrknghukl.supabase.co';
+const SB_KEY = 'sb_publishable_FidwPg28NPTu5mmZEpweiw_2Mamon0c';
+const sb = createClient(SB_URL, SB_KEY);
 
-// ── STATE ──
-let currentUser=null, currentProject=null, currentMode='plan', currentTab='venue';
-let D={dishes:[],ingredients:[],equipCustom:[],persons:[],tasks:[],todos:[],venueChecks:[],actuals:{},dayTasks:[],contacts:[]};
+let currentUser = null, currentProject = null, currentMode = 'plan';
+let D = { dishes:[], ingredients:[], equipCustom:[], persons:[], tasks:[], todos:[], venueChecks:[], actuals:{}, dayTasks:[] };
 
-// ── UTILS ──
-const eid=i=>document.getElementById(i);
-const fmtN=n=>Number(n||0).toLocaleString();
-const escH=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const escA=s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+const eid = i => document.getElementById(i);
+const fmtN = n => Number(n||0).toLocaleString();
+const escH = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escA = s => String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 
-function showToast(msg,dur=2000){
-  const t=eid('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),dur);
+function showToast(msg, dur=2000) {
+  const t = eid('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
 }
 
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>{
-    s.classList.remove('slide-left');
-    s.classList.add('hidden');
-  });
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
   eid(id).classList.remove('hidden');
 }
 
-// ── LOADING ──
-async function init(){
-  const {data:{session}}=await sb.auth.getSession();
-  if(session){ currentUser=session.user; await gotoHome(); }
-  else showScreen('screen-auth');
-  eid('loading').style.display='none';
-}
-
-// ── AUTH ──
-document.querySelectorAll('.auth-tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+// AUTH TABS
+document.querySelectorAll('.auth-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-    const isLogin=tab.dataset.tab==='login';
-    eid('auth-login-form').style.display=isLogin?'block':'none';
-    eid('auth-register-form').style.display=isLogin?'none':'block';
+    const isLogin = tab.dataset.tab === 'login';
+    eid('auth-login-form').style.display = isLogin ? 'block' : 'none';
+    eid('auth-register-form').style.display = isLogin ? 'none' : 'block';
   });
 });
 
-eid('btn-login').addEventListener('click',async()=>{
-  const email=eid('login-email').value.trim(), pw=eid('login-password').value;
-  const msg=eid('login-msg');
-  if(!email||!pw){msg.className='auth-msg err';msg.textContent='請填入Email與密碼';return;}
-  eid('btn-login').textContent='登入中...';
-  const {data,error}=await sb.auth.signInWithPassword({email,password:pw});
-  eid('btn-login').textContent='登入';
-  if(error){msg.className='auth-msg err';msg.textContent='登入失敗：'+error.message;}
-  else{currentUser=data.user;await gotoHome();}
+eid('btn-login').addEventListener('click', async () => {
+  const email = eid('login-email').value.trim();
+  const pw = eid('login-password').value;
+  const msg = eid('login-msg');
+  if (!email || !pw) { msg.className='auth-msg err'; msg.textContent='請填入Email與密碼'; return; }
+  eid('btn-login').textContent = '登入中...';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+  eid('btn-login').textContent = '登入';
+  if (error) { msg.className='auth-msg err'; msg.textContent='登入失敗：'+error.message; }
+  else { currentUser = data.user; await gotoHome(); }
 });
 
-eid('btn-register').addEventListener('click',async()=>{
-  const name=eid('reg-name').value.trim(),email=eid('reg-email').value.trim(),pw=eid('reg-password').value;
-  const msg=eid('reg-msg')||eid('register-msg');
-  if(!name||!email||!pw){msg.className='auth-msg err';msg.textContent='請填寫所有欄位';return;}
-  if(pw.length<6){msg.className='auth-msg err';msg.textContent='密碼至少6位';return;}
-  eid('btn-register').textContent='建立中...';
-  const {data,error}=await sb.auth.signUp({email,password:pw,options:{data:{name}}});
-  eid('btn-register').textContent='建立帳號';
-  if(error){msg.className='auth-msg err';msg.textContent='失敗：'+error.message;}
-  else{msg.className='auth-msg ok';msg.textContent='✓ 帳號建立成功！請查收確認信後登入';}
+eid('btn-register').addEventListener('click', async () => {
+  const name = eid('reg-name').value.trim();
+  const email = eid('reg-email').value.trim();
+  const pw = eid('reg-password').value;
+  const msg = eid('register-msg');
+  if (!name||!email||!pw) { msg.className='auth-msg err'; msg.textContent='請填寫所有欄位'; return; }
+  if (pw.length < 6) { msg.className='auth-msg err'; msg.textContent='密碼至少6位'; return; }
+  eid('btn-register').textContent = '建立中...';
+  const { error } = await sb.auth.signUp({ email, password: pw, options: { data: { name } } });
+  eid('btn-register').textContent = '建立帳號';
+  if (error) { msg.className='auth-msg err'; msg.textContent='失敗：'+error.message; }
+  else { msg.className='auth-msg ok'; msg.textContent='✓ 帳號建立成功！請查收確認信後登入'; }
 });
 
-eid('btn-forgot').addEventListener('click',()=>openModal('forgotPassword'));
+eid('btn-forgot').addEventListener('click', () => openModal('forgotPassword', null));
 
-
+eid('btn-logout').addEventListener('click', async () => {
   await sb.auth.signOut();
-  currentUser=null; currentProject=null;
+  currentUser = null; currentProject = null;
   showScreen('screen-auth');
 });
 
-// ── HOME ──
-async function gotoHome(){
+// HOME
+async function gotoHome() {
   showScreen('screen-home');
-  const {data:profile}=await sb.from('profiles').select('name').eq('id',currentUser.id).single();
-  eid('home-user-name').textContent=(profile?.name||currentUser.email);
+  try {
+    const { data: profile } = await sb.from('profiles').select('name').eq('id', currentUser.id).single();
+    eid('home-user-name').textContent = profile?.name || currentUser.email;
+  } catch(e) { eid('home-user-name').textContent = currentUser.email; }
   await loadProjects();
 }
 
-async function loadProjects(){
-  const el=eid('project-list');
-  // projects I own
-  const {data:owned}=await sb.from('projects').select('*').eq('owner_id',currentUser.id).order('created_at',{ascending:false});
-  // projects I'm member of
-  const {data:memberships}=await sb.from('project_members').select('project_id').eq('user_id',currentUser.id);
-  let memberProjects=[];
-  if(memberships?.length){
-    const ids=memberships.map(m=>m.project_id);
-    const {data:mp}=await sb.from('projects').select('*').in('id',ids);
-    memberProjects=mp||[];
+async function loadProjects() {
+  const el = eid('project-list');
+  el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">載入中...</div>';
+  try {
+    const { data: owned } = await sb.from('projects').select('*').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
+    const { data: memberships } = await sb.from('project_members').select('project_id').eq('user_id', currentUser.id);
+    let memberProjects = [];
+    if (memberships?.length) {
+      const ids = memberships.map(m => m.project_id);
+      const { data: mp } = await sb.from('projects').select('*').in('id', ids);
+      memberProjects = mp || [];
+    }
+    const all = [...(owned||[]), ...memberProjects.filter(p => !owned?.find(o => o.id===p.id))];
+    if (!all.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">還沒有婚禮專案<br>點下方按鈕建立第一個</div></div>';
+      return;
+    }
+    el.innerHTML = all.map(p => {
+      const isOwner = p.owner_id === currentUser.id;
+      return '<div class="project-card" data-pid="'+p.id+'">'
+        +'<div class="project-name">'+escH(p.name)+'</div>'
+        +'<div class="project-meta">'+(p.wedding_date?'💒 '+p.wedding_date:'')+(p.guest_count?' 👥 '+p.guest_count+'人':'')
+        +'<span class="project-badge">'+(isOwner?'主辦人':'協作者')+'</span></div></div>';
+    }).join('');
+    el.querySelectorAll('.project-card').forEach(card => {
+      card.addEventListener('click', () => openProject(card.dataset.pid, all.find(p => p.id===card.dataset.pid)));
+    });
+  } catch(e) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">載入失敗，請重新整理</div></div>';
   }
-  const allProjects=[...(owned||[]),...memberProjects.filter(p=>!owned?.find(o=>o.id===p.id))];
-  if(!allProjects.length){
-    el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">還沒有婚禮專案<br>點下方按鈕建立第一個</div></div>';
-    return;
-  }
-  el.innerHTML=allProjects.map(p=>{
-    const isOwner=p.owner_id===currentUser.id;
-    return `<div class="project-card" data-pid="${p.id}">
-      <div class="project-name">${escH(p.name)}</div>
-      <div class="project-meta">
-        ${p.wedding_date?'💒 '+p.wedding_date:''}
-        ${p.guest_count?'👥 '+p.guest_count+'人':''}
-        <span class="project-badge">${isOwner?'主辦人':'協作者'}</span>
-      </div>
-    </div>`;
-  }).join('');
-  el.querySelectorAll('.project-card').forEach(card=>{
-    card.addEventListener('click',()=>openProject(card.dataset.pid,allProjects.find(p=>p.id===card.dataset.pid)));
-  });
 }
 
-eid('btn-new-project').addEventListener('click',()=>openModal('newProject'));
-eid('btn-join-project').addEventListener('click',()=>openModal('joinProject'));
+eid('btn-new-project').addEventListener('click', () => openModal('newProject', null));
+eid('btn-join-project').addEventListener('click', () => openModal('joinProject', null));
 
-// ── OPEN PROJECT ──
-async function openProject(pid, projData){
-  currentProject=projData||{id:pid};
-  eid('proj-header-name').textContent=currentProject.name||'婚禮專案';
-  eid('proj-header-sub').textContent=currentProject.wedding_date?'💒 '+currentProject.wedding_date:'';
-  eid('invite-code-display').textContent=currentProject.invite_code||'——';
-  if(eid('inp-wedding-date')) eid('inp-wedding-date').value=currentProject.wedding_date||'';
-  if(eid('inp-budget')) eid('inp-budget').value=currentProject.budget||25000;
-  if(eid('inp-guests')) eid('inp-guests').value=currentProject.guest_count||150;
+// PROJECT
+async function openProject(pid, projData) {
+  currentProject = projData || { id: pid };
+  eid('proj-header-name').textContent = currentProject.name || '婚禮專案';
+  eid('proj-header-sub').textContent = currentProject.wedding_date ? '💒 '+currentProject.wedding_date : '';
+  eid('invite-code-display').textContent = currentProject.invite_code || '——';
+  if (eid('inp-wedding-date')) eid('inp-wedding-date').value = currentProject.wedding_date || '';
+  if (eid('inp-budget')) eid('inp-budget').value = currentProject.budget || 25000;
+  if (eid('inp-guests')) eid('inp-guests').value = currentProject.guest_count || 150;
   showScreen('screen-project');
   switchMode('plan');
   switchTab('venue');
   await loadAllData();
 }
 
-eid('btn-back').addEventListener('click',()=>{ showScreen('screen-home'); loadProjects(); });
+eid('btn-back').addEventListener('click', () => { showScreen('screen-home'); loadProjects(); });
+eid('mode-plan').addEventListener('click', () => switchMode('plan'));
+eid('mode-day').addEventListener('click', () => switchMode('day'));
 
-// ── MODE SWITCH ──
-eid('mode-plan').addEventListener('click',()=>switchMode('plan'));
-eid('mode-day').addEventListener('click',()=>switchMode('day'));
-function switchMode(mode){
-  currentMode=mode;
-  eid('mode-plan').classList.toggle('active',mode==='plan');
-  eid('mode-day').classList.toggle('active',mode==='day');
-  eid('plan-tabs').style.display=mode==='plan'?'flex':'none';
-  eid('plan-content').style.display=mode==='plan'?'flex':'none';
-  eid('day-mode').style.display=mode==='day'?'block':'none';
-  if(mode==='day') renderDayMode();
+function switchMode(mode) {
+  currentMode = mode;
+  eid('mode-plan').classList.toggle('active', mode==='plan');
+  eid('mode-day').classList.toggle('active', mode==='day');
+  eid('plan-tabs').style.display = mode==='plan' ? 'flex' : 'none';
+  eid('plan-content').style.display = mode==='plan' ? 'flex' : 'none';
+  eid('day-mode').style.display = mode==='day' ? 'block' : 'none';
+  if (mode==='day') renderDayMode();
 }
 
-// ── TAB SWITCH ──
-document.getElementById('plan-tabs').addEventListener('click',e=>{
-  const btn=e.target.closest('.tab-item'); if(!btn) return;
-  switchTab(btn.dataset.tab);
+eid('plan-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab-item');
+  if (btn) switchTab(btn.dataset.tab);
 });
-function switchTab(tab){
-  currentTab=tab;
-  document.querySelectorAll('.tab-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
-  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+tab));
-  if(tab==='compare') renderCompare();
-  if(tab==='procure') renderProcure();
-  if(tab==='team') renderTasks();
-  if(tab==='todos') renderTimeline();
-  if(tab==='settings') renderSettings();
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-item').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='pane-'+tab));
+  if (tab==='compare') renderCompare();
+  if (tab==='procure') renderProcure();
+  if (tab==='team') renderTasks();
+  if (tab==='todos') renderTimeline();
+  if (tab==='settings') renderSettings();
 }
 
-// ── LOAD ALL DATA ──
-async function loadAllData(){
-  const pid=currentProject.id;
-  const [dishes,ingredients,equipCustom,persons,tasks,todos,venueChecks,actuals,dayTasks,contacts]=await Promise.all([
+async function loadAllData() {
+  const pid = currentProject.id;
+  const [r1,r2,r3,r4,r5,r6,r7,r8,r9] = await Promise.all([
     sb.from('dishes').select('*').eq('project_id',pid).order('created_at'),
     sb.from('ingredients').select('*').eq('project_id',pid).order('created_at'),
     sb.from('equip_custom').select('*').eq('project_id',pid).order('created_at'),
@@ -633,758 +509,909 @@ async function loadAllData(){
     sb.from('todos').select('*').eq('project_id',pid).order('created_at'),
     sb.from('venue_checks').select('*').eq('project_id',pid),
     sb.from('actuals').select('*').eq('project_id',pid),
-    sb.from('day_tasks').select('*').eq('project_id',pid).order('sort_order'),
-    sb.from('persons').select('*').eq('project_id',pid).not('phone','is',null)
+    sb.from('day_tasks').select('*').eq('project_id',pid).order('sort_order')
   ]);
-  D.dishes=dishes.data||[];
-  D.ingredients=ingredients.data||[];
-  D.equipCustom=equipCustom.data||[];
-  D.persons=persons.data||[];
-  D.tasks=tasks.data||[];
-  D.todos=todos.data||[];
-  D.venueChecks=venueChecks.data||[];
-  D.actuals={};
-  (actuals.data||[]).forEach(a=>{ D.actuals[a.ref_key]=a.actual_value; });
-  D.dayTasks=dayTasks.data||[];
-  D.contacts=(contacts.data||[]).filter(p=>p.phone);
-  renderVenue(); renderDishes(); recalcBudget();
+  D.dishes = r1.data||[];
+  D.ingredients = r2.data||[];
+  D.equipCustom = r3.data||[];
+  D.persons = r4.data||[];
+  D.tasks = r5.data||[];
+  D.todos = r6.data||[];
+  D.venueChecks = r7.data||[];
+  D.actuals = {};
+  (r8.data||[]).forEach(a => { D.actuals[a.ref_key] = a.actual_value; });
+  D.dayTasks = r9.data||[];
+  renderVenue();
+  renderDishes();
+  recalcBudget();
 }
 
-// ── VENUE ──
-const VENUE_ITEMS=['確認場地可使用廚房','確認場地有冰箱可存放食材','確認場地有洗水槽','確認場地有電源插座','確認場地有桌子可擺設茶點','確認場地允許帶外食','確認垃圾處理方式','確認進場時間與離場時間'];
+// VENUE
+const VENUE_ITEMS = ['確認場地可使用廚房','確認場地有冰箱可存放食材','確認場地有洗水槽','確認場地有電源插座','確認場地有桌子可擺設茶點','確認場地允許帶外食','確認垃圾處理方式','確認進場時間與離場時間'];
 
-async function renderVenue(){
-  const pid=currentProject.id;
-  // ensure all items exist in DB
-  for(const item of VENUE_ITEMS){
-    if(!D.venueChecks.find(v=>v.item===item)){
-      const {data}=await sb.from('venue_checks').insert({project_id:pid,item,checked:false,note:''}).select().single();
-      if(data) D.venueChecks.push(data);
+async function renderVenue() {
+  const pid = currentProject.id;
+  for (const item of VENUE_ITEMS) {
+    if (!D.venueChecks.find(v => v.item===item)) {
+      const { data } = await sb.from('venue_checks').insert({ project_id:pid, item, checked:false, note:'' }).select().single();
+      if (data) D.venueChecks.push(data);
     }
   }
-  const done=D.venueChecks.filter(v=>v.checked).length;
-  eid('venue-prog').textContent=done+' / '+VENUE_ITEMS.length+' 已確認';
-  eid('venue-list').innerHTML=VENUE_ITEMS.map(item=>{
-    const vc=D.venueChecks.find(v=>v.item===item)||{checked:false,note:''};
-    return `<div class="chk-row">
-      <div class="chk-box${vc.checked?' on':''}" data-action="toggle-venue" data-item="${escA(item)}">${vc.checked?'✓':''}</div>
-      <div style="flex:1">
-        <div class="chk-label${vc.checked?' done':''}">${escH(item)}</div>
-        <textarea style="margin-top:5px;font-size:12px;min-height:0;padding:5px 8px;border-radius:6px" rows="1" placeholder="備註：可以 / 不行（需自備）..." data-action="venue-note" data-item="${escA(item)}">${escH(vc.note||'')}</textarea>
-      </div>
-    </div>`;
+  const done = D.venueChecks.filter(v => v.checked).length;
+  eid('venue-prog').textContent = done+' / '+VENUE_ITEMS.length+' 已確認';
+  eid('venue-list').innerHTML = VENUE_ITEMS.map(item => {
+    const vc = D.venueChecks.find(v => v.item===item) || { checked:false, note:'' };
+    return '<div class="chk-row">'
+      +'<div class="chk-box'+(vc.checked?' on':'')+'" data-action="toggle-venue" data-item="'+escA(item)+'">'+(vc.checked?'✓':'')+'</div>'
+      +'<div style="flex:1"><div style="font-size:13px'+(vc.checked?';text-decoration:line-through;color:var(--muted)':'')+'">'+escH(item)+'</div>'
+      +'<textarea style="margin-top:5px;font-size:12px;min-height:0;padding:5px 8px;border-radius:6px;width:100%" rows="1" placeholder="備註：可以 / 不行..." data-action="venue-note" data-item="'+escA(item)+'">'+escH(vc.note||'')+'</textarea>'
+      +'</div></div>';
   }).join('');
 }
 
-eid('pane-venue').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action="toggle-venue"]'); if(!btn) return;
-  const item=btn.dataset.item;
-  const vc=D.venueChecks.find(v=>v.item===item); if(!vc) return;
-  vc.checked=!vc.checked;
-  await sb.from('venue_checks').update({checked:vc.checked}).eq('id',vc.id);
+eid('pane-venue').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action="toggle-venue"]');
+  if (!btn) return;
+  const item = btn.dataset.item;
+  const vc = D.venueChecks.find(v => v.item===item);
+  if (!vc) return;
+  vc.checked = !vc.checked;
+  await sb.from('venue_checks').update({ checked: vc.checked }).eq('id', vc.id);
   renderVenue();
 });
-eid('pane-venue').addEventListener('change',async e=>{
-  const el=e.target; if(el.dataset.action!=='venue-note') return;
-  const item=el.dataset.item;
-  const vc=D.venueChecks.find(v=>v.item===item); if(!vc) return;
-  vc.note=el.value;
-  await sb.from('venue_checks').update({note:el.value}).eq('id',vc.id);
+
+eid('pane-venue').addEventListener('change', async e => {
+  const el = e.target;
+  if (el.dataset.action !== 'venue-note') return;
+  const vc = D.venueChecks.find(v => v.item===el.dataset.item);
+  if (!vc) return;
+  vc.note = el.value;
+  await sb.from('venue_checks').update({ note: el.value }).eq('id', vc.id);
 });
 
-// ── DISHES ──
-function calcIngCost(dishId){ return D.ingredients.filter(i=>i.dish_id===dishId).reduce((s,i)=>s+(i.total_cost||0),0); }
+// DISHES
+function calcIngCost(dishId) {
+  return D.ingredients.filter(i => i.dish_id===dishId).reduce((s,i) => s+(i.total_cost||0), 0);
+}
 
-function renderDishes(){
-  ['handmade','bought'].forEach(type=>{
-    const list=D.dishes.filter(d=>d.type===type);
-    const el=eid('list-'+type);
-    if(!list.length){ el.innerHTML=`<div class="empty"><div class="empty-icon" style="font-size:22px">${type==='handmade'?'👐':'🛒'}</div><div class="empty-text">還沒有${type==='handmade'?'手作點心':'外購品項'}</div></div>`; return; }
-    const guests=parseInt(eid('inp-guests').value)||150;
-    if(type==='bought'){
-      el.innerHTML=`<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">份數</th><th class="nr">規格</th><th class="nr">需幾盤</th><th class="nr">小計</th><th></th></tr></thead><tbody>${
-        list.map(d=>{
-          const unitSize=d.unit_size||1, qty=d.qty||1, price=d.est_price||0;
-          const units=Math.ceil(qty/unitSize), total=units*price;
-          return `<tr><td><b>${escH(d.name)}</b></td><td style="font-size:11px;color:var(--muted)">${escH(d.store||'—')}</td><td class="nr">${qty}</td><td class="nr">${unitSize}個<br><small>NT$${fmtN(price)}/盤</small></td><td class="nr hi">${units}盤</td><td class="nr hi">NT$${fmtN(total)}</td><td><button class="bx" data-action="del-dish" data-id="${d.id}">×</button></td></tr>`;
-        }).join('')
-      }</tbody></table></div>`;
+function renderDishes() {
+  const guests = parseInt(eid('inp-guests').value) || 150;
+  ['handmade','bought'].forEach(type => {
+    const list = D.dishes.filter(d => d.type===type);
+    const el = eid('list-'+type);
+    if (!list.length) {
+      el.innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">'+(type==='handmade'?'👐':'🛒')+'</div><div class="empty-text">還沒有'+(type==='handmade'?'手作點心':'外購品項')+'</div></div>';
+      return;
+    }
+    if (type === 'bought') {
+      let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">份數</th><th class="nr">規格</th><th class="nr">需幾盤</th><th class="nr">小計</th><th></th></tr></thead><tbody>';
+      list.forEach(d => {
+        const u = d.unit_size||1, qty = d.qty||1, price = d.est_price||0;
+        const units = Math.ceil(qty/u), total = units*price;
+        h += '<tr><td><b>'+escH(d.name)+'</b></td><td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td><td class="nr">'+qty+'</td><td class="nr">'+u+'個<br><small>NT$'+fmtN(price)+'/盤</small></td><td class="nr hi">'+units+'盤</td><td class="nr hi">NT$'+fmtN(total)+'</td><td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
+      });
+      el.innerHTML = h + '</tbody></table></div>';
     } else {
-      el.innerHTML=`<table class="tbl"><thead><tr><th>品項</th><th class="nr">份數</th><th class="nr">食材成本</th><th class="nr">單個</th><th class="nr">每人</th><th></th></tr></thead><tbody>${
-        list.map(d=>{
-          const qty=d.qty||1, total=calcIngCost(d.id);
-          const uc=qty>0?Math.round(total/qty*10)/10:0;
-          const guestC=guests>0?Math.round(total/guests*10)/10:0;
-          return `<tr><td><b>${escH(d.name)}</b></td><td class="nr">${qty}</td><td class="nr hi">NT$${fmtN(total)}</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$${uc}</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$${guestC}</td><td><button class="bx" data-action="del-dish" data-id="${d.id}">×</button></td></tr>`;
-        }).join('')
-      }</tbody></table>`;
+      let h = '<table class="tbl"><thead><tr><th>品項</th><th class="nr">份數</th><th class="nr">食材成本</th><th class="nr">單個</th><th class="nr">每人</th><th></th></tr></thead><tbody>';
+      list.forEach(d => {
+        const qty = d.qty||1, total = calcIngCost(d.id);
+        const uc = qty>0 ? Math.round(total/qty*10)/10 : 0;
+        const gc = guests>0 ? Math.round(total/guests*10)/10 : 0;
+        h += '<tr><td><b>'+escH(d.name)+'</b></td><td class="nr">'+qty+'</td><td class="nr hi">NT$'+fmtN(total)+'</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$'+uc+'</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$'+gc+'</td><td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
+      });
+      el.innerHTML = h + '</tbody></table>';
     }
   });
   recalcBudget();
 }
 
-eid('list-handmade').addEventListener('click',handleDishClick);
-eid('list-bought').addEventListener('click',handleDishClick);
-async function handleDishClick(e){
-  const btn=e.target.closest('[data-action="del-dish"]'); if(!btn) return;
-  await sb.from('dishes').delete().eq('id',btn.dataset.id);
-  await sb.from('ingredients').delete().eq('dish_id',btn.dataset.id);
-  D.dishes=D.dishes.filter(d=>d.id!==btn.dataset.id);
-  D.ingredients=D.ingredients.filter(i=>i.dish_id!==btn.dataset.id);
+function recalcBudget() {
+  const budget = parseInt(eid('inp-budget').value)||0;
+  let planned = 0;
+  D.dishes.forEach(d => {
+    if (d.type==='bought') { const u=d.unit_size||1; planned+=Math.ceil((d.qty||1)/u)*(d.est_price||0); }
+  });
+  D.ingredients.forEach(i => planned += i.total_cost||0);
+  D.equipCustom.forEach(e => { if (e.src_type==='buy') planned += (e.price||0)*(e.qty||1); });
+  eid('s1-budget').textContent = fmtN(budget);
+  eid('s1-planned').textContent = fmtN(planned);
+  const pct = budget ? Math.round(planned/budget*100) : 0;
+  eid('s1-pct').textContent = pct+'%';
+  const f = eid('s1-prog'); f.style.width = Math.min(pct,100)+'%'; f.classList.toggle('over', pct>100);
+}
+
+function handleDishListClick(e) {
+  const btn = e.target.closest('[data-action="del-dish"]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  sb.from('dishes').delete().eq('id', id);
+  sb.from('ingredients').delete().eq('dish_id', id);
+  D.dishes = D.dishes.filter(d => d.id!==id);
+  D.ingredients = D.ingredients.filter(i => i.dish_id!==id);
   renderDishes();
 }
 
-function recalcBudget(){
-  const budget=parseInt(eid('inp-budget').value)||0;
-  let planned=0;
-  D.dishes.forEach(d=>{
-    if(d.type==='bought'){ const u=d.unit_size||1; planned+=Math.ceil((d.qty||1)/u)*(d.est_price||0); }
-  });
-  D.ingredients.forEach(i=>planned+=(i.total_cost||0));
-  D.equipCustom.forEach(e=>{ if(e.src_type==='buy') planned+=(e.price||0)*(e.qty||1); });
-  eid('s1-budget').textContent=fmtN(budget);
-  eid('s1-planned').textContent=fmtN(planned);
-  const pct=budget?Math.round(planned/budget*100):0;
-  eid('s1-pct').textContent=pct+'%';
-  const f=eid('s1-prog'); f.style.width=Math.min(pct,100)+'%'; f.classList.toggle('over',pct>100);
-}
-
-eid('btn-add-handmade').addEventListener('click',()=>openModal('dish','handmade'));
-eid('btn-add-bought').addEventListener('click',()=>openModal('dish','bought'));
-eid('btn-save-budget').addEventListener('click',async()=>{
-  const budget=parseInt(eid('inp-budget').value)||0, guests=parseInt(eid('inp-guests').value)||0;
-  await sb.from('projects').update({budget,guest_count:guests}).eq('id',currentProject.id);
-  currentProject.budget=budget; currentProject.guest_count=guests;
+eid('list-handmade').addEventListener('click', handleDishListClick);
+eid('list-bought').addEventListener('click', handleDishListClick);
+eid('btn-add-handmade').addEventListener('click', () => openModal('dish', 'handmade'));
+eid('btn-add-bought').addEventListener('click', () => openModal('dish', 'bought'));
+eid('btn-save-budget').addEventListener('click', async () => {
+  const budget = parseInt(eid('inp-budget').value)||0;
+  const guests = parseInt(eid('inp-guests').value)||0;
+  await sb.from('projects').update({ budget, guest_count: guests }).eq('id', currentProject.id);
+  currentProject.budget = budget; currentProject.guest_count = guests;
   recalcBudget(); showToast('✓ 預算已儲存');
 });
 
-// ── COMPARE ──
-function chTotal(ch,ing,dish){
-  if(ing.use_weight){
-    const totalG=(dish.qty||1)*(ing.qty_per_item||1);
-    const packs=Math.ceil(totalG/(ch.pkgWeight||1));
-    return {mode:'weight',needed:totalG,packs,uc:ch.pkgWeight>0?ch.pkgPrice/ch.pkgWeight:0,total:packs*(ch.pkgPrice||0)};
-  } else if(ing.use_yield){
-    const needed=Math.ceil((dish.qty||1)/(ing.yields_per_unit||1));
-    return {mode:'yield',needed,packs:null,uc:ch.pkgPrice||0,total:(ch.pkgPrice||0)*needed};
+// COMPARE
+function chTotal(ch, ing, dish) {
+  if (ing.use_weight) {
+    const totalG = (dish.qty||1)*(ing.qty_per_item||1);
+    const packs = Math.ceil(totalG/(ch.pkgWeight||1));
+    return { mode:'weight', needed:totalG, packs, uc:ch.pkgWeight>0?ch.pkgPrice/ch.pkgWeight:0, total:packs*(ch.pkgPrice||0) };
+  } else if (ing.use_yield) {
+    const needed = Math.ceil((dish.qty||1)/(ing.yields_per_unit||1));
+    return { mode:'yield', needed, packs:null, uc:ch.pkgPrice||0, total:(ch.pkgPrice||0)*needed };
   } else {
-    const needed=Math.ceil((dish.qty||1)*(ing.qty_per_item||1));
-    const uc=(ch.pkgQty&&ch.pkgQty>0)?ch.pkgPrice/ch.pkgQty:(ch.pkgPrice||0);
-    return {mode:'count',needed,packs:null,uc,total:uc*needed};
+    const needed = Math.ceil((dish.qty||1)*(ing.qty_per_item||1));
+    const uc = (ch.pkgQty&&ch.pkgQty>0) ? ch.pkgPrice/ch.pkgQty : (ch.pkgPrice||0);
+    return { mode:'count', needed, packs:null, uc, total:uc*needed };
   }
 }
 
-function renderCompare(){
-  const hm=D.dishes.filter(d=>d.type==='handmade');
-  const el=eid('compare-list');
-  if(!hm.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">請先新增手作點心</div></div>'; return; }
-  el.innerHTML=hm.map(dish=>{
-    const ings=D.ingredients.filter(i=>i.dish_id===dish.id);
-    const tot=ings.reduce((s,i)=>s+(i.total_cost||0),0);
-    let h=`<div class="card"><div class="card-head"><div class="card-title">👐 ${escH(dish.name)} <span style="font-size:11px;font-weight:400;color:var(--muted)">× ${dish.qty} 份</span></div><button class="btn btn-outline btn-sm" data-action="add-ing" data-dish-id="${dish.id}">＋ 食材</button></div>`;
-    if(!ings.length) h+='<div style="font-size:12px;color:var(--muted)">還沒有食材</div>';
-    ings.forEach(ing=>{
-      const chs=ing.channels||[];
-      const tots=chs.map(ch=>chTotal(ch,ing,dish).total);
-      const minT=tots.length?Math.min(...tots.filter(t=>t>0)):0;
-      const isW=ing.use_weight, isY=ing.use_yield;
-      const descStr=isW?`每份${ing.qty_per_item}g`:isY?`每${escH(ing.unit)}可做${ing.yields_per_unit}份`:`每份${ing.qty_per_item}${escH(ing.unit)}`;
-      const neededLabel=isW?`共需<b>${(dish.qty||1)*(ing.qty_per_item||1)}g</b>`:isY?`共需<b>${Math.ceil((dish.qty||1)/(ing.yields_per_unit||1))}${escH(ing.unit)}</b>`:`共需<b>${Math.ceil((dish.qty||1)*(ing.qty_per_item||1))}${escH(ing.unit)}</b>`;
-      h+=`<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0ece4">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div><b style="font-size:13px">${escH(ing.name)}</b> <span style="font-size:11px;color:var(--muted)">${descStr}</span>
-            <button class="btn btn-outline btn-sm" style="padding:1px 6px;font-size:10px;margin-left:4px" data-action="edit-ing" data-ing-id="${ing.id}">✏️</button>
-          </div>
-          <div style="display:flex;gap:4px">
-            <button class="btn btn-outline btn-sm" data-action="add-ch" data-ing-id="${ing.id}">＋ 通路</button>
-            <button class="bx" data-action="del-ing" data-ing-id="${ing.id}">×</button>
-          </div>
-        </div>
-        <div class="tip" style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-bottom:6px">📦 ${neededLabel}</div>`;
-      if(!chs.length){ h+='<div style="font-size:12px;color:var(--muted)">點「＋ 通路」新增比價</div>'; }
-      else {
-        h+=`<div class="ctbl-wrap"><table class="tbl"><thead><tr><th>通路</th><th>售價</th><th>${isW?'規格g':isY?`需幾${escH(ing.unit)}`:'每包數'}</th><th>單個成本</th><th>${dish.qty}份總費</th><th>選</th><th></th></tr></thead><tbody>`;
-        chs.forEach((ch,ci)=>{
-          const r=chTotal(ch,ing,dish);
-          const isBest=r.total>0&&r.total===minT, isSel=ing.selected_channel===ci;
-          const ucStr=isW?(r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/g':'—'):(r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/'+escH(ing.unit):'—');
-          const col3=isW?(ch.pkgWeight||0):isY?r.needed:(ch.pkgQty||1);
-          h+=`<tr style="${isSel?'background:#f0f6ee':''}">
-            <td><input type="text" style="width:65px;padding:3px 5px;font-size:11px;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="${escA(ch.store||'')}" data-action="upd-ch-store" data-ing-id="${ing.id}" data-ci="${ci}"></td>
-            <td>NT$<input type="number" style="width:50px;padding:3px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="${ch.pkgPrice||0}" data-action="upd-ch-price" data-ing-id="${ing.id}" data-ci="${ci}"></td>
-            <td>${isY?col3+'':(`<input type="number" style="width:40px;padding:3px 4px;font-size:11px;text-align:center;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="${col3}" data-action="${isW?'upd-ch-weight':'upd-ch-qty'}" data-ing-id="${ing.id}" data-ci="${ci}">`)}</td>
-            <td style="font-size:11px;color:var(--muted)">${ucStr}</td>
-            <td style="${isBest?'color:#2a6a2a;font-weight:700':''}">${isBest?'✓ ':''}${r.total>0?'NT$'+fmtN(Math.ceil(r.total)):'—'}</td>
-            <td><input type="radio" name="rg${ing.id}" ${isSel?'checked':''} data-action="sel-ch" data-ing-id="${ing.id}" data-ci="${ci}" data-dish-id="${dish.id}" style="width:16px;height:16px;accent-color:var(--sage-dark)"></td>
-            <td><button class="bx" style="font-size:12px" data-action="del-ch" data-ing-id="${ing.id}" data-ci="${ci}">×</button></td>
-          </tr>`;
+function renderCompare() {
+  const hm = D.dishes.filter(d => d.type==='handmade');
+  const el = eid('compare-list');
+  if (!hm.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">請先新增手作點心</div></div>'; return; }
+  el.innerHTML = hm.map(dish => {
+    const ings = D.ingredients.filter(i => i.dish_id===dish.id);
+    const tot = ings.reduce((s,i) => s+(i.total_cost||0), 0);
+    let h = '<div class="card"><div class="card-head"><div class="card-title">👐 '+escH(dish.name)+' <span style="font-size:11px;font-weight:400;color:var(--muted)">× '+dish.qty+' 份</span></div><button class="btn btn-outline btn-sm" data-action="add-ing" data-dish-id="'+dish.id+'">＋ 食材</button></div>';
+    if (!ings.length) h += '<div style="font-size:12px;color:var(--muted)">還沒有食材</div>';
+    ings.forEach(ing => {
+      const chs = ing.channels||[];
+      const tots = chs.map(ch => chTotal(ch,ing,dish).total);
+      const minT = tots.length ? Math.min(...tots.filter(t=>t>0)) : 0;
+      const isW = ing.use_weight, isY = ing.use_yield;
+      const descStr = isW ? '每份'+ing.qty_per_item+'g' : isY ? '每'+escH(ing.unit)+'可做'+ing.yields_per_unit+'份' : '每份'+ing.qty_per_item+escH(ing.unit);
+      const neededNum = isW ? (dish.qty||1)*(ing.qty_per_item||1) : isY ? Math.ceil((dish.qty||1)/(ing.yields_per_unit||1)) : Math.ceil((dish.qty||1)*(ing.qty_per_item||1));
+      const neededStr = isW ? neededNum+'g' : neededNum+escH(ing.unit);
+      h += '<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0ece4">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+        +'<div><b style="font-size:13px">'+escH(ing.name)+'</b> <span style="font-size:11px;color:var(--muted)">'+descStr+'</span>'
+        +' <button class="btn btn-outline btn-sm" style="padding:1px 6px;font-size:10px;margin-left:4px" data-action="edit-ing" data-ing-id="'+ing.id+'">✏️</button></div>'
+        +'<div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" data-action="add-ch" data-ing-id="'+ing.id+'">＋ 通路</button>'
+        +'<button class="bx" data-action="del-ing" data-ing-id="'+ing.id+'">×</button></div></div>'
+        +'<div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-bottom:6px">📦 共需 <b>'+neededStr+'</b></div>';
+      if (!chs.length) {
+        h += '<div style="font-size:12px;color:var(--muted)">點「＋ 通路」新增比價</div>';
+      } else {
+        h += '<div class="cwrap"><table class="tbl"><thead><tr><th>通路</th><th>售價</th><th>'+(isW?'規格g':isY?'需幾'+escH(ing.unit):'每包數')+'</th><th>單個成本</th><th>總花費</th><th>選</th><th></th></tr></thead><tbody>';
+        chs.forEach((ch, ci) => {
+          const r = chTotal(ch, ing, dish);
+          const isBest = r.total>0 && r.total===minT;
+          const isSel = ing.selected_channel===ci;
+          const ucStr = isW ? (r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/g':'—') : (r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/'+escH(ing.unit):'—');
+          const col3 = isY ? r.needed : (isW ? (ch.pkgWeight||0) : (ch.pkgQty||1));
+          h += '<tr style="'+(isSel?'background:#f0f6ee':'')+'"><td>'
+            +'<input type="text" style="width:65px;padding:3px 5px;font-size:11px;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+escA(ch.store||'')+'" data-action="upd-ch-store" data-ing-id="'+ing.id+'" data-ci="'+ci+'">'
+            +'</td><td>NT$<input type="number" style="width:50px;padding:3px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(ch.pkgPrice||0)+'" data-action="upd-ch-price" data-ing-id="'+ing.id+'" data-ci="'+ci+'">'
+            +'</td><td>'+(isY ? col3 : '<input type="number" style="width:40px;padding:3px 4px;font-size:11px;text-align:center;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+col3+'" data-action="'+(isW?'upd-ch-weight':'upd-ch-qty')+'" data-ing-id="'+ing.id+'" data-ci="'+ci+'">')
+            +'</td><td style="font-size:11px;color:var(--muted)">'+ucStr+'</td>'
+            +'<td style="'+(isBest?'color:#2a6a2a;font-weight:700':'')+'">'+( isBest?'✓ ':'')+( r.total>0?'NT$'+fmtN(Math.ceil(r.total)):'—')+'</td>'
+            +'<td><input type="radio" name="rg'+ing.id+'" '+(isSel?'checked':'')+' data-action="sel-ch" data-ing-id="'+ing.id+'" data-ci="'+ci+'" data-dish-id="'+dish.id+'" style="width:16px;height:16px;accent-color:var(--sage-dark)"></td>'
+            +'<td><button class="bx" style="font-size:12px" data-action="del-ch" data-ing-id="'+ing.id+'" data-ci="'+ci+'">×</button></td></tr>';
         });
-        h+='</tbody></table></div>';
-        if(ing.selected_channel!=null&&chs[ing.selected_channel]) h+=`<div style="font-size:11px;color:var(--sage-dark);background:#e8f0e4;padding:4px 8px;border-radius:6px;margin-top:5px">✓ 已選：${escH(chs[ing.selected_channel].store||'')}，NT$${fmtN(ing.total_cost||0)}</div>`;
+        h += '</tbody></table></div>';
+        if (ing.selected_channel!=null && chs[ing.selected_channel]) {
+          h += '<div style="font-size:11px;color:var(--sage-dark);background:#e8f0e4;padding:4px 8px;border-radius:6px;margin-top:5px">✓ 已選：'+escH(chs[ing.selected_channel].store||'')+'，NT$'+fmtN(ing.total_cost||0)+'</div>';
+        }
       }
-      h+='</div>';
+      h += '</div>';
     });
-    if(ings.length) h+=`<div style="text-align:right;font-size:12px;color:var(--sage-dark);font-weight:600">食材合計：NT$${fmtN(tot)}</div>`;
-    return h+'</div>';
+    if (ings.length) h += '<div style="text-align:right;font-size:12px;color:var(--sage-dark);font-weight:600">食材合計：NT$'+fmtN(tot)+'</div>';
+    return h + '</div>';
   }).join('');
 }
 
-eid('compare-list').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action]'); if(!btn) return;
-  const act=btn.dataset.action;
-  if(act==='add-ing') openModal('ingredient',parseInt(btn.dataset.dishId)||btn.dataset.dishId);
-  if(act==='edit-ing') openModal('editIng',btn.dataset.ingId);
-  if(act==='del-ing'){
-    await sb.from('ingredients').delete().eq('id',btn.dataset.ingId);
-    D.ingredients=D.ingredients.filter(i=>i.id!==btn.dataset.ingId);
+eid('compare-list').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const act = btn.dataset.action;
+  if (act==='add-ing') openModal('ingredient', btn.dataset.dishId);
+  if (act==='edit-ing') openModal('editIng', btn.dataset.ingId);
+  if (act==='del-ing') {
+    await sb.from('ingredients').delete().eq('id', btn.dataset.ingId);
+    D.ingredients = D.ingredients.filter(i => i.id!==btn.dataset.ingId);
     renderCompare(); renderDishes();
   }
-  if(act==='add-ch') openModal('channel',btn.dataset.ingId);
-  if(act==='del-ch'){
-    const ingId=btn.dataset.ingId, ci=parseInt(btn.dataset.ci);
-    const ing=D.ingredients.find(i=>i.id===ingId); if(!ing) return;
-    const chs=[...(ing.channels||[])]; chs.splice(ci,1);
-    if(ing.selected_channel===ci){ ing.selected_channel=null; ing.total_cost=0; }
-    else if(ing.selected_channel>ci) ing.selected_channel--;
-    await sb.from('ingredients').update({channels:chs,selected_channel:ing.selected_channel,total_cost:ing.total_cost}).eq('id',ingId);
-    ing.channels=chs; renderCompare(); renderDishes();
+  if (act==='add-ch') openModal('channel', btn.dataset.ingId);
+  if (act==='del-ch') {
+    const ingId = btn.dataset.ingId, ci = parseInt(btn.dataset.ci);
+    const ing = D.ingredients.find(i => i.id===ingId);
+    if (!ing) return;
+    const chs = [...(ing.channels||[])]; chs.splice(ci, 1);
+    if (ing.selected_channel===ci) { ing.selected_channel=null; ing.total_cost=0; }
+    else if (ing.selected_channel>ci) ing.selected_channel--;
+    await sb.from('ingredients').update({ channels:chs, selected_channel:ing.selected_channel, total_cost:ing.total_cost }).eq('id', ingId);
+    ing.channels = chs; renderCompare(); renderDishes();
   }
 });
 
-eid('compare-list').addEventListener('change',async e=>{
-  const el=e.target, act=el.dataset.action; if(!act) return;
-  const ingId=el.dataset.ingId, ci=parseInt(el.dataset.ci);
-  const ing=D.ingredients.find(i=>i.id===ingId); if(!ing) return;
-  const chs=[...(ing.channels||[])];
-  if(act==='upd-ch-store'){ chs[ci]={...chs[ci],store:el.value}; }
-  if(act==='upd-ch-price'){ chs[ci]={...chs[ci],pkgPrice:parseFloat(el.value)||0}; }
-  if(act==='upd-ch-qty'){ chs[ci]={...chs[ci],pkgQty:parseFloat(el.value)||1}; }
-  if(act==='upd-ch-weight'){ chs[ci]={...chs[ci],pkgWeight:parseFloat(el.value)||1}; }
-  if(act==='sel-ch'){
-    const dish=D.dishes.find(d=>d.id===el.dataset.dishId);
-    if(dish){ const r=chTotal(chs[ci],ing,dish); ing.selected_channel=ci; ing.total_cost=Math.ceil(r.total); }
+eid('compare-list').addEventListener('change', async e => {
+  const el = e.target, act = el.dataset.action;
+  if (!act) return;
+  const ingId = el.dataset.ingId, ci = parseInt(el.dataset.ci);
+  const ing = D.ingredients.find(i => i.id===ingId);
+  if (!ing) return;
+  const chs = [...(ing.channels||[])];
+  if (act==='upd-ch-store') chs[ci] = {...chs[ci], store: el.value};
+  if (act==='upd-ch-price') chs[ci] = {...chs[ci], pkgPrice: parseFloat(el.value)||0};
+  if (act==='upd-ch-qty') chs[ci] = {...chs[ci], pkgQty: parseFloat(el.value)||1};
+  if (act==='upd-ch-weight') chs[ci] = {...chs[ci], pkgWeight: parseFloat(el.value)||1};
+  if (act==='sel-ch') {
+    const dish = D.dishes.find(d => d.id===el.dataset.dishId);
+    if (dish) { const r = chTotal(chs[ci], ing, dish); ing.selected_channel=ci; ing.total_cost=Math.ceil(r.total); }
   }
-  ing.channels=chs;
-  await sb.from('ingredients').update({channels:chs,selected_channel:ing.selected_channel,total_cost:ing.total_cost}).eq('id',ingId);
+  ing.channels = chs;
+  await sb.from('ingredients').update({ channels:chs, selected_channel:ing.selected_channel, total_cost:ing.total_cost }).eq('id', ingId);
   renderCompare(); renderDishes();
 });
 
-// ── PROCURE ──
-function renderProcure(){
-  const ings=D.ingredients.filter(i=>i.selected_channel!=null&&(i.total_cost||0)>0);
-  const iEl=eid('buy-ing');
-  if(!ings.length){ iEl.innerHTML='<div style="padding:8px;font-size:12px;color:var(--muted)">請在食材比價頁勾選通路</div>'; }
-  else iEl.innerHTML=`<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>${
-    ings.map(ing=>{
-      const d=D.dishes.find(d=>d.id===ing.dish_id);
-      const ch=(ing.channels||[])[ing.selected_channel]||{};
-      const akey='ing'+ing.id, aval=D.actuals[akey];
-      return `<tr><td>${escH(ing.name)}</td><td style="font-size:11px;color:var(--muted)">${d?escH(d.name):''}</td><td style="font-size:11px">${escH(ch.store||'')}</td><td class="nr hi">NT$${fmtN(ing.total_cost)}</td><td class="nr"><input type="number" style="width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="${aval!=null?aval:''}" data-action="upd-actual" data-key="${akey}"></td></tr>`;
-    }).join('')
-  }</tbody></table></div>`;
-
-  const bought=D.dishes.filter(d=>d.type==='bought');
-  const bEl=eid('buy-bought');
-  if(!bought.length){ bEl.innerHTML='<div style="padding:8px;font-size:12px;color:var(--muted)">請在餐點規劃頁新增外購品項</div>'; }
-  else bEl.innerHTML=`<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>${
-    bought.map(d=>{
-      const u=d.unit_size||1, total=Math.ceil((d.qty||1)/u)*(d.est_price||0);
-      const akey='b'+d.id, aval=D.actuals[akey];
-      return `<tr><td>${escH(d.name)}</td><td style="font-size:11px;color:var(--muted)">${escH(d.store||'—')}</td><td class="nr">${Math.ceil((d.qty||1)/u)}盤</td><td class="nr hi">NT$${fmtN(total)}</td><td class="nr"><input type="number" style="width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="${aval!=null?aval:''}" data-action="upd-actual" data-key="${akey}"></td></tr>`;
-    }).join('')
-  }</tbody></table></div>`;
-
-  const eEl=eid('buy-equip');
-  if(!D.equipCustom.length){ eEl.innerHTML='<div style="padding:8px;font-size:12px;color:var(--muted)">點「＋ 新增」加入器具耗材</div>'; }
-  else eEl.innerHTML=`<table class="tbl"><thead><tr><th>品項</th><th>來源</th><th class="nr">數量</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th></th></tr></thead><tbody>${
-    D.equipCustom.map(eq=>{
-      const sub=eq.src_type==='buy'?(eq.price||0)*(eq.qty||1):0;
-      const akey='eq'+eq.id, aval=D.actuals[akey];
-      return `<tr><td>${escH(eq.name)}</td><td style="font-size:11px;color:var(--muted)">${escH(eq.src_name||'')}</td><td class="nr">${eq.qty}</td><td class="nr">NT$${fmtN(eq.price||0)}</td><td class="nr hi">${sub>0?'NT$'+fmtN(sub):'—'}</td><td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="實際" value="${aval!=null?aval:''}" data-action="upd-actual" data-key="${akey}"></td><td><button class="bx" data-action="del-equip" data-id="${eq.id}">×</button></td></tr>`;
-    }).join('')
-  }</tbody></table>`;
+// PROCURE
+function renderProcure() {
+  const ings = D.ingredients.filter(i => i.selected_channel!=null && (i.total_cost||0)>0);
+  const iEl = eid('buy-ing');
+  if (!ings.length) { iEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在食材比價頁勾選通路</div>'; }
+  else {
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
+    ings.forEach(ing => {
+      const d = D.dishes.find(d => d.id===ing.dish_id);
+      const ch = (ing.channels||[])[ing.selected_channel]||{};
+      const akey = 'ing'+ing.id, aval = D.actuals[akey];
+      h += '<tr><td>'+escH(ing.name)+'</td><td style="font-size:11px;color:var(--muted)">'+(d?escH(d.name):'')+'</td><td style="font-size:11px">'+escH(ch.store||'')+'</td><td class="nr hi">NT$'+fmtN(ing.total_cost)+'</td>'
+        +'<td class="nr"><input type="number" style="width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td></tr>';
+    });
+    iEl.innerHTML = h + '</tbody></table></div>';
+  }
+  const bought = D.dishes.filter(d => d.type==='bought');
+  const bEl = eid('buy-bought');
+  if (!bought.length) { bEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在餐點規劃頁新增外購品項</div>'; }
+  else {
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
+    bought.forEach(d => {
+      const u = d.unit_size||1, total = Math.ceil((d.qty||1)/u)*(d.est_price||0);
+      const akey = 'b'+d.id, aval = D.actuals[akey];
+      h += '<tr><td>'+escH(d.name)+'</td><td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td><td class="nr">'+Math.ceil((d.qty||1)/u)+'盤</td><td class="nr hi">NT$'+fmtN(total)+'</td>'
+        +'<td class="nr"><input type="number" style="width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td></tr>';
+    });
+    bEl.innerHTML = h + '</tbody></table></div>';
+  }
+  const eEl = eid('buy-equip');
+  if (!D.equipCustom.length) { eEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">點「＋ 新增」加入器具耗材</div>'; }
+  else {
+    let h = '<table class="tbl"><thead><tr><th>品項</th><th>來源</th><th class="nr">數量</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th></th></tr></thead><tbody>';
+    D.equipCustom.forEach(eq => {
+      const sub = eq.src_type==='buy' ? (eq.price||0)*(eq.qty||1) : 0;
+      const akey = 'eq'+eq.id, aval = D.actuals[akey];
+      h += '<tr><td>'+escH(eq.name)+'</td><td style="font-size:11px;color:var(--muted)">'+escH(eq.src_name||'')+'</td><td class="nr">'+eq.qty+'</td><td class="nr">NT$'+fmtN(eq.price||0)+'</td>'
+        +'<td class="nr hi">'+(sub>0?'NT$'+fmtN(sub):'—')+'</td>'
+        +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
+        +'<td><button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button></td></tr>';
+    });
+    eEl.innerHTML = h + '</tbody></table>';
+  }
   updateProcureTotals();
 }
 
-function updateProcureTotals(){
-  let pT=0,aT=0,aN=0;
-  D.ingredients.filter(i=>i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i=>{ pT+=i.total_cost||0; const v=D.actuals['ing'+i.id]; if(v!=null){aT+=v;aN++;} });
-  D.dishes.filter(d=>d.type==='bought').forEach(d=>{ const u=d.unit_size||1; pT+=Math.ceil((d.qty||1)/u)*(d.est_price||0); const v=D.actuals['b'+d.id]; if(v!=null){aT+=v;aN++;} });
-  D.equipCustom.forEach(e=>{ if(e.src_type==='buy') pT+=(e.price||0)*(e.qty||1); const v=D.actuals['eq'+e.id]; if(v!=null){aT+=v;aN++;} });
-  eid('s4-total').textContent=fmtN(pT); eid('s4-actual').textContent=aN>0?fmtN(aT):'—';
-  const pct=pT?Math.round(aT/pT*100):0;
-  eid('s4-pct').textContent=aN>0?pct+'%':'尚未填入';
-  const f=eid('s4-prog'); f.style.width=Math.min(pct,100)+'%'; f.classList.toggle('over',pct>100);
+function updateProcureTotals() {
+  let pT=0, aT=0, aN=0;
+  D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => { pT+=i.total_cost||0; const v=D.actuals['ing'+i.id]; if(v!=null){aT+=v;aN++;} });
+  D.dishes.filter(d => d.type==='bought').forEach(d => { const u=d.unit_size||1; pT+=Math.ceil((d.qty||1)/u)*(d.est_price||0); const v=D.actuals['b'+d.id]; if(v!=null){aT+=v;aN++;} });
+  D.equipCustom.forEach(e => { if(e.src_type==='buy') pT+=(e.price||0)*(e.qty||1); const v=D.actuals['eq'+e.id]; if(v!=null){aT+=v;aN++;} });
+  eid('s4-total').textContent = fmtN(pT);
+  eid('s4-actual').textContent = aN>0 ? fmtN(aT) : '—';
+  const pct = pT ? Math.round(aT/pT*100) : 0;
+  eid('s4-pct').textContent = aN>0 ? pct+'%' : '尚未填入';
+  const f = eid('s4-prog'); f.style.width = Math.min(pct,100)+'%'; f.classList.toggle('over', pct>100);
 }
 
-eid('pane-procure').addEventListener('change',async e=>{
-  const el=e.target; if(el.dataset.action!=='upd-actual') return;
-  const key=el.dataset.key; const val=el.value===''?null:+el.value;
-  D.actuals[key]=val;
-  await sb.from('actuals').upsert({project_id:currentProject.id,ref_key:key,actual_value:val},{onConflict:'project_id,ref_key'});
+eid('pane-procure').addEventListener('change', async e => {
+  const el = e.target;
+  if (el.dataset.action !== 'upd-actual') return;
+  const val = el.value==='' ? null : +el.value;
+  D.actuals[el.dataset.key] = val;
+  await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:val }, { onConflict:'project_id,ref_key' });
   updateProcureTotals();
 });
-eid('pane-procure').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action="del-equip"]'); if(!btn) return;
-  await sb.from('equip_custom').delete().eq('id',btn.dataset.id);
-  D.equipCustom=D.equipCustom.filter(e=>e.id!==btn.dataset.id);
+
+eid('pane-procure').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action="del-equip"]');
+  if (!btn) return;
+  await sb.from('equip_custom').delete().eq('id', btn.dataset.id);
+  D.equipCustom = D.equipCustom.filter(e => e.id!==btn.dataset.id);
   renderProcure();
 });
-eid('btn-add-equip').addEventListener('click',()=>openModal('supply'));
 
-// ── TASKS / TEAM ──
-function renderPersonChips(){
-  const el=eid('person-chips-wrap');
-  if(!D.persons.length){ el.innerHTML='<div style="font-size:12px;color:var(--muted)">還沒有人員</div>'; return; }
-  el.innerHTML=D.persons.map(p=>`<span class="person-chip"><div class="pav">${p.name[0]}</div>${escH(p.name)}<span data-action="del-person" data-pid="${p.id}" style="color:#ccc;margin-left:3px;cursor:pointer;font-size:13px">×</span></span>`).join('');
+eid('btn-add-equip').addEventListener('click', () => openModal('supply', null));
+
+// TEAM
+function renderPersonChips() {
+  const el = eid('person-chips-wrap');
+  if (!D.persons.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">還沒有人員</div>'; return; }
+  el.innerHTML = D.persons.map(p =>
+    '<span class="person-chip"><div class="pav">'+p.name[0]+'</div>'+escH(p.name)
+    +'<span data-action="del-person" data-pid="'+p.id+'" style="color:#ccc;margin-left:3px;cursor:pointer;font-size:13px">×</span></span>'
+  ).join('');
 }
-eid('person-chips-wrap').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action="del-person"]'); if(!btn) return;
-  await sb.from('persons').delete().eq('id',btn.dataset.pid);
-  D.persons=D.persons.filter(p=>p.id!==btn.dataset.pid);
+
+eid('person-chips-wrap').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action="del-person"]');
+  if (!btn) return;
+  await sb.from('persons').delete().eq('id', btn.dataset.pid);
+  D.persons = D.persons.filter(p => p.id!==btn.dataset.pid);
   renderTasks();
 });
 
-function renderTasks(){
+function renderTasks() {
   renderPersonChips();
-  const hm=D.dishes.filter(d=>d.type==='handmade');
-  const el=eid('task-list');
-  if(!hm.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">請先新增手作點心</div></div>'; return; }
-  el.innerHTML=hm.map(dish=>{
-    const t=D.tasks.find(t=>t.dish_id===dish.id)||{person_ids:[],steps:[],plate_note:''};
-    const pids=t.person_ids||[];
-    const ctrs=(dish.containers||[]).map(c=>c.equipName).filter(Boolean);
-    return `<div class="card">
-      <div class="card-head"><div class="card-title">👐 ${escH(dish.name)}</div></div>
-      <div class="section-label">負責人（可多選）</div>
-      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px">
-        ${!D.persons.length?'<div style="font-size:12px;color:var(--muted)">請先新增人員</div>':''}
-        ${D.persons.map(p=>`<span class="person-chip${pids.indexOf(p.id)>=0?' sel':''}" data-action="assign-p" data-dish-id="${dish.id}" data-pid="${p.id}"><div class="pav">${p.name[0]}</div>${escH(p.name)}</span>`).join('')}
-      </div>
-      ${ctrs.length?`<div class="section-label">容器</div><div style="margin-bottom:10px">${ctrs.map(c=>`<span class="ctag">${escH(c)}</span>`).join('')}</div>`:''}
-      <div class="section-label">擺盤說明</div>
-      <div style="margin-bottom:10px"><input type="text" value="${escA(t.plate_note||'')}" placeholder="例：花型排列" data-action="upd-platenote" data-dish-id="${dish.id}"></div>
-      <div class="section-label">製作步驟</div>
-      <ol style="list-style:none;counter-reset:sc">${
-        (t.steps||[]).map((s,si)=>`<li style="counter-increment:sc;display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f0ece4">
-          <div style="min-width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">${si+1}</div>
-          <input type="text" value="${escA(s)}" style="border:none;background:none;padding:0;font-size:13px;flex:1" data-action="upd-step" data-dish-id="${dish.id}" data-si="${si}">
-          <button class="bx" style="font-size:12px" data-action="del-step" data-dish-id="${dish.id}" data-si="${si}">×</button>
-        </li>`).join('')
-      }</ol>
-      <button class="btn-add-row" data-action="add-step" data-dish-id="${dish.id}">＋ 新增步驟</button>
-    </div>`;
+  const hm = D.dishes.filter(d => d.type==='handmade');
+  const el = eid('task-list');
+  if (!hm.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">請先新增手作點心</div></div>'; return; }
+  hm.forEach(dish => {
+    if (!D.tasks.find(t => t.dish_id===dish.id)) {
+      D.tasks.push({ id: 'new_'+dish.id, dish_id:dish.id, person_ids:[], steps:[], plate_note:'' });
+    }
+  });
+  el.innerHTML = hm.map(dish => {
+    const t = D.tasks.find(t => t.dish_id===dish.id);
+    const pids = t.person_ids||[];
+    return '<div class="card"><div class="card-head"><div class="card-title">👐 '+escH(dish.name)+'</div></div>'
+      +'<div class="section-label">負責人（可多選）</div>'
+      +'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px">'
+      +(!D.persons.length ? '<div style="font-size:12px;color:var(--muted)">請先新增人員</div>' : '')
+      +D.persons.map(p => '<span class="person-chip'+(pids.indexOf(p.id)>=0?' sel':'')+'" data-action="assign-p" data-dish-id="'+dish.id+'" data-pid="'+p.id+'"><div class="pav">'+p.name[0]+'</div>'+escH(p.name)+'</span>').join('')
+      +'</div>'
+      +'<div class="section-label">擺盤說明</div>'
+      +'<div style="margin-bottom:10px"><input type="text" value="'+escA(t.plate_note||'')+'" placeholder="例：花型排列" data-action="upd-platenote" data-dish-id="'+dish.id+'"></div>'
+      +'<div class="section-label">製作步驟</div>'
+      +'<ol style="list-style:none;counter-reset:sc">'
+      +(t.steps||[]).map((s,si) =>
+        '<li style="counter-increment:sc;display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f0ece4">'
+        +'<div style="min-width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">'+(si+1)+'</div>'
+        +'<input type="text" value="'+escA(s)+'" style="border:none;background:none;padding:0;font-size:13px;flex:1" data-action="upd-step" data-dish-id="'+dish.id+'" data-si="'+si+'">'
+        +'<button class="bx" style="font-size:12px" data-action="del-step" data-dish-id="'+dish.id+'" data-si="'+si+'">×</button></li>'
+      ).join('')
+      +'</ol>'
+      +'<button class="btn-add-row" data-action="add-step" data-dish-id="'+dish.id+'">＋ 新增步驟</button></div>';
   }).join('');
 }
 
-eid('task-list').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action]'); if(!btn) return;
-  const act=btn.dataset.action, dishId=btn.dataset.dishId;
-  const dish=D.dishes.find(d=>d.id===dishId); if(!dish&&act!=='del-person') return;
-  let t=D.tasks.find(t=>t.dish_id===dishId);
-  if(!t){
-    const {data}=await sb.from('tasks').insert({project_id:currentProject.id,dish_id:dishId,person_ids:[],steps:[],plate_note:''}).select().single();
-    t=data; D.tasks.push(t);
+eid('task-list').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const act = btn.dataset.action, dishId = btn.dataset.dishId;
+  let t = D.tasks.find(t => t.dish_id===dishId);
+  if (!t) return;
+  if (t.id && t.id.startsWith('new_')) {
+    const { data } = await sb.from('tasks').insert({ project_id:currentProject.id, dish_id:dishId, person_ids:[], steps:[], plate_note:'' }).select().single();
+    if (data) { t.id = data.id; }
   }
-  if(act==='assign-p'){
-    const pid=btn.dataset.pid;
-    const ids=[...(t.person_ids||[])];
-    const idx=ids.indexOf(pid);
-    if(idx>=0) ids.splice(idx,1); else ids.push(pid);
-    t.person_ids=ids;
-    await sb.from('tasks').update({person_ids:ids}).eq('id',t.id);
+  if (act==='assign-p') {
+    const pid = btn.dataset.pid;
+    const ids = [...(t.person_ids||[])];
+    const idx = ids.indexOf(pid);
+    if (idx>=0) ids.splice(idx,1); else ids.push(pid);
+    t.person_ids = ids;
+    await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:ids, steps:t.steps, plate_note:t.plate_note });
     renderTasks();
   }
-  if(act==='add-step'){
-    const steps=[...(t.steps||[]),''];
-    t.steps=steps;
-    await sb.from('tasks').update({steps}).eq('id',t.id);
+  if (act==='add-step') {
+    const steps = [...(t.steps||[]), ''];
+    t.steps = steps;
+    await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps, plate_note:t.plate_note });
     renderTasks();
   }
-  if(act==='del-step'){
-    const steps=[...(t.steps||[])]; steps.splice(parseInt(btn.dataset.si),1);
-    t.steps=steps;
-    await sb.from('tasks').update({steps}).eq('id',t.id);
+  if (act==='del-step') {
+    const steps = [...(t.steps||[])]; steps.splice(parseInt(btn.dataset.si), 1);
+    t.steps = steps;
+    await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps, plate_note:t.plate_note });
     renderTasks();
   }
 });
 
-eid('task-list').addEventListener('change',async e=>{
-  const el=e.target, act=el.dataset.action, dishId=el.dataset.dishId;
-  let t=D.tasks.find(t=>t.dish_id===dishId); if(!t) return;
-  if(act==='upd-platenote'){ t.plate_note=el.value; await sb.from('tasks').update({plate_note:el.value}).eq('id',t.id); }
-  if(act==='upd-step'){ const steps=[...(t.steps||[])]; steps[parseInt(el.dataset.si)]=el.value; t.steps=steps; await sb.from('tasks').update({steps}).eq('id',t.id); }
+eid('task-list').addEventListener('change', async e => {
+  const el = e.target, act = el.dataset.action, dishId = el.dataset.dishId;
+  const t = D.tasks.find(t => t.dish_id===dishId);
+  if (!t) return;
+  if (act==='upd-platenote') { t.plate_note=el.value; await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps:t.steps, plate_note:el.value }); }
+  if (act==='upd-step') { const steps=[...(t.steps||[])]; steps[parseInt(el.dataset.si)]=el.value; t.steps=steps; await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps, plate_note:t.plate_note }); }
 });
 
-eid('btn-add-person').addEventListener('click',()=>openModal('person'));
+eid('btn-add-person').addEventListener('click', () => openModal('person', null));
 
-// ── TIMELINE ──
-const PHASES=[
-  {key:'pre',label:'婚前一個月以上',col:'ph-0'},
-  {key:'w2',label:'婚前兩週',col:'ph-1'},{key:'w1',label:'婚前一週',col:'ph-2'},
-  {key:'d2',label:'婚前兩天',col:'ph-3'},{key:'d1',label:'前一天',col:'ph-4'},
-  {key:'d0am',label:'當天早上',col:'ph-5'},{key:'d0',label:'當天進行中',col:'ph-6'},
-  {key:'after',label:'收尾離場',col:'ph-7'}
+// TIMELINE
+const PHASES = [
+  {key:'pre',label:'婚前一個月以上',col:'ph-0'},{key:'w2',label:'婚前兩週',col:'ph-1'},
+  {key:'w1',label:'婚前一週',col:'ph-2'},{key:'d2',label:'婚前兩天',col:'ph-3'},
+  {key:'d1',label:'前一天',col:'ph-4'},{key:'d0am',label:'當天早上',col:'ph-5'},
+  {key:'d0',label:'當天進行中',col:'ph-6'},{key:'after',label:'收尾離場',col:'ph-7'}
 ];
-const TODO_CATS=[{key:'buy',icon:'🛒',label:'採購'},{key:'prep',icon:'🍳',label:'製作準備'},{key:'check',icon:'📋',label:'確認'},{key:'pack',icon:'📦',label:'打包運送'},{key:'setup',icon:'🎪',label:'現場佈置'},{key:'wrap',icon:'✅',label:'收尾'}];
-const PRESETS=[['pre','check','確認婚禮日期與時間'],['pre','check','確認場地狀況（廚房/冰箱/插座）'],['pre','check','確認賓客人數，決定各品項份量'],['pre','buy','完成所有餐點與食材比價'],['pre','check','確認各餐點分工人員'],['w2','buy','訂購外購品項（飯糰/麵包等）'],['w2','buy','列出食材採購清單，確認通路'],['w2','check','確認所有器具清單，確認借用/購買'],['w1','buy','採購所有食材'],['w1','buy','採購器具、耗材（紙盤/手套/保鮮袋等）'],['w1','prep','清洗、消毒所有盛裝容器'],['w1','check','與所有幫忙人員確認分工與時間'],['d2','check','再次確認各品項數量，補購不足食材'],['d2','prep','製作可提前做好的點心'],['d1','prep','食材前處理（切片、醃漬、分裝）'],['d1','prep','製作手作點心（主要製作日）'],['d1','pack','清點所有器具，開始裝箱'],['d1','pack','需冷藏食材放入冰箱'],['d0am','pack','最後確認所有食物與器具齊全'],['d0am','pack','食物保冷/保溫處理'],['d0am','pack','裝車/安排運送'],['d0','setup','抵達場地，確認擺放區域'],['d0','setup','擺設茶點桌（容器擺放、佈置）'],['d0','setup','飲料備置（冰塊、杯具）'],['d0','check','確認所有品項皆已擺出'],['after','wrap','收拾剩餘食物'],['after','wrap','清理桌面、垃圾分類'],['after','wrap','歸還借用器具'],['after','wrap','結帳、報帳（實際花費填入採購預算頁）']];
+const TODO_CATS = [
+  {key:'buy',icon:'🛒',label:'採購'},{key:'prep',icon:'🍳',label:'製作準備'},
+  {key:'check',icon:'📋',label:'確認'},{key:'pack',icon:'📦',label:'打包運送'},
+  {key:'setup',icon:'🎪',label:'現場佈置'},{key:'wrap',icon:'✅',label:'收尾'}
+];
+const PRESETS = [
+  ['pre','check','確認婚禮日期與時間'],['pre','check','確認場地狀況（廚房/冰箱/插座）'],
+  ['pre','check','確認賓客人數，決定各品項份量'],['pre','buy','完成所有餐點與食材比價'],
+  ['pre','check','確認各餐點分工人員'],['w2','buy','訂購外購品項（飯糰/麵包等）'],
+  ['w2','buy','列出食材採購清單，確認通路'],['w2','check','確認所有器具清單，確認借用/購買'],
+  ['w1','buy','採購所有食材'],['w1','buy','採購器具、耗材（紙盤/手套/保鮮袋等）'],
+  ['w1','prep','清洗、消毒所有盛裝容器'],['w1','check','與所有幫忙人員確認分工與時間'],
+  ['d2','check','再次確認各品項數量，補購不足食材'],['d2','prep','製作可提前做好的點心'],
+  ['d1','prep','食材前處理（切片、醃漬、分裝）'],['d1','prep','製作手作點心（主要製作日）'],
+  ['d1','pack','清點所有器具，開始裝箱'],['d1','pack','需冷藏食材放入冰箱'],
+  ['d0am','pack','最後確認所有食物與器具齊全'],['d0am','pack','食物保冷/保溫處理'],
+  ['d0am','pack','裝車/安排運送'],['d0','setup','抵達場地，確認擺放區域'],
+  ['d0','setup','擺設茶點桌（容器擺放、佈置）'],['d0','setup','飲料備置（冰塊、杯具）'],
+  ['d0','check','確認所有品項皆已擺出'],['after','wrap','收拾剩餘食物'],
+  ['after','wrap','清理桌面、垃圾分類'],['after','wrap','歸還借用器具'],
+  ['after','wrap','結帳、報帳（實際花費填入採購預算頁）']
+];
 
-function renderTimeline(){
-  const done=D.todos.filter(t=>t.done).length;
-  eid('todo-prog').textContent=D.todos.length?(done+' / '+D.todos.length+' 完成'):'';
-  const el=eid('timeline-list');
-  if(!D.todos.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-text">還沒有待辦，點「＋ 新增待辦」或「載入預設清單」</div></div>'; return; }
-  el.innerHTML=PHASES.map(phase=>{
-    const pTodos=D.todos.filter(t=>t.phase===phase.key);
-    if(!pTodos.length) return '';
-    let h=`<div class="tl-phase"><div class="tl-head ${phase.col}"><span class="tl-head-title">${phase.label}</span><span style="font-size:11px;opacity:0.75">${pTodos.filter(t=>t.done).length}/${pTodos.length}</span></div><div class="tl-body">`;
-    TODO_CATS.forEach(cat=>{
-      const cTodos=pTodos.filter(t=>t.cat===cat.key);
-      if(!cTodos.length) return;
-      h+=`<div class="tl-cat-head"><span class="tl-cat-label">${cat.icon} ${cat.label}</span><span style="font-size:11px;color:var(--muted)">${cTodos.filter(t=>t.done).length}/${cTodos.length}</span></div>`;
-      cTodos.forEach(todo=>{
-        const person=todo.person_id?D.persons.find(p=>p.id===todo.person_id):null;
-        h+=`<div class="todo-row"><div class="todo-chk${todo.done?' on':''}" data-action="toggle-todo" data-tid="${todo.id}">${todo.done?'✓':''}</div><div style="flex:1"><div class="todo-text${todo.done?' done':''}">${escH(todo.text)}</div>${todo.date||person?`<div class="todo-meta">${todo.date?'📅 '+escH(todo.date):''}${person?' 👤 '+escH(person.name):''}</div>`:''}</div><button class="bx" style="font-size:13px" data-action="del-todo" data-tid="${todo.id}">×</button></div>`;
+function renderTimeline() {
+  const done = D.todos.filter(t => t.done).length;
+  eid('todo-prog').textContent = D.todos.length ? done+' / '+D.todos.length+' 完成' : '';
+  const el = eid('timeline-list');
+  if (!D.todos.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-text">還沒有待辦，點「＋ 新增待辦」或「載入預設清單」</div></div>'; return; }
+  el.innerHTML = PHASES.map(phase => {
+    const pTodos = D.todos.filter(t => t.phase===phase.key);
+    if (!pTodos.length) return '';
+    let h = '<div class="tl-phase"><div class="tl-head '+phase.col+'"><span class="tl-head-title">'+phase.label+'</span><span style="font-size:11px;opacity:0.75">'+pTodos.filter(t=>t.done).length+'/'+pTodos.length+'</span></div><div class="tl-body">';
+    TODO_CATS.forEach(cat => {
+      const cTodos = pTodos.filter(t => t.cat===cat.key);
+      if (!cTodos.length) return;
+      h += '<div class="tl-cat-head"><span class="tl-cat-label">'+cat.icon+' '+cat.label+'</span><span style="font-size:11px;color:var(--muted)">'+cTodos.filter(t=>t.done).length+'/'+cTodos.length+'</span></div>';
+      cTodos.forEach(todo => {
+        h += '<div class="todo-row"><div class="todo-chk'+(todo.done?' on':'')+'" data-action="toggle-todo" data-tid="'+todo.id+'">'+(todo.done?'✓':'')+'</div>'
+          +'<div style="flex:1"><div class="todo-text'+(todo.done?' done':'')+'">'+escH(todo.text)+'</div>'
+          +(todo.date?'<div class="todo-meta">📅 '+escH(todo.date)+'</div>':'')+'</div>'
+          +'<button class="bx" style="font-size:13px" data-action="del-todo" data-tid="'+todo.id+'">×</button></div>';
       });
     });
-    return h+'</div></div>';
+    return h + '</div></div>';
   }).join('');
 }
 
-eid('timeline-list').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action]'); if(!btn) return;
-  const tid=btn.dataset.tid;
-  if(btn.dataset.action==='toggle-todo'){
-    const t=D.todos.find(t=>t.id===tid); if(!t) return;
-    t.done=!t.done;
-    await sb.from('todos').update({done:t.done}).eq('id',tid);
+eid('timeline-list').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const tid = btn.dataset.tid;
+  if (btn.dataset.action==='toggle-todo') {
+    const t = D.todos.find(t => t.id===tid);
+    if (!t) return;
+    t.done = !t.done;
+    await sb.from('todos').update({ done:t.done }).eq('id', tid);
     renderTimeline();
   }
-  if(btn.dataset.action==='del-todo'){
-    await sb.from('todos').delete().eq('id',tid);
-    D.todos=D.todos.filter(t=>t.id!==tid);
+  if (btn.dataset.action==='del-todo') {
+    await sb.from('todos').delete().eq('id', tid);
+    D.todos = D.todos.filter(t => t.id!==tid);
     renderTimeline();
   }
 });
 
-eid('btn-add-todo').addEventListener('click',()=>openModal('todo'));
-eid('btn-load-presets').addEventListener('click',async()=>{
-  if(D.todos.length>0&&!confirm('載入預設清單將新增'+PRESETS.length+'個待辦，確定嗎？')) return;
-  const rows=PRESETS.map(p=>({project_id:currentProject.id,phase:p[0],cat:p[1],text:p[2],done:false}));
-  const {data}=await sb.from('todos').insert(rows).select();
-  D.todos=[...D.todos,...(data||[])];
+eid('btn-add-todo').addEventListener('click', () => openModal('todo', null));
+eid('btn-load-presets').addEventListener('click', async () => {
+  if (D.todos.length>0 && !confirm('載入預設清單將新增'+PRESETS.length+'個待辦，確定嗎？')) return;
+  const rows = PRESETS.map(p => ({ project_id:currentProject.id, phase:p[0], cat:p[1], text:p[2], done:false }));
+  const { data } = await sb.from('todos').insert(rows).select();
+  D.todos = [...D.todos, ...(data||[])];
   renderTimeline();
 });
 
-// ── SETTINGS ──
-async function renderSettings(){
-  eid('invite-code-display').textContent=currentProject.invite_code||'——';
-  // members
-  const {data:members}=await sb.from('project_members').select('*,profiles(name,email)').eq('project_id',currentProject.id);
-  const el=eid('members-list');
-  const {data:owner}=await sb.from('profiles').select('name,email').eq('id',currentProject.owner_id).single();
-  let h=`<div class="list-item"><div class="li-main"><div class="li-title">👑 ${escH(owner?.name||'主辦人')}</div><div class="li-sub">${escH(owner?.email||'')}</div></div><span style="font-size:11px;color:var(--sage-dark)">主辦人</span></div>`;
-  (members||[]).forEach(m=>{ h+=`<div class="list-item"><div class="li-main"><div class="li-title">${escH(m.profiles?.name||'')}</div><div class="li-sub">${escH(m.profiles?.email||'')}</div></div><span style="font-size:11px;color:var(--muted)">${m.role==='editor'?'協作者':'觀看者'}</span></div>`; });
-  el.innerHTML=h;
-  // contacts
-  const cEl=eid('contacts-list');
-  if(!D.persons.filter(p=>p.phone).length){ cEl.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 0">還沒有聯絡人</div>'; return; }
-  cEl.innerHTML=D.persons.filter(p=>p.phone).map(p=>`
-    <div class="contact-card">
-      <div class="contact-avatar">${p.name[0]}</div>
-      <div class="contact-info">
-        <div class="contact-name">${escH(p.name)}</div>
-        <div class="contact-role">${escH(p.role||'')}</div>
-        <div class="contact-phone">${escH(p.phone||'')}</div>
-      </div>
-      <a class="call-btn" href="tel:${escH(p.phone||'')}">📞 撥打</a>
-    </div>`).join('');
+// SETTINGS
+async function renderSettings() {
+  eid('invite-code-display').textContent = currentProject.invite_code || '——';
+  const { data: owner } = await sb.from('profiles').select('name,email').eq('id', currentProject.owner_id).single();
+  const { data: members } = await sb.from('project_members').select('*,profiles(name,email)').eq('project_id', currentProject.id);
+  let h = '<div class="list-item" style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece4">'
+    +'<div style="flex:1"><div style="font-size:14px;font-weight:500">👑 '+escH(owner?.name||'主辦人')+'</div><div style="font-size:11px;color:var(--muted)">'+escH(owner?.email||'')+'</div></div>'
+    +'<span style="font-size:11px;color:var(--sage-dark)">主辦人</span></div>';
+  (members||[]).forEach(m => {
+    h += '<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece4">'
+      +'<div style="flex:1"><div style="font-size:14px;font-weight:500">'+escH(m.profiles?.name||'')+'</div><div style="font-size:11px;color:var(--muted)">'+escH(m.profiles?.email||'')+'</div></div>'
+      +'<span style="font-size:11px;color:var(--muted)">'+(m.role==='editor'?'協作者':'觀看者')+'</span></div>';
+  });
+  eid('members-list').innerHTML = h;
+  const contacts = D.persons.filter(p => p.phone);
+  eid('contacts-list').innerHTML = contacts.length ? contacts.map(p =>
+    '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0ece4">'
+    +'<div style="width:40px;height:40px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+p.name[0]+'</div>'
+    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:11px;color:var(--muted)">'+escH(p.role||'')+'</div><div style="font-size:13px;color:var(--sage-dark)">'+escH(p.phone||'')+'</div></div>'
+    +'<a class="call-btn" href="tel:'+escH(p.phone||'')+'">📞 撥打</a></div>'
+  ).join('') : '<div style="font-size:12px;color:var(--muted);padding:8px 0">還沒有聯絡人</div>';
 }
 
-eid('btn-copy-code').addEventListener('click',()=>{
-  navigator.clipboard?.writeText(currentProject.invite_code||'').then(()=>showToast('✓ 邀請碼已複製'));
+eid('btn-copy-code').addEventListener('click', () => {
+  navigator.clipboard?.writeText(currentProject.invite_code||'').then(() => showToast('✓ 邀請碼已複製'));
 });
-eid('btn-share-link').addEventListener('click',()=>{
-  const url=window.location.origin+window.location.pathname+'?join='+currentProject.invite_code;
-  if(navigator.share){ navigator.share({title:'加入婚禮茶點管家',text:'用這個連結加入我們的婚禮茶點籌備！',url}); }
-  else { navigator.clipboard?.writeText(url).then(()=>showToast('✓ 連結已複製')); }
+eid('btn-share-link').addEventListener('click', () => {
+  const url = window.location.origin+window.location.pathname+'?join='+currentProject.invite_code;
+  if (navigator.share) { navigator.share({ title:'加入婚禮茶點管家', url }); }
+  else { navigator.clipboard?.writeText(url).then(() => showToast('✓ 連結已複製')); }
 });
-eid('btn-save-settings').addEventListener('click',async()=>{
-  const wd=eid('inp-wedding-date').value;
-  await sb.from('projects').update({wedding_date:wd||null}).eq('id',currentProject.id);
-  currentProject.wedding_date=wd;
-  eid('proj-header-sub').textContent=wd?'💒 '+wd:'';
+eid('btn-save-settings').addEventListener('click', async () => {
+  const wd = eid('inp-wedding-date').value;
+  await sb.from('projects').update({ wedding_date:wd||null }).eq('id', currentProject.id);
+  currentProject.wedding_date = wd;
+  eid('proj-header-sub').textContent = wd ? '💒 '+wd : '';
   showToast('✓ 設定已儲存');
 });
-eid('btn-add-contact').addEventListener('click',()=>openModal('contact'));
+eid('btn-add-contact').addEventListener('click', () => openModal('contact', null));
 
-// ── DAY MODE ──
-function renderDayMode(){
-  // Day tasks
-  const dtEl=eid('day-tasks-list');
-  if(!D.dayTasks.length){ dtEl.innerHTML='<div style="padding:12px;font-size:12px;color:var(--muted)">還沒有當天工作</div>'; }
-  else dtEl.innerHTML=D.dayTasks.map(t=>`<div class="chk-row" style="padding:10px 12px">
-    <div class="chk-box${t.done?' on':''}" data-action="toggle-day" data-id="${t.id}">${t.done?'✓':''}</div>
-    <div style="flex:1"><div class="chk-label${t.done?' done':''}">${escH(t.text)}</div>${t.time_note?`<div style="font-size:11px;color:var(--muted)">⏰ ${escH(t.time_note)}</div>`:''}</div>
-  </div>`).join('');
+// DAY MODE
+function renderDayMode() {
+  const dtEl = eid('day-tasks-list');
+  dtEl.innerHTML = D.dayTasks.length ? D.dayTasks.map(t =>
+    '<div class="chk-row" style="padding:10px 12px">'
+    +'<div class="chk-box'+(t.done?' on':'')+'" data-action="toggle-day" data-id="'+t.id+'">'+(t.done?'✓':'')+'</div>'
+    +'<div style="flex:1"><div style="font-size:13px'+(t.done?';text-decoration:line-through;color:var(--muted)':'')+'">'+escH(t.text)+'</div>'
+    +(t.time_note?'<div style="font-size:11px;color:var(--muted)">⏰ '+escH(t.time_note)+'</div>':'')+'</div></div>'
+  ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">還沒有當天工作</div>';
 
-  // Equip list (from dishes containers)
-  const equipSummary={};
-  D.dishes.forEach(dish=>{
-    (dish.containers||[]).forEach(ctr=>{
-      if(!equipSummary[ctr.equipName]) equipSummary[ctr.equipName]=0;
-      equipSummary[ctr.equipName]+=ctr.qtyMode==='per'?(dish.qty||1):(ctr.fixedQty||1);
+  const equipSummary = {};
+  D.dishes.forEach(dish => {
+    (dish.containers||[]).forEach(ctr => {
+      if (!equipSummary[ctr.equipName]) equipSummary[ctr.equipName] = 0;
+      equipSummary[ctr.equipName] += ctr.qtyMode==='per' ? (dish.qty||1) : (ctr.fixedQty||1);
     });
   });
-  const eqKeys=Object.keys(equipSummary);
-  const eqEl=eid('day-equip-list');
-  if(!eqKeys.length){ eqEl.innerHTML='<div style="padding:12px;font-size:12px;color:var(--muted)">請先在器具清單設定容器</div>'; }
-  else eqEl.innerHTML=eqKeys.map(name=>`<div class="chk-row" style="padding:10px 12px">
-    <div class="chk-box" data-action="toggle-equip-carry">${''}</div>
-    <div class="chk-label">${escH(name)} <span style="color:var(--muted);font-size:12px">× ${equipSummary[name]}</span></div>
-  </div>`).join('');
+  const eqKeys = Object.keys(equipSummary);
+  eid('day-equip-list').innerHTML = eqKeys.length ? eqKeys.map(name =>
+    '<div class="chk-row" style="padding:10px 12px">'
+    +'<div class="chk-box" data-action="toggle-equip-carry"></div>'
+    +'<div style="font-size:13px">'+escH(name)+' <span style="color:var(--muted);font-size:12px">× '+equipSummary[name]+'</span></div></div>'
+  ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先在器具清單設定容器</div>';
 
-  // Plate reminders
-  const pEl=eid('day-plate-list');
-  const hm=D.dishes.filter(d=>d.type==='handmade');
-  if(!hm.length){ pEl.innerHTML='<div style="padding:12px;font-size:12px;color:var(--muted)">請先新增手作點心</div>'; return; }
-  pEl.innerHTML=hm.map(dish=>{
-    const t=D.tasks.find(t=>t.dish_id===dish.id)||{};
-    const ctrs=(dish.containers||[]).map(c=>c.equipName).filter(Boolean);
-    return `<div style="padding:12px;border-bottom:1px solid #f0ece4">
-      <div style="font-weight:600;font-size:14px;margin-bottom:4px">👐 ${escH(dish.name)}</div>
-      ${ctrs.length?`<div style="margin-bottom:4px">${ctrs.map(c=>`<span class="ctag">${escH(c)}</span>`).join('')}</div>`:''}
-      ${t.plate_note?`<div style="font-size:12px;color:var(--muted)">📝 ${escH(t.plate_note)}</div>`:''}
-    </div>`;
-  }).join('');
+  const hm = D.dishes.filter(d => d.type==='handmade');
+  eid('day-plate-list').innerHTML = hm.length ? hm.map(dish => {
+    const t = D.tasks.find(t => t.dish_id===dish.id)||{};
+    const ctrs = (dish.containers||[]).map(c => c.equipName).filter(Boolean);
+    return '<div style="padding:12px;border-bottom:1px solid #f0ece4">'
+      +'<div style="font-weight:600;font-size:14px;margin-bottom:4px">👐 '+escH(dish.name)+'</div>'
+      +(ctrs.length?'<div style="margin-bottom:4px">'+ctrs.map(c=>'<span class="ctag">'+escH(c)+'</span>').join('')+'</div>':'')
+      +(t.plate_note?'<div style="font-size:12px;color:var(--muted)">📝 '+escH(t.plate_note)+'</div>':'')+'</div>';
+  }).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先新增手作點心</div>';
 
-  // Contacts
-  const cEl=eid('day-contacts-list');
-  const contacts=D.persons.filter(p=>p.phone);
-  if(!contacts.length){ cEl.innerHTML='<div style="padding:12px;font-size:12px;color:var(--muted)">請先在「設定」新增聯絡人</div>'; return; }
-  cEl.innerHTML=contacts.map(p=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0ece4">
-    <div style="flex:1"><div style="font-weight:600;font-size:14px">${escH(p.name)}</div><div style="font-size:12px;color:var(--muted)">${escH(p.role||'')} ${escH(p.phone||'')}</div></div>
-    <a class="call-btn" href="tel:${escH(p.phone||'')}">📞</a>
-  </div>`).join('');
+  const contacts = D.persons.filter(p => p.phone);
+  eid('day-contacts-list').innerHTML = contacts.length ? contacts.map(p =>
+    '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0ece4">'
+    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:12px;color:var(--muted)">'+escH(p.role||'')+' '+escH(p.phone||'')+'</div></div>'
+    +'<a class="call-btn" href="tel:'+escH(p.phone||'')+'">📞</a></div>'
+  ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先在「設定」新增聯絡人</div>';
 }
 
-eid('day-tasks-list').addEventListener('click',async e=>{
-  const btn=e.target.closest('[data-action="toggle-day"]'); if(!btn) return;
-  const t=D.dayTasks.find(t=>t.id===btn.dataset.id); if(!t) return;
-  t.done=!t.done;
-  await sb.from('day_tasks').update({done:t.done}).eq('id',t.id);
+eid('day-tasks-list').addEventListener('click', async e => {
+  const btn = e.target.closest('[data-action="toggle-day"]');
+  if (!btn) return;
+  const t = D.dayTasks.find(t => t.id===btn.dataset.id);
+  if (!t) return;
+  t.done = !t.done;
+  await sb.from('day_tasks').update({ done:t.done }).eq('id', t.id);
   renderDayMode();
 });
-eid('day-equip-list').addEventListener('click',e=>{
-  const btn=e.target.closest('[data-action="toggle-equip-carry"]'); if(!btn) return;
+
+eid('day-equip-list').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action="toggle-equip-carry"]');
+  if (!btn) return;
   btn.classList.toggle('on');
-  btn.textContent=btn.classList.contains('on')?'✓':'';
+  btn.textContent = btn.classList.contains('on') ? '✓' : '';
 });
-eid('btn-add-day-task').addEventListener('click',()=>openModal('dayTask'));
 
-// ── MODAL ──
-let _mc={};
-function openModal(type,ctx){
-  _mc={type,ctx};
-  const tEl=eid('modal-title'), bEl=eid('modal-body');
-  bEl.innerHTML='';
+eid('btn-add-day-task').addEventListener('click', () => openModal('dayTask', null));
 
-  if(type==='newProject'){
-    tEl.textContent='建立婚禮專案';
-    bEl.innerHTML=`<label>專案名稱（例：Sarah & John 婚禮茶點）</label><input id="m0" placeholder="例：Sarah & John 婚禮茶點"><label>婚禮日期</label><input id="m-date" type="date"><label>預計賓客人數</label><input id="m-guests" type="number" value="150"><label>食物預算 NT$</label><input id="m-budget" type="number" value="25000"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">建立</button></div>`;
-  } else if(type==='joinProject'){
-    tEl.textContent='加入婚禮專案';
-    bEl.innerHTML=`<label>邀請碼（8位英數字）</label><input id="m0" placeholder="例：abc12345" maxlength="8" style="letter-spacing:4px;font-size:18px;text-align:center"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">加入</button></div>`;
-  } else if(type==='dish'){
-    const hm=ctx==='handmade';
-    tEl.textContent=hm?'新增手作點心':'新增外購品項';
-    bEl.innerHTML=`<label>名稱</label><input id="m0" placeholder="${hm?'例：可頌火腿起司':'例：松田飯糰'}"><label>預計數量（份）</label><input id="m1" type="number" value="150">${hm?'':`<label>店家名稱</label><input id="m-store" placeholder="例：一之軒、松田"><label>每盤/包幾個</label><input id="m-unitsize" type="number" value="1"><label>每盤/包售價 NT$</label><input id="m3" type="number" value="0">`}<label>備註</label><input id="m4" placeholder="（選填）"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-  } else if(type==='ingredient'){
-    const dish=D.dishes.find(d=>d.id===ctx);
-    tEl.textContent='新增食材 — '+(dish?.name||'');
-    bEl.innerHTML=`<label>食材名稱</label><input id="m0" placeholder="例：起司片、火腿、法國麵包"><label>計算方式</label><div class="tog-row" id="ing-mode-row"><span class="tog sel" data-mode="count">數量</span><span class="tog" data-mode="weight">重量(g)</span><span class="tog" data-mode="yield">產出</span></div><div id="m-count-s"><label>每份需要數量（小數如0.5）</label><input id="m1" type="number" step="0.01" value="1"><label>單位（片/個/條/罐…）</label><input id="m2" value="個"></div><div id="m-weight-s" style="display:none"><label>每份需要幾克</label><input id="m1w" type="number" step="0.1" value="10"></div><div id="m-yield-s" style="display:none"><label>單位名稱（條/盒/罐）</label><input id="m-yu" value="條"><label>1條/盒/罐可做幾份</label><input id="m-yv" type="number" value="20"></div><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-    bEl.addEventListener('click',e=>{ const mb=e.target.closest('#ing-mode-row .tog'); if(!mb) return; bEl.querySelectorAll('#ing-mode-row .tog').forEach(t=>t.classList.remove('sel')); mb.classList.add('sel'); const m=mb.dataset.mode; eid('m-count-s').style.display=m==='count'?'block':'none'; eid('m-weight-s').style.display=m==='weight'?'block':'none'; eid('m-yield-s').style.display=m==='yield'?'block':'none'; });
-  } else if(type==='editIng'){
-    const ing=D.ingredients.find(i=>i.id===ctx);
-    tEl.textContent='修改食材';
-    bEl.innerHTML=`<label>食材名稱</label><input id="m0" value="${escA(ing?.name||'')}"><label>每份${ing?.use_weight?'幾克':ing?.use_yield?`(${escH(ing.unit)})可做幾份`:'數量'}</label><input id="m1" type="number" step="0.01" value="${ing?.use_yield?ing.yields_per_unit:ing?.qty_per_item||1}">${!ing?.use_weight&&!ing?.use_yield?`<label>單位</label><input id="m2" value="${escA(ing?.unit||'')}">`:''}<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">儲存修改</button></div>`;
-  } else if(type==='channel'){
-    const ing=D.ingredients.find(i=>i.id===ctx);
-    tEl.textContent='新增通路 — '+(ing?.name||'');
-    const isW=ing?.use_weight, isY=ing?.use_yield;
-    bEl.innerHTML=`<label>通路名稱</label><input id="m0" placeholder="例：全聯、家樂福、Costco"><label>包裝售價 NT$</label><input id="m1" type="number" placeholder="例：259">${isW?`<label>每包幾克</label><input id="m2" type="number" value="500">`:isY?`<div style="background:var(--warm);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);margin-top:8px">售價即為每${escH(ing?.unit||'個')}的價格</div>`:`<label>每包數量（${escH(ing?.unit||'個')}）</label><input id="m2" type="number" value="1">`}<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-  } else if(type==='supply'){
-    tEl.textContent='新增器具 / 耗材';
-    bEl.innerHTML=`<label>品項名稱</label><input id="m0" placeholder="例：烘焙紙、手套"><label>來源</label><div class="tog-row" id="src-row"><span class="tog sel" data-src="buy">買</span><span class="tog" data-src="borrow">借</span><span class="tog" data-src="gift">付出</span></div><label>來源說明（通路或誰借的）</label><input id="m-src" placeholder="例：蝦皮、Amy家裡"><label>數量</label><input id="m2" type="number" value="1"><label>預估單價 NT$</label><input id="m3" type="number" value="0"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-    bEl.addEventListener('click',e=>{ const sb2=e.target.closest('#src-row .tog'); if(!sb2) return; bEl.querySelectorAll('#src-row .tog').forEach(t=>t.classList.remove('sel')); sb2.classList.add('sel'); });
-  } else if(type==='person'){
-    tEl.textContent='新增人員';
-    bEl.innerHTML=`<label>姓名 / 暱稱</label><input id="m0" placeholder="例：Amy、Ben"><label>角色</label><select id="m-role"><option value="">一般幫忙</option><option value="usher">Usher</option><option value="usher_king">Usher King</option><option value="vendor">廠商</option><option value="venue">場地負責人</option><option value="driver">運送司機</option></select><label>電話（選填）</label><input id="m-phone" type="tel" placeholder="例：0912345678"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-  } else if(type==='contact'){
-    tEl.textContent='新增聯絡人';
-    bEl.innerHTML=`<label>姓名</label><input id="m0" placeholder="例：運送司機 Peter"><label>角色</label><select id="m-role"><option value="">一般</option><option value="usher">Usher</option><option value="usher_king">Usher King</option><option value="vendor">廠商</option><option value="venue">場地負責人</option><option value="driver">運送司機</option></select><label>電話</label><input id="m-phone" type="tel" placeholder="0912345678" required><label>備註</label><input id="m4" placeholder="（選填）"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-  } else if(type==='todo'){
-    tEl.textContent='新增待辦事項';
-    bEl.innerHTML=`<label>待辦內容</label><input id="m0" placeholder="例：確認飯糰訂購數量"><label>時程階段</label><div class="tog-row" id="phase-row">${PHASES.map((p,i)=>`<span class="tog${i===0?' sel':''}" data-phase="${p.key}">${p.label}</span>`).join('')}</div><label>分類</label><div class="tog-row" id="cat-row">${TODO_CATS.map((c,i)=>`<span class="tog${i===0?' sel':''}" data-cat="${c.key}">${c.icon} ${c.label}</span>`).join('')}</div><label>指定日期（選填）</label><input id="m-date" type="date"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-    bEl.addEventListener('click',e=>{
-      const pb=e.target.closest('#phase-row .tog'); if(pb){ bEl.querySelectorAll('#phase-row .tog').forEach(t=>t.classList.remove('sel')); pb.classList.add('sel'); }
-      const cb=e.target.closest('#cat-row .tog'); if(cb){ bEl.querySelectorAll('#cat-row .tog').forEach(t=>t.classList.remove('sel')); cb.classList.add('sel'); }
+// MODAL
+let _mc = {};
+
+function openModal(type, ctx) {
+  _mc = { type, ctx };
+  const tEl = eid('modal-title'), bEl = eid('modal-body');
+  bEl.innerHTML = '';
+
+  if (type==='forgotPassword') {
+    tEl.textContent = '重設密碼';
+    bEl.innerHTML = '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">輸入你的 Email，我們會寄送重設密碼連結。</div>'
+      +'<label>Email</label><input id="m0" type="email" placeholder="your@email.com">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">寄送重設信</button></div>';
+
+  } else if (type==='newProject') {
+    tEl.textContent = '建立婚禮專案';
+    bEl.innerHTML = '<label>專案名稱</label><input id="m0" placeholder="例：Sarah & John 婚禮茶點">'
+      +'<label>婚禮日期</label><input id="m-date" type="date">'
+      +'<label>預計賓客人數</label><input id="m-guests" type="number" value="150">'
+      +'<label>食物預算 NT$</label><input id="m-budget" type="number" value="25000">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">建立</button></div>';
+
+  } else if (type==='joinProject') {
+    tEl.textContent = '加入婚禮專案';
+    bEl.innerHTML = '<label>邀請碼（8位英數字）</label>'
+      +'<input id="m0" placeholder="例：abc12345" maxlength="8" style="letter-spacing:4px;font-size:18px;text-align:center">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">加入</button></div>';
+
+  } else if (type==='dish') {
+    const hm = ctx==='handmade';
+    tEl.textContent = hm ? '新增手作點心' : '新增外購品項';
+    bEl.innerHTML = '<label>名稱</label><input id="m0" placeholder="'+(hm?'例：可頌火腿起司':'例：松田飯糰')+'">'
+      +'<label>預計數量（份）</label><input id="m1" type="number" value="150">'
+      +(hm ? '' : '<label>店家名稱</label><input id="m-store" placeholder="例：一之軒、松田"><label>每盤/包幾個</label><input id="m-unitsize" type="number" value="1"><label>每盤/包售價 NT$</label><input id="m3" type="number" value="0">')
+      +'<label>備註</label><input id="m4" placeholder="（選填）">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+
+  } else if (type==='ingredient') {
+    const dish = D.dishes.find(d => d.id===ctx);
+    tEl.textContent = '新增食材 — '+(dish?.name||'');
+    bEl.innerHTML = '<label>食材名稱</label><input id="m0" placeholder="例：起司片、火腿、法國麵包">'
+      +'<label>計算方式</label>'
+      +'<div class="tog-row" id="ing-mode-row"><span class="tog sel" data-mode="count">數量</span><span class="tog" data-mode="weight">重量(g)</span><span class="tog" data-mode="yield">產出</span></div>'
+      +'<div id="m-count-s"><label>每份需要數量（小數如0.5）</label><input id="m1" type="number" step="0.01" value="1"><label>單位（片/個/條/罐）</label><input id="m2" value="個"></div>'
+      +'<div id="m-weight-s" style="display:none"><label>每份需要幾克</label><input id="m1w" type="number" step="0.1" value="10"></div>'
+      +'<div id="m-yield-s" style="display:none"><label>單位名稱（條/盒/罐）</label><input id="m-yu" value="條"><label>1條/盒/罐可做幾份</label><input id="m-yv" type="number" value="20"></div>'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+    bEl.addEventListener('click', e => {
+      const mb = e.target.closest('#ing-mode-row .tog');
+      if (!mb) return;
+      bEl.querySelectorAll('#ing-mode-row .tog').forEach(t => t.classList.remove('sel'));
+      mb.classList.add('sel');
+      const m = mb.dataset.mode;
+      eid('m-count-s').style.display = m==='count'?'block':'none';
+      eid('m-weight-s').style.display = m==='weight'?'block':'none';
+      eid('m-yield-s').style.display = m==='yield'?'block':'none';
     });
-  } else if(type==='dayTask'){
-    tEl.textContent='新增當天工作';
-    bEl.innerHTML=`<label>工作內容</label><input id="m0" placeholder="例：擺設茶點桌"><label>時間提醒（選填）</label><input id="m-time" placeholder="例：10:00前完成"><label>負責人（選填）</label><div class="tog-row" id="person-row"><span class="tog sel" data-pid="">無</span>${D.persons.map(p=>`<span class="tog" data-pid="${p.id}">${escH(p.name)}</span>`).join('')}</div><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
-    bEl.addEventListener('click',e=>{ const pb=e.target.closest('#person-row .tog'); if(!pb) return; bEl.querySelectorAll('#person-row .tog').forEach(t=>t.classList.remove('sel')); pb.classList.add('sel'); });
-  if(type==='forgotPassword'){
-    tEl.textContent='重設密碼';
-    bEl.innerHTML=`<div style="font-size:13px;color:var(--muted);margin-bottom:12px">輸入你的 Email，我們會寄送重設密碼連結給你。</div>
-      <label>Email</label><input id="m0" type="email" placeholder="your@email.com">
-      <div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">寄送重設信</button></div>`;
-  } else if(type==='calc'){
-    tEl.textContent='🧮 小計算機';
-    bEl.innerHTML=`<div style="background:#1a1a2e;border-radius:12px;padding:12px;margin-bottom:12px"><div id="calc-expr" style="color:#aaa;font-size:11px;min-height:18px;text-align:right;margin-bottom:2px"></div><div id="calc-display" style="color:#fff;font-size:28px;font-weight:700;text-align:right;min-height:40px;word-break:break-all">0</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><button class="cbtn cbtn-fn" data-v="AC">AC</button><button class="cbtn cbtn-fn" data-v="+/-">+/-</button><button class="cbtn cbtn-fn" data-v="%">%</button><button class="cbtn cbtn-op" data-v="÷">÷</button><button class="cbtn" data-v="7">7</button><button class="cbtn" data-v="8">8</button><button class="cbtn" data-v="9">9</button><button class="cbtn cbtn-op" data-v="×">×</button><button class="cbtn" data-v="4">4</button><button class="cbtn" data-v="5">5</button><button class="cbtn" data-v="6">6</button><button class="cbtn cbtn-op" data-v="−">−</button><button class="cbtn" data-v="1">1</button><button class="cbtn" data-v="2">2</button><button class="cbtn" data-v="3">3</button><button class="cbtn cbtn-op" data-v="+">+</button><button class="cbtn" data-v="0" style="grid-column:span 2">0</button><button class="cbtn" data-v=".">.</button><button class="cbtn cbtn-eq" data-v="=">=</button></div><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:7px 10px;margin-top:10px">💡 例：659 ÷ 8 = 82.375（每罐成本）</div><div class="btn-row"><button class="btn btn-outline" id="m-cancel">關閉</button></div>`;
-    const cSt={expr:'',cur:'0',op:'',prev:null,jc:false};
-    function cUpd(){ const d=eid('calc-display'),x=eid('calc-expr'); if(d) d.textContent=cSt.cur; if(x) x.textContent=cSt.expr; }
-    bEl.addEventListener('click',e=>{ const btn=e.target.closest('.cbtn'); if(!btn) return; const v=btn.dataset.v; if(v==='AC'){Object.assign(cSt,{expr:'',cur:'0',op:'',prev:null,jc:false});cUpd();return;} if(v==='+/-'){cSt.cur=String(-(parseFloat(cSt.cur)||0));cUpd();return;} if(v==='%'){cSt.cur=String((parseFloat(cSt.cur)||0)/100);cUpd();return;} if('÷×−+'.includes(v)){cSt.prev=parseFloat(cSt.cur);cSt.op=v;cSt.expr=cSt.cur+' '+v;cSt.jc=false;cSt.cur='0';cUpd();return;} if(v==='='){if(cSt.prev==null){cUpd();return;}const a=cSt.prev,b=parseFloat(cSt.cur);let r;if(cSt.op==='÷')r=b?a/b:0;else if(cSt.op==='×')r=a*b;else if(cSt.op==='−')r=a-b;else r=a+b;cSt.expr=cSt.expr+' '+cSt.cur+' =';cSt.cur=String(Math.round(r*1000000)/1000000);cSt.prev=null;cSt.op='';cSt.jc=true;cUpd();return;} if(v==='.'){if(cSt.jc){cSt.cur='0';cSt.jc=false;}if(!cSt.cur.includes('.'))cSt.cur+='.';cUpd();return;} if(cSt.cur==='0'||cSt.jc){cSt.cur=v;cSt.jc=false;}else cSt.cur+=v;cUpd(); });
+
+  } else if (type==='editIng') {
+    const ing = D.ingredients.find(i => i.id===ctx);
+    tEl.textContent = '修改食材';
+    bEl.innerHTML = '<label>食材名稱</label><input id="m0" value="'+escA(ing?.name||'')+'">'
+      +'<label>每份'+(ing?.use_weight?'幾克':ing?.use_yield?'（'+escH(ing.unit)+'）可做幾份':'數量')+'</label>'
+      +'<input id="m1" type="number" step="0.01" value="'+(ing?.use_yield?ing.yields_per_unit:ing?.qty_per_item||1)+'">'
+      +(!ing?.use_weight&&!ing?.use_yield ? '<label>單位</label><input id="m2" value="'+escA(ing?.unit||'')+'">':'')
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">儲存修改</button></div>';
+
+  } else if (type==='channel') {
+    const ing = D.ingredients.find(i => i.id===ctx);
+    tEl.textContent = '新增通路 — '+(ing?.name||'');
+    const isW = ing?.use_weight, isY = ing?.use_yield;
+    bEl.innerHTML = '<label>通路名稱</label><input id="m0" placeholder="例：全聯、家樂福、Costco">'
+      +'<label>包裝售價 NT$</label><input id="m1" type="number" placeholder="例：259">'
+      +(isW ? '<label>每包幾克</label><input id="m2" type="number" value="500">'
+        : isY ? '<div style="background:var(--warm);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);margin-top:8px">售價即為每'+escH(ing?.unit||'個')+'的價格</div>'
+        : '<label>每包數量（'+escH(ing?.unit||'個')+'）</label><input id="m2" type="number" value="1">')
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+
+  } else if (type==='supply') {
+    tEl.textContent = '新增器具 / 耗材';
+    bEl.innerHTML = '<label>品項名稱</label><input id="m0" placeholder="例：烘焙紙、手套">'
+      +'<label>來源</label>'
+      +'<div class="tog-row" id="src-row"><span class="tog sel" data-src="buy">買</span><span class="tog" data-src="borrow">借</span><span class="tog" data-src="gift">付出</span></div>'
+      +'<label>來源說明（通路或誰借的）</label><input id="m-src" placeholder="例：蝦皮、Amy家裡">'
+      +'<label>數量</label><input id="m2" type="number" value="1">'
+      +'<label>預估單價 NT$</label><input id="m3" type="number" value="0">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+    bEl.addEventListener('click', e => {
+      const sb2 = e.target.closest('#src-row .tog');
+      if (!sb2) return;
+      bEl.querySelectorAll('#src-row .tog').forEach(t => t.classList.remove('sel'));
+      sb2.classList.add('sel');
+    });
+
+  } else if (type==='person' || type==='contact') {
+    tEl.textContent = type==='person' ? '新增人員' : '新增聯絡人';
+    bEl.innerHTML = '<label>姓名 / 暱稱</label><input id="m0" placeholder="例：Amy、Ben">'
+      +'<label>角色</label>'
+      +'<select id="m-role"><option value="">一般幫忙</option><option value="usher">Usher</option><option value="usher_king">Usher King</option><option value="vendor">廠商</option><option value="venue">場地負責人</option><option value="driver">運送司機</option></select>'
+      +'<label>電話'+(type==='contact'?'':' （選填）')+'</label><input id="m-phone" type="tel" placeholder="0912345678">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+
+  } else if (type==='todo') {
+    tEl.textContent = '新增待辦事項';
+    bEl.innerHTML = '<label>待辦內容</label><input id="m0" placeholder="例：確認飯糰訂購數量">'
+      +'<label>時程階段</label>'
+      +'<div class="tog-row" id="phase-row">'+PHASES.map((p,i)=>'<span class="tog'+(i===0?' sel':'')+'" data-phase="'+p.key+'">'+p.label+'</span>').join('')+'</div>'
+      +'<label>分類</label>'
+      +'<div class="tog-row" id="cat-row">'+TODO_CATS.map((c,i)=>'<span class="tog'+(i===0?' sel':'')+'" data-cat="'+c.key+'">'+c.icon+' '+c.label+'</span>').join('')+'</div>'
+      +'<label>指定日期（選填）</label><input id="m-date" type="date">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+    bEl.addEventListener('click', e => {
+      const pb = e.target.closest('#phase-row .tog');
+      if (pb) { bEl.querySelectorAll('#phase-row .tog').forEach(t=>t.classList.remove('sel')); pb.classList.add('sel'); }
+      const cb = e.target.closest('#cat-row .tog');
+      if (cb) { bEl.querySelectorAll('#cat-row .tog').forEach(t=>t.classList.remove('sel')); cb.classList.add('sel'); }
+    });
+
+  } else if (type==='dayTask') {
+    tEl.textContent = '新增當天工作';
+    bEl.innerHTML = '<label>工作內容</label><input id="m0" placeholder="例：擺設茶點桌">'
+      +'<label>時間提醒（選填）</label><input id="m-time" placeholder="例：10:00前完成">'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+
+  } else if (type==='calc') {
+    tEl.textContent = '🧮 小計算機';
+    bEl.innerHTML = '<div style="background:#1a1a2e;border-radius:12px;padding:12px;margin-bottom:12px">'
+      +'<div id="calc-expr" style="color:#aaa;font-size:11px;min-height:18px;text-align:right;margin-bottom:2px"></div>'
+      +'<div id="calc-display" style="color:#fff;font-size:28px;font-weight:700;text-align:right;min-height:40px;word-break:break-all">0</div></div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'
+      +'<button class="cbtn cbtn-fn" data-v="AC">AC</button><button class="cbtn cbtn-fn" data-v="+/-">+/-</button><button class="cbtn cbtn-fn" data-v="%">%</button><button class="cbtn cbtn-op" data-v="÷">÷</button>'
+      +'<button class="cbtn" data-v="7">7</button><button class="cbtn" data-v="8">8</button><button class="cbtn" data-v="9">9</button><button class="cbtn cbtn-op" data-v="×">×</button>'
+      +'<button class="cbtn" data-v="4">4</button><button class="cbtn" data-v="5">5</button><button class="cbtn" data-v="6">6</button><button class="cbtn cbtn-op" data-v="−">−</button>'
+      +'<button class="cbtn" data-v="1">1</button><button class="cbtn" data-v="2">2</button><button class="cbtn" data-v="3">3</button><button class="cbtn cbtn-op" data-v="+">+</button>'
+      +'<button class="cbtn" data-v="0" style="grid-column:span 2">0</button><button class="cbtn" data-v=".">.</button><button class="cbtn cbtn-eq" data-v="=">=</button></div>'
+      +'<div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:7px 10px;margin-top:10px">💡 例：659 ÷ 8 = 82.375（每罐成本）</div>'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">關閉</button></div>';
+    const cSt = { expr:'', cur:'0', op:'', prev:null, jc:false };
+    function cUpd() { const d=eid('calc-display'),x=eid('calc-expr'); if(d) d.textContent=cSt.cur; if(x) x.textContent=cSt.expr; }
+    bEl.addEventListener('click', e => {
+      const btn = e.target.closest('.cbtn'); if (!btn) return;
+      const v = btn.dataset.v;
+      if (v==='AC') { Object.assign(cSt,{expr:'',cur:'0',op:'',prev:null,jc:false}); cUpd(); return; }
+      if (v==='+/-') { cSt.cur=String(-(parseFloat(cSt.cur)||0)); cUpd(); return; }
+      if (v==='%') { cSt.cur=String((parseFloat(cSt.cur)||0)/100); cUpd(); return; }
+      if ('÷×−+'.includes(v)) { cSt.prev=parseFloat(cSt.cur); cSt.op=v; cSt.expr=cSt.cur+' '+v; cSt.jc=false; cSt.cur='0'; cUpd(); return; }
+      if (v==='=') {
+        if (cSt.prev==null) { cUpd(); return; }
+        const a=cSt.prev, b=parseFloat(cSt.cur); let r;
+        if (cSt.op==='÷') r=b?a/b:0; else if (cSt.op==='×') r=a*b; else if (cSt.op==='−') r=a-b; else r=a+b;
+        cSt.expr=cSt.expr+' '+cSt.cur+' ='; cSt.cur=String(Math.round(r*1000000)/1000000); cSt.prev=null; cSt.op=''; cSt.jc=true; cUpd(); return;
+      }
+      if (v==='.') { if(cSt.jc){cSt.cur='0';cSt.jc=false;} if(!cSt.cur.includes('.')) cSt.cur+='.'; cUpd(); return; }
+      if (cSt.cur==='0'||cSt.jc) { cSt.cur=v; cSt.jc=false; } else cSt.cur+=v;
+      cUpd();
+    });
   }
 
-  // calc button styles
-  if(!document.getElementById('calc-styles')){
-    const s=document.createElement('style');
-    s.id='calc-styles';
-    s.textContent='.cbtn{padding:14px 8px;border-radius:10px;border:none;background:#2a2a3e;color:#fff;font-size:17px;font-weight:600;cursor:pointer;font-family:"Noto Sans TC",sans-serif;}.cbtn-fn{background:#3a3a4e;color:#e0e0e0;}.cbtn-op{background:#4a6240;color:#fff;}.cbtn-eq{background:#c4963a;color:#fff;}';
-    document.head.appendChild(s);
-  }
-
-  const cc=eid('m-cancel'), cf=eid('m-confirm');
-  if(cc) cc.addEventListener('click',closeModal);
-  if(cf) cf.addEventListener('click',confirmModal);
+  const cc = eid('m-cancel'), cf = eid('m-confirm');
+  if (cc) cc.addEventListener('click', closeModal);
+  if (cf) cf.addEventListener('click', confirmModal);
   eid('ovl').classList.add('open');
-  setTimeout(()=>{ const f=eid('m0'); if(f) f.focus(); },300);
+  setTimeout(() => { const f = eid('m0'); if (f) f.focus(); }, 300);
 }
 
-function closeModal(){ eid('ovl').classList.remove('open'); }
-function ovlOutside(e){ if(e.target===eid('ovl')) closeModal(); }
-const mv=id=>{ const el=eid(id); return el?el.value:null; };
-const getSelTog=rowId=>{ const s=document.querySelector('#'+rowId+' .tog.sel'); return s?s.dataset:{}; };
+function closeModal() { eid('ovl').classList.remove('open'); }
+eid('ovl').addEventListener('click', e => { if (e.target===eid('ovl')) closeModal(); });
 
-async function confirmModal(){
-  const {type,ctx}=_mc;
+const mv = id => { const el = eid(id); return el ? el.value : null; };
+const getSelTog = rowId => { const s = document.querySelector('#'+rowId+' .tog.sel'); return s ? s.dataset : {}; };
 
-  if(type==='forgotPassword'){
-    const email=mv('m0'); if(!email){showToast('請填入Email');return;}
-    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://wedding-snacks.vercel.app'});
-    if(error){showToast('寄送失敗：'+error.message);}
-    else{showToast('✓ 重設密碼信已寄出，請查收Email',3000); closeModal(); return;}
-  }
+async function confirmModal() {
+  const { type, ctx } = _mc;
 
-  if(type==='newProject'){
-    const n=mv('m0'); if(!n){showToast('請填入專案名稱');return;}
-    const {data,error}=await sb.from('projects').insert({name:n,owner_id:currentUser.id,wedding_date:mv('m-date')||null,guest_count:parseInt(mv('m-guests'))||150,budget:parseInt(mv('m-budget'))||25000}).select().single();
-    if(error){showToast('建立失敗');return;}
-    closeModal(); await openProject(data.id,data);
+  if (type==='forgotPassword') {
+    const email = mv('m0'); if (!email) { showToast('請填入Email'); return; }
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo:'https://wedding-snacks.vercel.app' });
+    if (error) showToast('寄送失敗：'+error.message);
+    else { showToast('✓ 重設密碼信已寄出，請查收Email', 3000); closeModal(); }
 
-  } else if(type==='joinProject'){
-    const code=(mv('m0')||'').trim();
-    if(!code){showToast('請填入邀請碼');return;}
-    const {data:proj}=await sb.from('projects').select('*').eq('invite_code',code).single();
-    if(!proj){showToast('找不到此邀請碼');return;}
-    if(proj.owner_id===currentUser.id){showToast('這是你自己的專案');closeModal();return;}
-    await sb.from('project_members').upsert({project_id:proj.id,user_id:currentUser.id,role:'editor'},{onConflict:'project_id,user_id'});
+  } else if (type==='newProject') {
+    const n = mv('m0'); if (!n) { showToast('請填入專案名稱'); return; }
+    const { data, error } = await sb.from('projects').insert({ name:n, owner_id:currentUser.id, wedding_date:mv('m-date')||null, guest_count:parseInt(mv('m-guests'))||150, budget:parseInt(mv('m-budget'))||25000 }).select().single();
+    if (error) { showToast('建立失敗：'+error.message); return; }
+    closeModal();
+    await openProject(data.id, data);
+
+  } else if (type==='joinProject') {
+    const code = (mv('m0')||'').trim();
+    if (!code) { showToast('請填入邀請碼'); return; }
+    const { data: proj } = await sb.from('projects').select('*').eq('invite_code', code).single();
+    if (!proj) { showToast('找不到此邀請碼'); return; }
+    if (proj.owner_id===currentUser.id) { showToast('這是你自己的專案'); closeModal(); return; }
+    await sb.from('project_members').upsert({ project_id:proj.id, user_id:currentUser.id, role:'editor' }, { onConflict:'project_id,user_id' });
     closeModal(); showToast('✓ 已加入！'); await loadProjects();
 
-  } else if(type==='dish'){
-    const n=mv('m0'); if(!n){showToast('請填入名稱');return;}
-    const isH=ctx==='handmade';
-    const payload={project_id:currentProject.id,name:n,type:ctx,qty:parseInt(mv('m1'))||1,est_price:isH?0:(parseFloat(mv('m3'))||0),unit_size:isH?1:(parseInt(mv('m-unitsize'))||1),store:isH?'':(mv('m-store')||''),note:mv('m4')||'',containers:[]};
-    const {data}=await sb.from('dishes').insert(payload).select().single();
+  } else if (type==='dish') {
+    const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
+    const isH = ctx==='handmade';
+    const { data } = await sb.from('dishes').insert({ project_id:currentProject.id, name:n, type:ctx, qty:parseInt(mv('m1'))||1, est_price:isH?0:(parseFloat(mv('m3'))||0), unit_size:isH?1:(parseInt(mv('m-unitsize'))||1), store:isH?'':(mv('m-store')||''), note:mv('m4')||'', containers:[] }).select().single();
     D.dishes.push(data); renderDishes(); closeModal();
 
-  } else if(type==='ingredient'){
-    const n=mv('m0'); if(!n){showToast('請填入名稱');return;}
-    const md=getSelTog('ing-mode-row'), mode=md.mode||'count';
-    const isW=mode==='weight', isY=mode==='yield';
-    const payload={project_id:currentProject.id,dish_id:ctx,name:n,use_weight:isW,use_yield:isY,qty_per_item:isW?(parseFloat(mv('m1w'))||10):isY?1:(parseFloat(mv('m1'))||1),unit:isW?'g':isY?(mv('m-yu')||'條'):(mv('m2')||'個'),yields_per_unit:isY?(parseFloat(mv('m-yv'))||20):1,channels:[],selected_channel:null,total_cost:0};
-    const {data}=await sb.from('ingredients').insert(payload).select().single();
+  } else if (type==='ingredient') {
+    const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
+    const md = getSelTog('ing-mode-row'), mode = md.mode||'count';
+    const isW = mode==='weight', isY = mode==='yield';
+    const payload = { project_id:currentProject.id, dish_id:ctx, name:n, use_weight:isW, use_yield:isY, qty_per_item:isW?(parseFloat(mv('m1w'))||10):isY?1:(parseFloat(mv('m1'))||1), unit:isW?'g':isY?(mv('m-yu')||'條'):(mv('m2')||'個'), yields_per_unit:isY?(parseFloat(mv('m-yv'))||20):1, channels:[], selected_channel:null, total_cost:0 };
+    const { data } = await sb.from('ingredients').insert(payload).select().single();
     D.ingredients.push(data); renderCompare(); renderDishes(); closeModal();
 
-  } else if(type==='editIng'){
-    const ing=D.ingredients.find(i=>i.id===ctx); if(!ing) return;
-    const val=parseFloat(mv('m1'))||1;
-    const update={name:mv('m0')||ing.name};
-    if(ing.use_yield) update.yields_per_unit=val; else update.qty_per_item=val;
-    if(!ing.use_weight&&!ing.use_yield) update.unit=mv('m2')||ing.unit;
-    await sb.from('ingredients').update(update).eq('id',ctx);
-    Object.assign(ing,update); renderCompare(); renderDishes(); closeModal();
+  } else if (type==='editIng') {
+    const ing = D.ingredients.find(i => i.id===ctx); if (!ing) return;
+    const val = parseFloat(mv('m1'))||1;
+    const update = { name: mv('m0')||ing.name };
+    if (ing.use_yield) update.yields_per_unit = val; else update.qty_per_item = val;
+    if (!ing.use_weight && !ing.use_yield) update.unit = mv('m2')||ing.unit;
+    await sb.from('ingredients').update(update).eq('id', ctx);
+    Object.assign(ing, update); renderCompare(); renderDishes(); closeModal();
 
-  } else if(type==='channel'){
-    const n=mv('m0'); if(!n){showToast('請填入通路名稱');return;}
-    const ing=D.ingredients.find(i=>i.id===ctx); if(!ing) return;
-    const isW=ing.use_weight, isY=ing.use_yield;
-    const ch={store:n,pkgPrice:parseFloat(mv('m1'))||0,pkgQty:isY?1:(parseFloat(mv('m2'))||1),pkgWeight:isW?(parseFloat(mv('m2'))||500):0};
-    const chs=[...(ing.channels||[]),ch];
-    await sb.from('ingredients').update({channels:chs}).eq('id',ctx);
-    ing.channels=chs; renderCompare(); closeModal();
+  } else if (type==='channel') {
+    const n = mv('m0'); if (!n) { showToast('請填入通路名稱'); return; }
+    const ing = D.ingredients.find(i => i.id===ctx); if (!ing) return;
+    const isW = ing.use_weight, isY = ing.use_yield;
+    const ch = { store:n, pkgPrice:parseFloat(mv('m1'))||0, pkgQty:isY?1:(parseFloat(mv('m2'))||1), pkgWeight:isW?(parseFloat(mv('m2'))||500):0 };
+    const chs = [...(ing.channels||[]), ch];
+    await sb.from('ingredients').update({ channels:chs }).eq('id', ctx);
+    ing.channels = chs; renderCompare(); closeModal();
 
-  } else if(type==='supply'){
-    const n=mv('m0'); if(!n){showToast('請填入名稱');return;}
-    const sd=getSelTog('src-row');
-    const {data}=await sb.from('equip_custom').insert({project_id:currentProject.id,name:n,src_type:sd.src||'buy',src_name:mv('m-src')||'',price:parseFloat(mv('m3'))||0,qty:parseInt(mv('m2'))||1}).select().single();
-    D.equipCustom.push(data); renderProcure(); closeModal();
+  } else if (type==='supply') {
+    const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
+    const sd = getSelTog('src-row');
+    const { data } = await sb.from('equip_custom').insert({ project_id:currentProject.id, name:n, src_type:sd.src||'buy', src_name:mv('m-src')||'', price:parseFloat(mv('m3'))||0, qty:parseInt(mv('m2'))||1 }).select().single();
+    D.equipCustom.push(data); renderProcure(); recalcBudget(); closeModal();
 
-  } else if(type==='person'||type==='contact'){
-    const n=mv('m0'); if(!n){showToast('請填入姓名');return;}
-    const {data}=await sb.from('persons').insert({project_id:currentProject.id,name:n,role:mv('m-role')||'',phone:mv('m-phone')||null,note:mv('m4')||''}).select().single();
+  } else if (type==='person' || type==='contact') {
+    const n = mv('m0'); if (!n) { showToast('請填入姓名'); return; }
+    const { data } = await sb.from('persons').insert({ project_id:currentProject.id, name:n, role:mv('m-role')||'', phone:mv('m-phone')||null }).select().single();
     D.persons.push(data);
-    if(type==='person') renderTasks(); else renderSettings();
+    if (type==='person') renderTasks(); else renderSettings();
     closeModal();
 
-  } else if(type==='todo'){
-    const n=mv('m0'); if(!n){showToast('請填入待辦內容');return;}
-    const pd=getSelTog('phase-row'), cd=getSelTog('cat-row');
-    const {data}=await sb.from('todos').insert({project_id:currentProject.id,phase:pd.phase||'w1',cat:cd.cat||'check',text:n,date:mv('m-date')||null,done:false}).select().single();
+  } else if (type==='todo') {
+    const n = mv('m0'); if (!n) { showToast('請填入待辦內容'); return; }
+    const pd = getSelTog('phase-row'), cd = getSelTog('cat-row');
+    const { data } = await sb.from('todos').insert({ project_id:currentProject.id, phase:pd.phase||'w1', cat:cd.cat||'check', text:n, date:mv('m-date')||null, done:false }).select().single();
     D.todos.push(data); renderTimeline(); closeModal();
 
-  } else if(type==='dayTask'){
-    const n=mv('m0'); if(!n){showToast('請填入工作內容');return;}
-    const pd=getSelTog('person-row');
-    const {data}=await sb.from('day_tasks').insert({project_id:currentProject.id,text:n,time_note:mv('m-time')||'',person_ids:pd.pid?[pd.pid]:[],done:false,sort_order:D.dayTasks.length}).select().single();
+  } else if (type==='dayTask') {
+    const n = mv('m0'); if (!n) { showToast('請填入工作內容'); return; }
+    const { data } = await sb.from('day_tasks').insert({ project_id:currentProject.id, text:n, time_note:mv('m-time')||'', done:false, sort_order:D.dayTasks.length }).select().single();
     D.dayTasks.push(data); renderDayMode(); closeModal();
   }
 }
 
-eid('btn-open-calc').addEventListener('click',()=>openModal('calc'));
+eid('btn-open-calc').addEventListener('click', () => openModal('calc', null));
 
-// ── JOIN VIA URL ──
-async function checkInviteUrl(){
-  const params=new URLSearchParams(window.location.search);
-  const code=params.get('join');
-  if(code&&currentUser){
-    const {data:proj}=await sb.from('projects').select('*').eq('invite_code',code).single();
-    if(proj&&proj.owner_id!==currentUser.id){
-      await sb.from('project_members').upsert({project_id:proj.id,user_id:currentUser.id,role:'editor'},{onConflict:'project_id,user_id'});
-      window.history.replaceState({},'',window.location.pathname);
+// CHECK INVITE URL
+async function checkInviteUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('join');
+  if (code && currentUser) {
+    const { data: proj } = await sb.from('projects').select('*').eq('invite_code', code).single();
+    if (proj && proj.owner_id!==currentUser.id) {
+      await sb.from('project_members').upsert({ project_id:proj.id, user_id:currentUser.id, role:'editor' }, { onConflict:'project_id,user_id' });
+      window.history.replaceState({}, '', window.location.pathname);
       showToast('✓ 已加入：'+proj.name);
       await loadProjects();
     }
   }
 }
 
-// ── INIT ──
-init().then(()=>{ if(currentUser) checkInviteUrl(); });
-
-sb.auth.onAuthStateChange(async(event,session)=>{
-  if(event==='SIGNED_IN'&&session){
-    currentUser=session.user;
+// AUTH STATE CHANGE
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event==='SIGNED_IN' && session) {
+    currentUser = session.user;
     await gotoHome();
     checkInviteUrl();
   }
-  if(event==='SIGNED_OUT'){
-    currentUser=null; currentProject=null;
+  if (event==='SIGNED_OUT') {
+    currentUser = null; currentProject = null;
     showScreen('screen-auth');
   }
 });
 
-})();
+// START
+const loadTimeout = setTimeout(() => {
+  eid('loading').style.display = 'none';
+  showScreen('screen-auth');
+}, 5000);
+
+try {
+  const { data: { session } } = await sb.auth.getSession();
+  clearTimeout(loadTimeout);
+  if (session) { currentUser = session.user; await gotoHome(); checkInviteUrl(); }
+  else showScreen('screen-auth');
+} catch(e) {
+  clearTimeout(loadTimeout);
+  showScreen('screen-auth');
+}
+eid('loading').style.display = 'none';
 </script>
 </body>
 </html>
