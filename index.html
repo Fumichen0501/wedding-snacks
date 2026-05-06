@@ -251,6 +251,7 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-password" placeholder="密碼">
       <button class="btn-auth" id="btn-login">登入</button>
+      <div style="text-align:center;margin-top:10px"><span style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline" id="btn-forgot">忘記密碼？</span></div>
       <div class="auth-msg" id="login-msg"></div>
     </div>
     <div class="auth-form" id="auth-register-form" style="display:none">
@@ -522,7 +523,9 @@ eid('btn-register').addEventListener('click',async()=>{
   else{msg.className='auth-msg ok';msg.textContent='✓ 帳號建立成功！請查收確認信後登入';}
 });
 
-eid('btn-logout').addEventListener('click',async()=>{
+eid('btn-forgot').addEventListener('click',()=>openModal('forgotPassword'));
+
+
   await sb.auth.signOut();
   currentUser=null; currentProject=null;
   showScreen('screen-auth');
@@ -1188,7 +1191,7 @@ function openModal(type,ctx){
 
   if(type==='newProject'){
     tEl.textContent='建立婚禮專案';
-    bEl.innerHTML=`<label>專案名稱（例：辰欣婚禮茶點）</label><input id="m0" placeholder="XXX 婚禮茶點"><label>婚禮日期</label><input id="m-date" type="date"><label>預計賓客人數</label><input id="m-guests" type="number" value="150"><label>食物預算 NT$</label><input id="m-budget" type="number" value="25000"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">建立</button></div>`;
+    bEl.innerHTML=`<label>專案名稱（例：Sarah & John 婚禮茶點）</label><input id="m0" placeholder="例：Sarah & John 婚禮茶點"><label>婚禮日期</label><input id="m-date" type="date"><label>預計賓客人數</label><input id="m-guests" type="number" value="150"><label>食物預算 NT$</label><input id="m-budget" type="number" value="25000"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">建立</button></div>`;
   } else if(type==='joinProject'){
     tEl.textContent='加入婚禮專案';
     bEl.innerHTML=`<label>邀請碼（8位英數字）</label><input id="m0" placeholder="例：abc12345" maxlength="8" style="letter-spacing:4px;font-size:18px;text-align:center"><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">加入</button></div>`;
@@ -1231,6 +1234,11 @@ function openModal(type,ctx){
     tEl.textContent='新增當天工作';
     bEl.innerHTML=`<label>工作內容</label><input id="m0" placeholder="例：擺設茶點桌"><label>時間提醒（選填）</label><input id="m-time" placeholder="例：10:00前完成"><label>負責人（選填）</label><div class="tog-row" id="person-row"><span class="tog sel" data-pid="">無</span>${D.persons.map(p=>`<span class="tog" data-pid="${p.id}">${escH(p.name)}</span>`).join('')}</div><div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>`;
     bEl.addEventListener('click',e=>{ const pb=e.target.closest('#person-row .tog'); if(!pb) return; bEl.querySelectorAll('#person-row .tog').forEach(t=>t.classList.remove('sel')); pb.classList.add('sel'); });
+  if(type==='forgotPassword'){
+    tEl.textContent='重設密碼';
+    bEl.innerHTML=`<div style="font-size:13px;color:var(--muted);margin-bottom:12px">輸入你的 Email，我們會寄送重設密碼連結給你。</div>
+      <label>Email</label><input id="m0" type="email" placeholder="your@email.com">
+      <div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">寄送重設信</button></div>`;
   } else if(type==='calc'){
     tEl.textContent='🧮 小計算機';
     bEl.innerHTML=`<div style="background:#1a1a2e;border-radius:12px;padding:12px;margin-bottom:12px"><div id="calc-expr" style="color:#aaa;font-size:11px;min-height:18px;text-align:right;margin-bottom:2px"></div><div id="calc-display" style="color:#fff;font-size:28px;font-weight:700;text-align:right;min-height:40px;word-break:break-all">0</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><button class="cbtn cbtn-fn" data-v="AC">AC</button><button class="cbtn cbtn-fn" data-v="+/-">+/-</button><button class="cbtn cbtn-fn" data-v="%">%</button><button class="cbtn cbtn-op" data-v="÷">÷</button><button class="cbtn" data-v="7">7</button><button class="cbtn" data-v="8">8</button><button class="cbtn" data-v="9">9</button><button class="cbtn cbtn-op" data-v="×">×</button><button class="cbtn" data-v="4">4</button><button class="cbtn" data-v="5">5</button><button class="cbtn" data-v="6">6</button><button class="cbtn cbtn-op" data-v="−">−</button><button class="cbtn" data-v="1">1</button><button class="cbtn" data-v="2">2</button><button class="cbtn" data-v="3">3</button><button class="cbtn cbtn-op" data-v="+">+</button><button class="cbtn" data-v="0" style="grid-column:span 2">0</button><button class="cbtn" data-v=".">.</button><button class="cbtn cbtn-eq" data-v="=">=</button></div><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:7px 10px;margin-top:10px">💡 例：659 ÷ 8 = 82.375（每罐成本）</div><div class="btn-row"><button class="btn btn-outline" id="m-cancel">關閉</button></div>`;
@@ -1261,6 +1269,13 @@ const getSelTog=rowId=>{ const s=document.querySelector('#'+rowId+' .tog.sel'); 
 
 async function confirmModal(){
   const {type,ctx}=_mc;
+
+  if(type==='forgotPassword'){
+    const email=mv('m0'); if(!email){showToast('請填入Email');return;}
+    const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://wedding-snacks.vercel.app'});
+    if(error){showToast('寄送失敗：'+error.message);}
+    else{showToast('✓ 重設密碼信已寄出，請查收Email',3000); closeModal(); return;}
+  }
 
   if(type==='newProject'){
     const n=mv('m0'); if(!n){showToast('請填入專案名稱');return;}
