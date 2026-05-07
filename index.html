@@ -217,6 +217,7 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
     <button class="tab-item active" data-tab="venue"><div class="tab-icon">🏛️</div>場地</button>
     <button class="tab-item" data-tab="dishes"><div class="tab-icon">🍽️</div>餐點</button>
     <button class="tab-item" data-tab="compare"><div class="tab-icon">🔍</div>比價</button>
+    <button class="tab-item" data-tab="equip"><div class="tab-icon">🧺</div>器具</button>
     <button class="tab-item" data-tab="procure"><div class="tab-icon">💰</div>採購</button>
     <button class="tab-item" data-tab="team"><div class="tab-icon">👥</div>分工</button>
     <button class="tab-item" data-tab="todos"><div class="tab-icon">🗓️</div>待辦</button>
@@ -262,7 +263,11 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
       </div>
       <div id="compare-list"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">請先在「餐點」新增手作點心</div></div></div>
     </div>
-    <div class="tab-pane" id="pane-procure">
+    <div class="tab-pane" id="pane-equip">
+      <div class="ph" style="margin-bottom:12px"><div class="pt" style="font-size:16px">器具清單</div><div class="pd">為每道餐點指定容器，設定數量模式，系統自動彙總總需求。</div></div>
+      <div id="equip-assign-section"><div class="empty"><div class="empty-icon">🧺</div><div class="empty-text">請先新增餐點</div></div></div>
+      <div class="card"><div class="card-head"><div class="card-title">📦 器具總需求彙總</div></div><div id="equip-summary"><div style="font-size:12px;color:var(--muted);padding:6px">請先為餐點指定容器</div></div></div>
+    </div>
       <div class="sg">
         <div class="sb hi"><div class="sl">採購預算</div><div class="sv" id="s4-total">—</div><div class="su">NT$</div></div>
         <div class="sb"><div class="sl">實際花費</div><div class="sv" id="s4-actual">—</div><div class="su">NT$</div></div>
@@ -492,6 +497,7 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-item').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='pane-'+tab));
   if (tab==='compare') renderCompare();
+  if (tab==='equip') renderEquipAssign();
   if (tab==='procure') renderProcure();
   if (tab==='team') renderTasks();
   if (tab==='todos') renderTimeline();
@@ -756,6 +762,87 @@ eid('compare-list').addEventListener('change', async e => {
   ing.channels = chs;
   await sb.from('ingredients').update({ channels:chs, selected_channel:ing.selected_channel, total_cost:ing.total_cost }).eq('id', ingId);
   renderCompare(); renderDishes();
+});
+
+// EQUIP ASSIGN
+const EQUIP_CATS = [
+  {cat:'刀具/工具', items:['剪刀','食物剪刀','砧板','菜刀','食物夾','手套','湯匙','模具']},
+  {cat:'容器/盛裝', items:['大木托盤','小木托盤','塑膠托盤','木籃','木盆','鋼盆','冷水壺','飲料桶','快煮壺','店家自有']},
+  {cat:'一次性', items:['烘焙紙','保鮮袋','保鮮盒','保鮮膜','紙盤','紙杯','塑膠杯','紙托','塑膠湯匙','塑膠叉子']},
+  {cat:'清潔/衛生', items:['衛生紙','餐巾紙','廚房紙巾','酒精']},
+  {cat:'其他', items:['冰塊']}
+];
+
+function renderEquipAssign() {
+  const el = eid('equip-assign-section');
+  if (!D.dishes.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🧺</div><div class="empty-text">請先新增餐點</div></div>'; renderEquipSummary(); return; }
+  el.innerHTML = D.dishes.map(dish => {
+    if (!dish.containers) dish.containers = [];
+    const ctrs = dish.containers;
+    let h = '<div class="card"><div class="card-head"><div class="card-title">'+(dish.type==='handmade'?'👐':'🛍️')+' '+escH(dish.name)+' <span style="font-size:11px;font-weight:400;color:var(--muted)">× '+dish.qty+' 份</span></div>'
+      +'<button class="btn btn-primary btn-sm" data-action="add-container" data-dish-id="'+dish.id+'">＋ 加容器</button></div>';
+    if (!ctrs.length) h += '<div style="font-size:12px;color:var(--muted);padding:4px 0">尚未指定容器</div>';
+    ctrs.forEach((ctr, ci) => {
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f0e8">'
+        +'<span class="ctag" style="flex-shrink:0">'+escH(ctr.equipName)+'</span>'
+        +'<div style="display:flex;align-items:center;gap:6px;flex:1">'
+        +'<span class="tog'+(ctr.qtyMode==='fixed'?' sel':'')+'" data-action="set-ctr-mode" data-dish-id="'+dish.id+'" data-ci="'+ci+'" data-mode="fixed">固定</span>'
+        +'<span class="tog'+(ctr.qtyMode==='per'?' sel':'')+'" data-action="set-ctr-mode" data-dish-id="'+dish.id+'" data-ci="'+ci+'" data-mode="per">每份一個</span>'
+        +(ctr.qtyMode==='fixed'
+          ? '<input class="ii" type="number" value="'+(ctr.fixedQty||1)+'" data-action="upd-ctr-qty" data-dish-id="'+dish.id+'" data-ci="'+ci+'"> 個'
+          : '<span style="font-size:11px;color:var(--sage-dark);font-weight:600">= '+dish.qty+' 個</span>')
+        +'</div>'
+        +'<button class="bx" data-action="del-container" data-dish-id="'+dish.id+'" data-ci="'+ci+'">×</button>'
+        +'</div>';
+    });
+    return h + '</div>';
+  }).join('');
+  renderEquipSummary();
+}
+
+function renderEquipSummary() {
+  const summary = {};
+  D.dishes.forEach(dish => {
+    (dish.containers||[]).forEach(ctr => {
+      if (!summary[ctr.equipName]) summary[ctr.equipName] = 0;
+      summary[ctr.equipName] += ctr.qtyMode==='per' ? (dish.qty||1) : (ctr.fixedQty||1);
+    });
+  });
+  const keys = Object.keys(summary);
+  const el = eid('equip-summary');
+  if (!keys.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px">請先為餐點指定容器</div>'; return; }
+  el.innerHTML = '<table class="tbl"><thead><tr><th>器具/容器</th><th class="nr">總需求量</th></tr></thead><tbody>'
+    +keys.map(k => '<tr><td>'+escH(k)+'</td><td class="nr hi">'+summary[k]+' 個</td></tr>').join('')
+    +'</tbody></table><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-top:8px">💡 此彙總會帶入「採購」頁面的器具欄位</div>';
+}
+
+eid('pane-equip').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]'); if (!btn) return;
+  const act = btn.dataset.action, dishId = btn.dataset.dishId;
+  const dish = D.dishes.find(d => d.id===dishId);
+  if (act==='add-container') openModal('pickContainer', dishId);
+  if (act==='del-container' && dish) {
+    if (!dish.containers) dish.containers = [];
+    dish.containers.splice(parseInt(btn.dataset.ci), 1);
+    sb.from('dishes').update({ containers: dish.containers }).eq('id', dishId);
+    renderEquipAssign();
+  }
+  if (act==='set-ctr-mode' && dish) {
+    if (!dish.containers) dish.containers = [];
+    dish.containers[parseInt(btn.dataset.ci)].qtyMode = btn.dataset.mode;
+    sb.from('dishes').update({ containers: dish.containers }).eq('id', dishId);
+    renderEquipAssign();
+  }
+});
+
+eid('pane-equip').addEventListener('change', e => {
+  const el = e.target; if (el.dataset.action!=='upd-ctr-qty') return;
+  const dish = D.dishes.find(d => d.id===el.dataset.dishId);
+  if (dish && dish.containers[parseInt(el.dataset.ci)]) {
+    dish.containers[parseInt(el.dataset.ci)].fixedQty = parseInt(el.value)||1;
+    sb.from('dishes').update({ containers: dish.containers }).eq('id', el.dataset.dishId);
+    renderEquipSummary();
+  }
 });
 
 // PROCURE
@@ -1183,12 +1270,46 @@ function openModal(type, ctx) {
     const ing = D.ingredients.find(i => i.id===ctx);
     tEl.textContent = '新增通路 — '+(ing?.name||'');
     const isW = ing?.use_weight, isY = ing?.use_yield;
-    bEl.innerHTML = '<label>通路名稱</label><input id="m0" placeholder="例：全聯、家樂福、Costco">'
+    const storeOpts = ['家樂福','全聯','Costco','愛買','大潤發','美聯社','7-11','全家','萊爾富'];
+    bEl.innerHTML = '<label>通路（點選或自填）</label>'
+      +'<div class="tog-row" id="store-tog-row" style="margin-bottom:6px">'
+      +storeOpts.map(s => '<span class="tog" data-store="'+s+'">'+s+'</span>').join('')
+      +'</div>'
+      +'<input id="m0" placeholder="或直接填入通路名稱">'
       +'<label>包裝售價 NT$</label><input id="m1" type="number" placeholder="例：259">'
-      +(isW ? '<label>每包幾克</label><input id="m2" type="number" value="500">'
-        : isY ? '<div style="background:var(--warm);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);margin-top:8px">售價即為每'+escH(ing?.unit||'個')+'的價格</div>'
-        : '<label>每包數量（'+escH(ing?.unit||'個')+'）</label><input id="m2" type="number" value="1">')
+      +(isW ? '<label>每包幾克 (g)</label><input id="m2" type="number" value="500"><div style="background:var(--warm);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--muted);margin-top:6px">💡 例：火腿 500g/包 NT$80 → 系統自動算需幾包</div>'
+        : isY ? '<div style="background:var(--warm);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);margin-top:8px">售價即為每'+escH(ing?.unit||'個')+'的價格，系統自動計算需幾'+escH(ing?.unit||'個')+'</div>'
+        : '<label>每包數量（'+escH(ing?.unit||'個')+'）</label><input id="m2" type="number" value="1"><div style="background:var(--warm);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--muted);margin-top:6px">💡 例：Costco 可頌 NT$259 / 30個 → 自動算每個成本再算總花費</div>')
       +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+    bEl.addEventListener('click', e => {
+      const sb2 = e.target.closest('#store-tog-row .tog');
+      if (!sb2) return;
+      bEl.querySelectorAll('#store-tog-row .tog').forEach(t => t.classList.remove('sel'));
+      sb2.classList.add('sel');
+      eid('m0').value = sb2.dataset.store;
+    });
+
+  } else if (type==='pickContainer') {
+    const dish = D.dishes.find(d => d.id===ctx);
+    tEl.textContent = '新增容器 — '+(dish?.name||'');
+    let h = '<label>選擇器具</label>';
+    EQUIP_CATS.forEach(gc => {
+      h += '<div style="font-size:11px;font-weight:600;color:var(--muted);margin:8px 0 4px">'+gc.cat+'</div><div class="tog-row" style="margin-bottom:4px">';
+      gc.items.forEach(name => { h += '<span class="tog" data-action="pick-equip" data-name="'+escA(name)+'">'+escH(name)+'</span>'; });
+      h += '</div>';
+    });
+    h += '<label>或自填名稱</label><input id="m-custom-equip" placeholder="自訂器具名稱">'
+      +'<label>數量模式</label>'
+      +'<div class="tog-row" id="qty-mode-row"><span class="tog sel" data-mode="fixed">固定數量</span><span class="tog" data-mode="per">每份一個</span></div>'
+      +'<div id="fixed-qty-section"><label>固定數量</label><input id="m-fixed-qty" type="number" value="1" min="1"></div>'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+    bEl.innerHTML = h;
+    bEl.addEventListener('click', e => {
+      const chip = e.target.closest('[data-action="pick-equip"]');
+      if (chip) { eid('m-custom-equip').value=chip.dataset.name; bEl.querySelectorAll('[data-action="pick-equip"]').forEach(c=>c.classList.remove('sel')); chip.classList.add('sel'); }
+      const mb = e.target.closest('#qty-mode-row .tog');
+      if (mb) { bEl.querySelectorAll('#qty-mode-row .tog').forEach(t=>t.classList.remove('sel')); mb.classList.add('sel'); eid('fixed-qty-section').style.display=mb.dataset.mode==='fixed'?'block':'none'; }
+    });
 
   } else if (type==='supply') {
     tEl.textContent = '新增器具 / 耗材';
@@ -1307,6 +1428,17 @@ async function confirmModal() {
     if (proj.owner_id===currentUser.id) { showToast('這是你自己的專案'); closeModal(); return; }
     await sb.from('project_members').upsert({ project_id:proj.id, user_id:currentUser.id, role:'editor' }, { onConflict:'project_id,user_id' });
     closeModal(); showToast('✓ 已加入！'); await loadProjects();
+
+  } else if (type==='pickContainer') {
+    const eName = eid('m-custom-equip')?.value; if (!eName) { showToast('請選擇或填入器具名稱'); return; }
+    const md = getSelTog('qty-mode-row');
+    const mode = md.mode||'fixed';
+    const fqty = parseInt(eid('m-fixed-qty')?.value)||1;
+    const dish = D.dishes.find(d => d.id===ctx); if (!dish) return;
+    if (!dish.containers) dish.containers = [];
+    dish.containers.push({ equipName:eName, qtyMode:mode, fixedQty:fqty });
+    await sb.from('dishes').update({ containers: dish.containers }).eq('id', ctx);
+    renderEquipAssign(); closeModal();
 
   } else if (type==='dish') {
     const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
