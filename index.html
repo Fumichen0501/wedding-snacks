@@ -281,6 +281,11 @@ label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
         <div class="card-head"><div class="card-title">🧺 器具 &amp; 耗材</div><button class="btn btn-primary btn-sm" id="btn-add-equip">＋ 新增</button></div>
         <div id="buy-equip"></div>
       </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">💸 算帳清單</div><button class="btn btn-outline btn-sm" id="btn-refresh-accounting">重新計算</button></div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">根據「誰付的」自動統計每人需補貼金額</div>
+        <div id="accounting-list"><div style="font-size:12px;color:var(--muted)">請先填入實際花費並選擇付款人</div></div>
+      </div>
     </div>
     <div class="tab-pane" id="pane-team">
       <div class="card">
@@ -848,49 +853,164 @@ eid('pane-equip').addEventListener('change', e => {
 });
 
 // PROCURE
+function getPersonName(pid) {
+  const p = D.persons.find(p => p.id===pid);
+  return p ? p.name : '';
+}
+
+function personSelector(key, currentPid) {
+  if (!D.persons.length) return '<span style="font-size:11px;color:var(--muted)">先新增人員</span>';
+  return '<select style="padding:3px 6px;font-size:11px;border:1px solid #ddd8cc;border-radius:6px;background:var(--cream)" data-action="upd-buyer" data-key="'+key+'">'
+    +'<option value="">— 誰去買 —</option>'
+    +D.persons.map(p => '<option value="'+p.id+'"'+(currentPid===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('')
+    +'</select>';
+}
+
+function syncEquipFromSummary() {
+  // Build summary from dish containers
+  const summary = {};
+  D.dishes.forEach(dish => {
+    (dish.containers||[]).forEach(ctr => {
+      if (!summary[ctr.equipName]) summary[ctr.equipName] = 0;
+      summary[ctr.equipName] += ctr.qtyMode==='per' ? (dish.qty||1) : (ctr.fixedQty||1);
+    });
+  });
+  // Sync into equipCustom (from_summary items)
+  const summaryNames = Object.keys(summary);
+  // Remove old summary items that no longer exist
+  D.equipCustom = D.equipCustom.filter(e => !e.from_summary || summaryNames.includes(e.name));
+  // Add/update summary items
+  summaryNames.forEach(name => {
+    const existing = D.equipCustom.find(e => e.from_summary && e.name===name);
+    if (existing) { existing.qty = summary[name]; }
+    else { D.equipCustom.push({ id:'summary_'+name, name, from_summary:true, src_type:'buy', src_name:'', price:0, qty:summary[name] }); }
+  });
+}
+
 function renderProcure() {
+  syncEquipFromSummary();
+
+  // Food ingredients
   const ings = D.ingredients.filter(i => i.selected_channel!=null && (i.total_cost||0)>0);
   const iEl = eid('buy-ing');
   if (!ings.length) { iEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在食材比價頁勾選通路</div>'; }
   else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th><th>誰付的</th></tr></thead><tbody>';
     ings.forEach(ing => {
       const d = D.dishes.find(d => d.id===ing.dish_id);
       const ch = (ing.channels||[])[ing.selected_channel]||{};
-      const akey = 'ing'+ing.id, aval = D.actuals[akey];
-      h += '<tr><td>'+escH(ing.name)+'</td><td style="font-size:11px;color:var(--muted)">'+(d?escH(d.name):'')+'</td><td style="font-size:11px">'+escH(ch.store||'')+'</td><td class="nr hi">NT$'+fmtN(ing.total_cost)+'</td>'
-        +'<td class="nr"><input type="number" style="width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td></tr>';
+      const akey = 'ing'+ing.id;
+      const aval = D.actuals[akey];
+      const buyer = D.actuals[akey+'_buyer']||'';
+      const payer = D.actuals[akey+'_payer']||'';
+      h += '<tr>'
+        +'<td>'+escH(ing.name)+'</td>'
+        +'<td style="font-size:11px;color:var(--muted)">'+(d?escH(d.name):'')+'</td>'
+        +'<td style="font-size:11px">'+escH(ch.store||'')+'</td>'
+        +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
+        +'<td class="nr hi">NT$'+fmtN(ing.total_cost)+'</td>'
+        +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
+        +'<td>'+personSelector(akey+'_payer', payer)+'</td>'
+        +'</tr>';
     });
     iEl.innerHTML = h + '</tbody></table></div>';
   }
+
+  // Bought dishes
   const bought = D.dishes.filter(d => d.type==='bought');
   const bEl = eid('buy-bought');
   if (!bought.length) { bEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在餐點規劃頁新增外購品項</div>'; }
   else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th><th>誰付的</th></tr></thead><tbody>';
     bought.forEach(d => {
       const u = d.unit_size||1, total = Math.ceil((d.qty||1)/u)*(d.est_price||0);
-      const akey = 'b'+d.id, aval = D.actuals[akey];
-      h += '<tr><td>'+escH(d.name)+'</td><td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td><td class="nr">'+Math.ceil((d.qty||1)/u)+'盤</td><td class="nr hi">NT$'+fmtN(total)+'</td>'
-        +'<td class="nr"><input type="number" style="width:80px;padding:3px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td></tr>';
+      const akey = 'b'+d.id;
+      const aval = D.actuals[akey];
+      const buyer = D.actuals[akey+'_buyer']||'';
+      const payer = D.actuals[akey+'_payer']||'';
+      h += '<tr>'
+        +'<td>'+escH(d.name)+'</td>'
+        +'<td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td>'
+        +'<td class="nr">'+Math.ceil((d.qty||1)/u)+'盤</td>'
+        +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
+        +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
+        +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
+        +'<td>'+personSelector(akey+'_payer', payer)+'</td>'
+        +'</tr>';
     });
     bEl.innerHTML = h + '</tbody></table></div>';
   }
+
+  // Equip & supplies
   const eEl = eid('buy-equip');
-  if (!D.equipCustom.length) { eEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">點「＋ 新增」加入器具耗材</div>'; }
-  else {
-    let h = '<table class="tbl"><thead><tr><th>品項</th><th>來源</th><th class="nr">數量</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th></th></tr></thead><tbody>';
+  if (!D.equipCustom.length) {
+    eEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">器具清單的容器會自動帶入，也可點「＋ 新增」手動加入</div>';
+  } else {
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>說明</th><th class="nr">需求量</th><th>誰去買</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th>誰付的</th><th></th></tr></thead><tbody>';
     D.equipCustom.forEach(eq => {
       const sub = eq.src_type==='buy' ? (eq.price||0)*(eq.qty||1) : 0;
-      const akey = 'eq'+eq.id, aval = D.actuals[akey];
-      h += '<tr><td>'+escH(eq.name)+'</td><td style="font-size:11px;color:var(--muted)">'+escH(eq.src_name||'')+'</td><td class="nr">'+eq.qty+'</td><td class="nr">NT$'+fmtN(eq.price||0)+'</td>'
+      const akey = 'eq'+eq.id;
+      const aval = D.actuals[akey];
+      const buyer = D.actuals[akey+'_buyer']||'';
+      const payer = D.actuals[akey+'_payer']||'';
+      const tag = eq.from_summary ? '<span style="background:#e8f0e4;color:var(--sage-dark);font-size:10px;padding:1px 5px;border-radius:6px;margin-left:3px">自動</span>' : '';
+      h += '<tr>'
+        +'<td>'+escH(eq.name)+tag+'</td>'
+        +'<td style="font-size:11px;color:var(--muted)">'+escH(eq.src_name||'')+'</td>'
+        +'<td class="nr">'+eq.qty+'</td>'
+        +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
+        +'<td class="nr">NT$<input type="number" style="width:48px;padding:2px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'"></td>'
         +'<td class="nr hi">'+(sub>0?'NT$'+fmtN(sub):'—')+'</td>'
-        +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'<td><button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button></td></tr>';
+        +'<td class="nr"><input type="number" style="width:65px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
+        +'<td>'+personSelector(akey+'_payer', payer)+'</td>'
+        +'<td>'+(eq.from_summary?'':'<button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button>')+'</td>'
+        +'</tr>';
     });
-    eEl.innerHTML = h + '</tbody></table>';
+    eEl.innerHTML = h + '</tbody></table></div>';
   }
+
   updateProcureTotals();
+  renderAccounting();
+}
+
+function renderAccounting() {
+  const totals = {}; // personId -> amount
+  const allKeys = [];
+
+  // Collect all payer keys
+  D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => allKeys.push('ing'+i.id));
+  D.dishes.filter(d => d.type==='bought').forEach(d => allKeys.push('b'+d.id));
+  D.equipCustom.forEach(e => allKeys.push('eq'+e.id));
+
+  allKeys.forEach(key => {
+    const actual = D.actuals[key];
+    const payerId = D.actuals[key+'_payer'];
+    if (actual!=null && actual>0 && payerId) {
+      if (!totals[payerId]) totals[payerId] = 0;
+      totals[payerId] += actual;
+    }
+  });
+
+  const el = eid('accounting-list');
+  const pids = Object.keys(totals);
+  if (!pids.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">請先填入實際花費並選擇「誰付的」</div>'; return; }
+
+  const grandTotal = pids.reduce((s,pid) => s+totals[pid], 0);
+  let h = '<div style="margin-bottom:10px">';
+  pids.forEach(pid => {
+    const name = getPersonName(pid)||'未知';
+    const amt = totals[pid];
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0ece4">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<div style="width:32px;height:32px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">'+escH(name[0])+'</div>'
+      +'<div><div style="font-size:14px;font-weight:600">'+escH(name)+'</div><div style="font-size:11px;color:var(--muted)">實際墊付</div></div></div>'
+      +'<div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--sage-dark)">NT$'+fmtN(amt)+'</div>'
+      +'<div style="font-size:11px;color:#c04020">需還款</div></div></div>';
+  });
+  h += '</div><div style="background:var(--sage-dark);color:#fff;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">'
+    +'<span style="font-size:13px">💸 總需補貼</span>'
+    +'<span style="font-size:18px;font-weight:700">NT$'+fmtN(grandTotal)+'</span></div>';
+  el.innerHTML = h;
 }
 
 function updateProcureTotals() {
@@ -907,11 +1027,23 @@ function updateProcureTotals() {
 
 eid('pane-procure').addEventListener('change', async e => {
   const el = e.target;
-  if (el.dataset.action !== 'upd-actual') return;
-  const val = el.value==='' ? null : +el.value;
-  D.actuals[el.dataset.key] = val;
-  await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:val }, { onConflict:'project_id,ref_key' });
-  updateProcureTotals();
+  const act = el.dataset.action;
+  if (act==='upd-actual') {
+    const val = el.value==='' ? null : +el.value;
+    D.actuals[el.dataset.key] = val;
+    await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:val }, { onConflict:'project_id,ref_key' });
+    updateProcureTotals(); renderAccounting();
+  }
+  if (act==='upd-buyer') {
+    const val = el.value||null;
+    D.actuals[el.dataset.key] = val;
+    if (val) await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:0 }, { onConflict:'project_id,ref_key' });
+  }
+  if (act==='upd-eq-price') {
+    const eq = D.equipCustom.find(e => e.id===el.dataset.id);
+    if (eq && !eq.from_summary) { eq.price=parseFloat(el.value)||0; await sb.from('equip_custom').update({price:eq.price}).eq('id',eq.id); updateProcureTotals(); }
+    else if (eq && eq.from_summary) { eq.price=parseFloat(el.value)||0; updateProcureTotals(); }
+  }
 });
 
 eid('pane-procure').addEventListener('click', async e => {
@@ -923,6 +1055,7 @@ eid('pane-procure').addEventListener('click', async e => {
 });
 
 eid('btn-add-equip').addEventListener('click', () => openModal('supply', null));
+eid('btn-refresh-accounting').addEventListener('click', () => renderAccounting());
 
 // TEAM
 function renderPersonChips() {
