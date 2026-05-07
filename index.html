@@ -601,7 +601,13 @@ function renderDishes() {
       list.forEach(d => {
         const u = d.unit_size||1, qty = d.qty||1, price = d.est_price||0;
         const units = Math.ceil(qty/u), total = units*price;
-        h += '<tr><td><b>'+escH(d.name)+'</b></td><td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td><td class="nr">'+qty+'</td><td class="nr">'+u+'個<br><small>NT$'+fmtN(price)+'/盤</small></td><td class="nr hi">'+units+'盤</td><td class="nr hi">NT$'+fmtN(total)+'</td><td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
+        h += '<tr><td><b>'+escH(d.name)+'</b></td>'
+          +'<td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td>'
+          +'<td class="nr"><input type="number" class="ii" value="'+qty+'" min="1" data-action="upd-qty" data-id="'+d.id+'"></td>'
+          +'<td class="nr">'+u+'個<br><small>NT$'+fmtN(price)+'/盤</small></td>'
+          +'<td class="nr hi">'+units+'盤</td>'
+          +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
+          +'<td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
       });
       el.innerHTML = h + '</tbody></table></div>';
     } else {
@@ -610,7 +616,12 @@ function renderDishes() {
         const qty = d.qty||1, total = calcIngCost(d.id);
         const uc = qty>0 ? Math.round(total/qty*10)/10 : 0;
         const gc = guests>0 ? Math.round(total/guests*10)/10 : 0;
-        h += '<tr><td><b>'+escH(d.name)+'</b></td><td class="nr">'+qty+'</td><td class="nr hi">NT$'+fmtN(total)+'</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$'+uc+'</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$'+gc+'</td><td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
+        h += '<tr><td><b>'+escH(d.name)+'</b></td>'
+          +'<td class="nr"><input type="number" class="ii" value="'+qty+'" min="1" data-action="upd-qty" data-id="'+d.id+'"></td>'
+          +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
+          +'<td class="nr" style="font-size:11px;color:var(--muted)">NT$'+uc+'</td>'
+          +'<td class="nr" style="font-size:11px;color:var(--muted)">NT$'+gc+'</td>'
+          +'<td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
       });
       el.innerHTML = h + '</tbody></table>';
     }
@@ -644,8 +655,30 @@ function handleDishListClick(e) {
   renderDishes();
 }
 
+async function handleDishListChange(e) {
+  const el = e.target;
+  if (el.dataset.action !== 'upd-qty') return;
+  const qty = parseInt(el.value)||1;
+  const dish = D.dishes.find(d => d.id===el.dataset.id);
+  if (!dish) return;
+  dish.qty = qty;
+  await sb.from('dishes').update({ qty }).eq('id', dish.id);
+  // Recalc ingredient costs for this dish
+  const ings = D.ingredients.filter(i => i.dish_id===dish.id);
+  for (const ing of ings) {
+    if (ing.selected_channel != null && ing.channels[ing.selected_channel]) {
+      const r = chTotal(ing.channels[ing.selected_channel], ing, dish);
+      ing.total_cost = Math.ceil(r.total);
+      await sb.from('ingredients').update({ total_cost: ing.total_cost }).eq('id', ing.id);
+    }
+  }
+  renderDishes();
+}
+
 eid('list-handmade').addEventListener('click', handleDishListClick);
 eid('list-bought').addEventListener('click', handleDishListClick);
+eid('list-handmade').addEventListener('change', handleDishListChange);
+eid('list-bought').addEventListener('change', handleDishListChange);
 eid('btn-add-handmade').addEventListener('click', () => openModal('dish', 'handmade'));
 eid('btn-add-bought').addEventListener('click', () => openModal('dish', 'bought'));
 eid('btn-save-budget').addEventListener('click', async () => {
@@ -853,6 +886,11 @@ eid('pane-equip').addEventListener('change', e => {
 });
 
 // PROCURE
+function getRoleLabel(role) {
+  const map = { lead:'主要負責人', co_lead:'副負責人', treasurer:'管錢', usher:'Usher', usher_king:'Usher King', vendor:'廠商', venue:'場地負責人', driver:'運送司機' };
+  return map[role] || role || '一般幫忙';
+}
+
 function getPersonName(pid) {
   const p = D.persons.find(p => p.id===pid);
   return p ? p.name : '';
@@ -895,14 +933,13 @@ function renderProcure() {
   const iEl = eid('buy-ing');
   if (!ings.length) { iEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在食材比價頁勾選通路</div>'; }
   else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th><th>誰付的</th></tr></thead><tbody>';
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
     ings.forEach(ing => {
       const d = D.dishes.find(d => d.id===ing.dish_id);
       const ch = (ing.channels||[])[ing.selected_channel]||{};
       const akey = 'ing'+ing.id;
       const aval = D.actuals[akey];
       const buyer = D.actuals[akey+'_buyer']||'';
-      const payer = D.actuals[akey+'_payer']||'';
       h += '<tr>'
         +'<td>'+escH(ing.name)+'</td>'
         +'<td style="font-size:11px;color:var(--muted)">'+(d?escH(d.name):'')+'</td>'
@@ -910,7 +947,6 @@ function renderProcure() {
         +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
         +'<td class="nr hi">NT$'+fmtN(ing.total_cost)+'</td>'
         +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'<td>'+personSelector(akey+'_payer', payer)+'</td>'
         +'</tr>';
     });
     iEl.innerHTML = h + '</tbody></table></div>';
@@ -921,13 +957,12 @@ function renderProcure() {
   const bEl = eid('buy-bought');
   if (!bought.length) { bEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在餐點規劃頁新增外購品項</div>'; }
   else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th><th>誰付的</th></tr></thead><tbody>';
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
     bought.forEach(d => {
       const u = d.unit_size||1, total = Math.ceil((d.qty||1)/u)*(d.est_price||0);
       const akey = 'b'+d.id;
       const aval = D.actuals[akey];
       const buyer = D.actuals[akey+'_buyer']||'';
-      const payer = D.actuals[akey+'_payer']||'';
       h += '<tr>'
         +'<td>'+escH(d.name)+'</td>'
         +'<td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td>'
@@ -935,7 +970,6 @@ function renderProcure() {
         +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
         +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
         +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'<td>'+personSelector(akey+'_payer', payer)+'</td>'
         +'</tr>';
     });
     bEl.innerHTML = h + '</tbody></table></div>';
@@ -946,23 +980,29 @@ function renderProcure() {
   if (!D.equipCustom.length) {
     eEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">器具清單的容器會自動帶入，也可點「＋ 新增」手動加入</div>';
   } else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>說明</th><th class="nr">需求量</th><th>誰去買</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th>誰付的</th><th></th></tr></thead><tbody>';
+    const srcOpts = [['buy','買'],['borrow','借'],['gift','付出']];
+    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>來源</th><th class="nr">需求量</th><th>誰去買/借</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th></th></tr></thead><tbody>';
     D.equipCustom.forEach(eq => {
       const sub = eq.src_type==='buy' ? (eq.price||0)*(eq.qty||1) : 0;
       const akey = 'eq'+eq.id;
       const aval = D.actuals[akey];
       const buyer = D.actuals[akey+'_buyer']||'';
-      const payer = D.actuals[akey+'_payer']||'';
       const tag = eq.from_summary ? '<span style="background:#e8f0e4;color:var(--sage-dark);font-size:10px;padding:1px 5px;border-radius:6px;margin-left:3px">自動</span>' : '';
+      // Source selector
+      const srcSel = '<select style="padding:3px 5px;font-size:11px;border:1px solid #ddd8cc;border-radius:6px;background:var(--cream)" data-action="upd-eq-src" data-id="'+eq.id+'">'
+        +srcOpts.map(o => '<option value="'+o[0]+'"'+(eq.src_type===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')
+        +'</select>';
+      const priceCell = eq.src_type==='buy'
+        ? 'NT$<input type="number" style="width:52px;padding:2px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'">'
+        : '<span style="font-size:11px;color:var(--muted)">免費</span>';
       h += '<tr>'
         +'<td>'+escH(eq.name)+tag+'</td>'
-        +'<td style="font-size:11px;color:var(--muted)">'+escH(eq.src_name||'')+'</td>'
+        +'<td>'+srcSel+'</td>'
         +'<td class="nr">'+eq.qty+'</td>'
         +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
-        +'<td class="nr">NT$<input type="number" style="width:48px;padding:2px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'"></td>'
+        +'<td class="nr">'+priceCell+'</td>'
         +'<td class="nr hi">'+(sub>0?'NT$'+fmtN(sub):'—')+'</td>'
         +'<td class="nr"><input type="number" style="width:65px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'<td>'+personSelector(akey+'_payer', payer)+'</td>'
         +'<td>'+(eq.from_summary?'':'<button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button>')+'</td>'
         +'</tr>';
     });
@@ -974,42 +1014,45 @@ function renderProcure() {
 }
 
 function renderAccounting() {
-  const totals = {}; // personId -> amount
+  const totals = {}; // personId -> {name, items:[{label,amount}], total}
   const allKeys = [];
+  D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => allKeys.push({key:'ing'+i.id, label:i.name, est:i.total_cost}));
+  D.dishes.filter(d => d.type==='bought').forEach(d => { const u=d.unit_size||1; allKeys.push({key:'b'+d.id, label:d.name, est:Math.ceil((d.qty||1)/u)*(d.est_price||0)}); });
+  D.equipCustom.filter(e => e.src_type==='buy').forEach(e => allKeys.push({key:'eq'+e.id, label:e.name, est:(e.price||0)*(e.qty||1)}));
 
-  // Collect all payer keys
-  D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => allKeys.push('ing'+i.id));
-  D.dishes.filter(d => d.type==='bought').forEach(d => allKeys.push('b'+d.id));
-  D.equipCustom.forEach(e => allKeys.push('eq'+e.id));
-
-  allKeys.forEach(key => {
+  allKeys.forEach(({key, label, est}) => {
+    const buyerId = D.actuals[key+'_buyer'];
     const actual = D.actuals[key];
-    const payerId = D.actuals[key+'_payer'];
-    if (actual!=null && actual>0 && payerId) {
-      if (!totals[payerId]) totals[payerId] = 0;
-      totals[payerId] += actual;
+    const amount = actual!=null ? actual : est; // use actual if filled, else estimate
+    if (buyerId && amount>0) {
+      if (!totals[buyerId]) totals[buyerId] = { items:[], total:0 };
+      totals[buyerId].items.push({ label, amount });
+      totals[buyerId].total += amount;
     }
   });
 
   const el = eid('accounting-list');
   const pids = Object.keys(totals);
-  if (!pids.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">請先填入實際花費並選擇「誰付的」</div>'; return; }
+  if (!pids.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">請先為採購項目選擇「誰去買」</div>'; return; }
 
-  const grandTotal = pids.reduce((s,pid) => s+totals[pid], 0);
-  let h = '<div style="margin-bottom:10px">';
+  const grandTotal = pids.reduce((s,pid) => s+totals[pid].total, 0);
+  let h = '';
   pids.forEach(pid => {
     const name = getPersonName(pid)||'未知';
-    const amt = totals[pid];
-    h += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #f0ece4">'
+    const data = totals[pid];
+    h += '<div style="padding:12px 0;border-bottom:1px solid #f0ece4">'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
       +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<div style="width:32px;height:32px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center">'+escH(name[0])+'</div>'
-      +'<div><div style="font-size:14px;font-weight:600">'+escH(name)+'</div><div style="font-size:11px;color:var(--muted)">實際墊付</div></div></div>'
-      +'<div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--sage-dark)">NT$'+fmtN(amt)+'</div>'
-      +'<div style="font-size:11px;color:#c04020">需還款</div></div></div>';
+      +'<div style="width:34px;height:34px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center">'+escH(name[0])+'</div>'
+      +'<div style="font-size:14px;font-weight:600">'+escH(name)+'</div></div>'
+      +'<div style="font-size:17px;font-weight:700;color:var(--sage-dark)">NT$'+fmtN(Math.round(data.total))+'</div></div>'
+      +'<div style="margin-left:42px">'
+      +data.items.map(item => '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:2px 0"><span>'+escH(item.label)+'</span><span>NT$'+fmtN(Math.round(item.amount))+'</span></div>').join('')
+      +'</div></div>';
   });
-  h += '</div><div style="background:var(--sage-dark);color:#fff;border-radius:10px;padding:12px;display:flex;justify-content:space-between;align-items:center">'
+  h += '<div style="background:var(--sage-dark);color:#fff;border-radius:10px;padding:12px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">'
     +'<span style="font-size:13px">💸 總需補貼</span>'
-    +'<span style="font-size:18px;font-weight:700">NT$'+fmtN(grandTotal)+'</span></div>';
+    +'<span style="font-size:18px;font-weight:700">NT$'+fmtN(Math.round(grandTotal))+'</span></div>';
   el.innerHTML = h;
 }
 
@@ -1017,7 +1060,7 @@ function updateProcureTotals() {
   let pT=0, aT=0, aN=0;
   D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => { pT+=i.total_cost||0; const v=D.actuals['ing'+i.id]; if(v!=null){aT+=v;aN++;} });
   D.dishes.filter(d => d.type==='bought').forEach(d => { const u=d.unit_size||1; pT+=Math.ceil((d.qty||1)/u)*(d.est_price||0); const v=D.actuals['b'+d.id]; if(v!=null){aT+=v;aN++;} });
-  D.equipCustom.forEach(e => { if(e.src_type==='buy') pT+=(e.price||0)*(e.qty||1); const v=D.actuals['eq'+e.id]; if(v!=null){aT+=v;aN++;} });
+  D.equipCustom.filter(e => e.src_type==='buy').forEach(e => { pT+=(e.price||0)*(e.qty||1); const v=D.actuals['eq'+e.id]; if(v!=null){aT+=v;aN++;} });
   eid('s4-total').textContent = fmtN(pT);
   eid('s4-actual').textContent = aN>0 ? fmtN(aT) : '—';
   const pct = pT ? Math.round(aT/pT*100) : 0;
@@ -1035,14 +1078,26 @@ eid('pane-procure').addEventListener('change', async e => {
     updateProcureTotals(); renderAccounting();
   }
   if (act==='upd-buyer') {
-    const val = el.value||null;
-    D.actuals[el.dataset.key] = val;
-    if (val) await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:0 }, { onConflict:'project_id,ref_key' });
+    const val = el.value||'';
+    D.actuals[el.dataset.key] = val||null;
+    await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:0 }, { onConflict:'project_id,ref_key' });
+    renderAccounting();
+  }
+  if (act==='upd-eq-src') {
+    const eq = D.equipCustom.find(e => e.id===el.dataset.id);
+    if (eq) {
+      eq.src_type = el.value;
+      if (!eq.from_summary) await sb.from('equip_custom').update({ src_type:eq.src_type }).eq('id', eq.id);
+      renderProcure();
+    }
   }
   if (act==='upd-eq-price') {
     const eq = D.equipCustom.find(e => e.id===el.dataset.id);
-    if (eq && !eq.from_summary) { eq.price=parseFloat(el.value)||0; await sb.from('equip_custom').update({price:eq.price}).eq('id',eq.id); updateProcureTotals(); }
-    else if (eq && eq.from_summary) { eq.price=parseFloat(el.value)||0; updateProcureTotals(); }
+    if (eq) {
+      eq.price = parseFloat(el.value)||0;
+      if (!eq.from_summary) await sb.from('equip_custom').update({ price:eq.price }).eq('id', eq.id);
+      updateProcureTotals();
+    }
   }
 });
 
@@ -1251,7 +1306,7 @@ async function renderSettings() {
   eid('contacts-list').innerHTML = contacts.length ? contacts.map(p =>
     '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0ece4">'
     +'<div style="width:40px;height:40px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+p.name[0]+'</div>'
-    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:11px;color:var(--muted)">'+escH(p.role||'')+'</div><div style="font-size:13px;color:var(--sage-dark)">'+escH(p.phone||'')+'</div></div>'
+    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:11px;color:var(--muted)">'+getRoleLabel(p.role)+'</div><div style="font-size:13px;color:var(--sage-dark)">'+escH(p.phone||'')+'</div></div>'
     +'<a class="call-btn" href="tel:'+escH(p.phone||'')+'">📞 撥打</a></div>'
   ).join('') : '<div style="font-size:12px;color:var(--muted);padding:8px 0">還沒有聯絡人</div>';
 }
@@ -1310,7 +1365,7 @@ function renderDayMode() {
   const contacts = D.persons.filter(p => p.phone);
   eid('day-contacts-list').innerHTML = contacts.length ? contacts.map(p =>
     '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0ece4">'
-    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:12px;color:var(--muted)">'+escH(p.role||'')+' '+escH(p.phone||'')+'</div></div>'
+    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:12px;color:var(--muted)">'+getRoleLabel(p.role)+' '+escH(p.phone||'')+'</div></div>'
     +'<a class="call-btn" href="tel:'+escH(p.phone||'')+'">📞</a></div>'
   ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先在「設定」新增聯絡人</div>';
 }
@@ -1466,7 +1521,17 @@ function openModal(type, ctx) {
     tEl.textContent = type==='person' ? '新增人員' : '新增聯絡人';
     bEl.innerHTML = '<label>姓名 / 暱稱</label><input id="m0" placeholder="例：Amy、Ben">'
       +'<label>角色</label>'
-      +'<select id="m-role"><option value="">一般幫忙</option><option value="usher">Usher</option><option value="usher_king">Usher King</option><option value="vendor">廠商</option><option value="venue">場地負責人</option><option value="driver">運送司機</option></select>'
+      +'<select id="m-role">'
+      +'<option value="">一般幫忙</option>'
+      +'<option value="lead">主要負責人</option>'
+      +'<option value="co_lead">副負責人</option>'
+      +'<option value="treasurer">管錢</option>'
+      +'<option value="usher">Usher</option>'
+      +'<option value="usher_king">Usher King</option>'
+      +'<option value="vendor">廠商</option>'
+      +'<option value="venue">場地負責人</option>'
+      +'<option value="driver">運送司機</option>'
+      +'</select>'
       +'<label>電話'+(type==='contact'?'':' （選填）')+'</label><input id="m-phone" type="tel" placeholder="0912345678">'
       +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
 
