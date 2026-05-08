@@ -975,38 +975,51 @@ function renderProcure() {
     bEl.innerHTML = h + '</tbody></table></div>';
   }
 
-  // Equip & supplies
+  // Equip & supplies - card style for mobile
   const eEl = eid('buy-equip');
   if (!D.equipCustom.length) {
     eEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">器具清單的容器會自動帶入，也可點「＋ 新增」手動加入</div>';
   } else {
     const srcOpts = [['buy','買'],['borrow','借'],['gift','付出']];
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>來源</th><th class="nr">需求量</th><th>誰去買/借</th><th class="nr">單價</th><th class="nr">小計</th><th class="nr">實際</th><th></th></tr></thead><tbody>';
-    D.equipCustom.forEach(eq => {
+    eEl.innerHTML = D.equipCustom.map(eq => {
       const sub = eq.src_type==='buy' ? (eq.price||0)*(eq.qty||1) : 0;
       const akey = 'eq'+eq.id;
       const aval = D.actuals[akey];
       const buyer = D.actuals[akey+'_buyer']||'';
-      const tag = eq.from_summary ? '<span style="background:#e8f0e4;color:var(--sage-dark);font-size:10px;padding:1px 5px;border-radius:6px;margin-left:3px">自動</span>' : '';
-      // Source selector
-      const srcSel = '<select style="padding:3px 5px;font-size:11px;border:1px solid #ddd8cc;border-radius:6px;background:var(--cream)" data-action="upd-eq-src" data-id="'+eq.id+'">'
+      const tag = eq.from_summary ? '<span style="background:#e8f0e4;color:var(--sage-dark);font-size:10px;padding:1px 5px;border-radius:6px;margin-left:4px">自動</span>' : '';
+      const srcSel = '<select style="padding:5px 8px;font-size:12px;border:1.5px solid #ddd8cc;border-radius:8px;background:var(--cream);width:auto" data-action="upd-eq-src" data-id="'+eq.id+'">'
         +srcOpts.map(o => '<option value="'+o[0]+'"'+(eq.src_type===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')
         +'</select>';
-      const priceCell = eq.src_type==='buy'
-        ? 'NT$<input type="number" style="width:52px;padding:2px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'">'
-        : '<span style="font-size:11px;color:var(--muted)">免費</span>';
-      h += '<tr>'
-        +'<td>'+escH(eq.name)+tag+'</td>'
-        +'<td>'+srcSel+'</td>'
-        +'<td class="nr">'+eq.qty+'</td>'
-        +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
-        +'<td class="nr">'+priceCell+'</td>'
-        +'<td class="nr hi">'+(sub>0?'NT$'+fmtN(sub):'—')+'</td>'
-        +'<td class="nr"><input type="number" style="width:65px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'<td>'+(eq.from_summary?'':'<button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button>')+'</td>'
-        +'</tr>';
-    });
-    eEl.innerHTML = h + '</tbody></table></div>';
+      const noteSection = (eq.src_type==='borrow'||eq.src_type==='gift')
+        ? '<div style="margin-top:8px"><input type="text" style="font-size:12px;padding:6px 10px;border:1.5px solid #ddd8cc;border-radius:8px;background:var(--cream)" placeholder="'+(eq.src_type==='borrow'?'跟誰借 / 在哪裡':'付出說明')+'" value="'+escA(eq.src_name||'')+'" data-action="upd-eq-note" data-id="'+eq.id+'"></div>'
+        : '';
+      const priceSection = eq.src_type==='buy'
+        ? '<div style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="font-size:12px;color:var(--muted)">單價</span>NT$<input type="number" style="width:70px;padding:4px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'"><span style="font-size:12px;color:var(--muted)">小計：</span><span style="font-size:12px;font-weight:600;color:var(--sage-dark)">'+(sub>0?'NT$'+fmtN(sub):'—')+'</span></div>'
+        : '<div style="font-size:12px;color:var(--muted);margin-top:4px">'+(eq.src_type==='borrow'?'借用，不需費用':'付出，不需費用')+'</div>';
+
+      return '<div style="padding:12px;border-bottom:1px solid #f0ece4">'
+        // Row 1: name + qty + delete
+        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
+        +'<div style="font-size:14px;font-weight:600">'+escH(eq.name)+tag+'</div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:12px;color:var(--muted)">需求：<b style="color:var(--sage-dark)">'+eq.qty+'</b></span>'
+        +(eq.from_summary?'':'<button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button>')
+        +'</div></div>'
+        // Row 2: source + buyer
+        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+        +srcSel
+        +personSelector(akey+'_buyer', buyer)
+        +'</div>'
+        // Note for borrow/gift
+        +noteSection
+        // Price
+        +priceSection
+        // Actual
+        +(eq.src_type==='buy'
+          ? '<div style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="font-size:12px;color:var(--muted)">實際花費</span><input type="number" style="flex:1;padding:5px 8px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:8px" placeholder="填入實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></div>'
+          : '')
+        +'</div>';
+    }).join('');
   }
 
   updateProcureTotals();
@@ -1082,6 +1095,13 @@ eid('pane-procure').addEventListener('change', async e => {
     D.actuals[el.dataset.key] = val||null;
     await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:0 }, { onConflict:'project_id,ref_key' });
     renderAccounting();
+  }
+  if (act==='upd-eq-note') {
+    const eq = D.equipCustom.find(e => e.id===el.dataset.id);
+    if (eq) {
+      eq.src_name = el.value;
+      if (!eq.from_summary) await sb.from('equip_custom').update({ src_name:eq.src_name }).eq('id', eq.id);
+    }
   }
   if (act==='upd-eq-src') {
     const eq = D.equipCustom.find(e => e.id===el.dataset.id);
@@ -1281,12 +1301,20 @@ eid('timeline-list').addEventListener('click', async e => {
 
 eid('btn-add-todo').addEventListener('click', () => openModal('todo', null));
 eid('btn-load-presets').addEventListener('click', async () => {
-  if (D.todos.length>0 && !confirm('載入預設清單將新增'+PRESETS.length+'個待辦，確定嗎？')) return;
+  if (D.todos.length > 0) {
+    openModal('confirmPresets', null);
+    return;
+  }
+  await doLoadPresets();
+});
+
+async function doLoadPresets() {
   const rows = PRESETS.map(p => ({ project_id:currentProject.id, phase:p[0], cat:p[1], text:p[2], done:false }));
   const { data } = await sb.from('todos').insert(rows).select();
   D.todos = [...D.todos, ...(data||[])];
   renderTimeline();
-});
+  showToast('✓ 已載入 '+PRESETS.length+' 個預設待辦');
+}
 
 // SETTINGS
 async function renderSettings() {
@@ -1397,7 +1425,12 @@ function openModal(type, ctx) {
   const tEl = eid('modal-title'), bEl = eid('modal-body');
   bEl.innerHTML = '';
 
-  if (type==='forgotPassword') {
+  if (type==='confirmPresets') {
+    tEl.textContent = '載入預設清單';
+    bEl.innerHTML = '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">已有 '+D.todos.length+' 個待辦，確定要繼續新增 '+PRESETS.length+' 個預設待辦嗎？</div>'
+      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確定載入</button></div>';
+
+  } else if (type==='forgotPassword') {
     tEl.textContent = '重設密碼';
     bEl.innerHTML = '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">輸入你的 Email，我們會寄送重設密碼連結。</div>'
       +'<label>Email</label><input id="m0" type="email" placeholder="your@email.com">'
@@ -1607,7 +1640,11 @@ const getSelTog = rowId => { const s = document.querySelector('#'+rowId+' .tog.s
 async function confirmModal() {
   const { type, ctx } = _mc;
 
-  if (type==='forgotPassword') {
+  if (type==='confirmPresets') {
+    closeModal();
+    await doLoadPresets();
+
+  } else if (type==='forgotPassword') {
     const email = mv('m0'); if (!email) { showToast('請填入Email'); return; }
     const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo:'https://wedding-snacks.vercel.app' });
     if (error) showToast('寄送失敗：'+error.message);
