@@ -2,1785 +2,518 @@
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="婚禮茶點">
 <meta name="theme-color" content="#4a6240">
 <title>婚禮茶點管家</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--sage:#8a9e7e;--sage-light:#c5d4bc;--sage-dark:#4a6240;--cream:#faf7f2;--warm:#f0ead8;--gold-light:#f0ddb0;--text:#2e2a22;--muted:#7a7060;--border:rgba(138,158,126,0.25);--shadow:0 2px 16px rgba(74,98,64,0.10);--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--text);}
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--cream);z-index:10;}
-.screen.hidden{display:none;}
-#screen-auth{background:linear-gradient(160deg,var(--sage-dark) 0%,#2d3d28 100%);justify-content:center;align-items:center;padding:40px 24px;}
-.auth-logo{text-align:center;margin-bottom:40px;}
-.auth-logo h1{font-family:'Noto Serif TC',serif;color:#fff;font-size:26px;letter-spacing:3px;margin-bottom:6px;}
-.auth-logo p{color:rgba(255,255,255,0.6);font-size:13px;}
-.auth-card{background:rgba(255,255,255,0.95);border-radius:20px;padding:28px 24px;width:100%;max-width:400px;}
-.auth-tabs{display:flex;gap:0;margin-bottom:22px;background:#f0ece4;border-radius:10px;padding:3px;}
-.auth-tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted);transition:all 0.2s;}
-.auth-tab.active{background:#fff;color:var(--sage-dark);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.1);}
-.auth-form input{width:100%;padding:12px 14px;border:1.5px solid #ddd8cc;border-radius:10px;font-size:14px;margin-bottom:12px;background:var(--cream);font-family:'Noto Sans TC',sans-serif;}
-.auth-form input:focus{outline:none;border-color:var(--sage);}
-.btn-auth{width:100%;padding:13px;background:var(--sage-dark);color:#fff;border:none;border-radius:10px;font-size:15px;font-family:'Noto Serif TC',serif;cursor:pointer;margin-top:4px;}
-.auth-msg{font-size:12px;text-align:center;margin-top:10px;min-height:18px;}
-.auth-msg.err{color:#c04020;}.auth-msg.ok{color:#2a7050;}
-#screen-home{padding-top:calc(var(--safe-top));}
-.home-header{background:var(--sage-dark);padding:16px 16px 14px;display:flex;align-items:center;justify-content:space-between;}
-.home-title{font-family:'Noto Serif TC',serif;color:#fff;font-size:16px;}
-.home-user{color:rgba(255,255,255,0.7);font-size:12px;}
-.home-body{flex:1;overflow-y:auto;padding:16px;}
-.project-card{background:#fff;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;}
-.project-name{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--sage-dark);margin-bottom:4px;}
-.project-meta{font-size:12px;color:var(--muted);}
-.project-badge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:#e8f0e4;color:var(--sage-dark);margin-left:6px;}
-.fab-home{position:fixed;bottom:calc(var(--safe-bottom) + 20px);right:20px;background:var(--sage-dark);color:#fff;border:none;border-radius:28px;padding:14px 20px;font-size:14px;font-family:'Noto Serif TC',serif;cursor:pointer;box-shadow:0 4px 20px rgba(74,98,64,0.4);z-index:50;}
-#screen-project{padding-top:var(--safe-top);}
-.proj-header{background:var(--sage-dark);padding:12px 16px;display:flex;align-items:center;gap:12px;}
-.back-btn{color:#fff;font-size:22px;background:none;border:none;cursor:pointer;padding:4px;line-height:1;}
-.proj-header-info{flex:1;}
-.proj-header-name{font-family:'Noto Serif TC',serif;color:#fff;font-size:15px;}
-.proj-header-sub{color:rgba(255,255,255,0.6);font-size:11px;}
-.proj-mode-toggle{display:flex;gap:6px;}
-.mode-btn{padding:5px 10px;border-radius:16px;border:1.5px solid rgba(255,255,255,0.4);background:none;color:rgba(255,255,255,0.7);font-size:11px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
-.mode-btn.active{background:#fff;color:var(--sage-dark);border-color:#fff;font-weight:600;}
-.tab-bar{background:#fff;border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom);flex-shrink:0;}
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px 6px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:9px;font-family:'Noto Sans TC',sans-serif;gap:3px;}
-.tab-item.active{color:var(--sage-dark);}
-.tab-icon{font-size:20px;line-height:1;}
-.tab-content{flex:1;overflow-y:auto;overscroll-behavior:contain;}
-.tab-pane{display:none;padding:14px;padding-bottom:80px;}
-.tab-pane.active{display:block;}
-.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
-.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.card-title{font-size:14px;font-weight:600;color:var(--sage-dark);}
-.section-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px;}
-.btn{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:12px;}
-.btn-primary{background:var(--sage-dark);color:#fff;}
-.btn-outline{background:none;border:1.5px solid var(--sage-light);color:var(--sage-dark);}
-.btn-sm{padding:5px 10px;font-size:11px;border-radius:6px;}
-.btn-block{width:100%;padding:12px;font-size:14px;border-radius:10px;font-family:'Noto Serif TC',serif;}
-.bx{background:none;border:none;color:#bbb;font-size:15px;cursor:pointer;padding:2px 5px;line-height:1;}
-.btn-add-row{width:100%;padding:10px;border:1.5px dashed var(--sage-light);border-radius:10px;background:none;color:var(--sage);font-size:12px;cursor:pointer;margin-top:8px;}
-input[type=text],input[type=number],input[type=date],input[type=email],input[type=password],textarea,select{width:100%;padding:9px 12px;border:1.5px solid #ddd8cc;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--text);background:var(--cream);}
-input:focus,textarea:focus,select:focus{outline:none;border-color:var(--sage);}
-textarea{resize:vertical;min-height:70px;}
-label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px;}
-.ii{width:60px!important;padding:5px 7px!important;font-size:12px!important;}
-.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.sb{background:var(--warm);border-radius:10px;padding:12px;text-align:center;}
-.sb.hi{background:var(--sage-dark);}
-.sl{font-size:11px;color:var(--muted);margin-bottom:3px;}
-.sb.hi .sl{color:rgba(255,255,255,0.65);}
-.sv{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:700;color:var(--sage-dark);}
-.sb.hi .sv{color:#fff;}
-.su{font-size:10px;color:var(--muted);}
-.sb.hi .su{color:rgba(255,255,255,0.55);}
-.pw{margin:4px 0 10px;}
-.pl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;}
-.pb{height:7px;background:#e8e4dc;border-radius:99px;overflow:hidden;}
-.pf{height:100%;background:linear-gradient(90deg,var(--sage),var(--sage-dark));border-radius:99px;}
-.pf.over{background:linear-gradient(90deg,#e08060,#c04020);}
-.tbl{width:100%;border-collapse:collapse;font-size:12px;}
-.tbl th{background:var(--warm);color:var(--muted);font-size:11px;font-weight:500;padding:6px 8px;text-align:left;}
-.tbl td{padding:8px;border-bottom:1px solid #f0ece4;vertical-align:middle;}
-.tbl tr:last-child td{border-bottom:none;}
-.nr{text-align:right;}.hi{color:var(--sage-dark);font-weight:600;}
-.cwrap{overflow-x:auto;}
-.chk-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f5f0e8;}
-.chk-row:last-child{border-bottom:none;}
-.chk-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;}
-.chk-box.on{background:var(--sage-dark);border-color:var(--sage-dark);color:#fff;font-size:13px;}
-.tl-phase{margin-bottom:14px;}
-.tl-head{padding:8px 12px;border-radius:10px 10px 0 0;color:#fff;display:flex;align-items:center;justify-content:space-between;}
-.tl-head-title{font-size:13px;font-weight:600;}
-.tl-body{background:#fff;border-radius:0 0 10px 10px;border:1px solid var(--border);border-top:none;}
-.tl-cat-head{padding:6px 12px;background:#faf8f4;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0ece4;}
-.tl-cat-label{font-size:12px;font-weight:600;color:var(--muted);}
-.todo-row{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-bottom:1px solid #f5f0e8;}
-.todo-row:last-child{border-bottom:none;}
-.todo-chk{width:18px;height:18px;border-radius:50%;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;margin-top:2px;}
-.todo-chk.on{background:var(--sage);border-color:var(--sage);color:#fff;font-size:10px;}
-.todo-text{font-size:13px;flex:1;line-height:1.5;}
-.todo-text.done{text-decoration:line-through;color:var(--muted);}
-.todo-meta{font-size:10px;color:var(--muted);margin-top:2px;}
-.ph-0{background:#7a6450;}.ph-1{background:#6a5878;}.ph-2{background:#3a6898;}.ph-3{background:#2a7858;}.ph-4{background:#983a3a;}.ph-5{background:#585858;}.ph-6{background:#4a6090;}.ph-7{background:#507050;}
-.person-chip{display:inline-flex;align-items:center;gap:5px;background:var(--warm);border-radius:20px;padding:4px 10px 4px 5px;margin:3px;cursor:pointer;border:1.5px solid transparent;font-size:12px;}
-.person-chip.sel{background:var(--sage-dark);color:#fff;}
-.pav{width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
-.person-chip.sel .pav{background:rgba(255,255,255,0.3);color:#fff;}
-.ctag{background:#e8f0e4;color:var(--sage-dark);border-radius:8px;padding:2px 7px;font-size:11px;margin:2px;display:inline-block;}
-.ovl{position:fixed;inset:0;background:rgba(20,16,10,0.55);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.25s;}
-.ovl.open{opacity:1;pointer-events:all;}
-.modal{background:#fff;border-radius:20px 20px 0 0;padding:16px 16px calc(var(--safe-bottom) + 32px);width:100%;max-width:600px;transform:translateY(100%);transition:transform 0.3s ease;max-height:92vh;overflow-y:auto;}
-.ovl.open .modal{transform:translateY(0);}
-.modal-handle{width:36px;height:4px;background:#ddd;border-radius:99px;margin:0 auto 14px;}
-.modal-title{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--sage-dark);margin-bottom:14px;}
-.btn-row{display:flex;gap:8px;margin-top:14px;}
-.btn-row .btn{flex:1;padding:11px;font-size:13px;}
-.tog-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px;}
-.tog{padding:5px 12px;border-radius:18px;border:1.5px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted);}
-.tog.sel{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark);}
-.invite-code{font-family:monospace;font-size:28px;font-weight:700;letter-spacing:4px;color:var(--sage-dark);text-align:center;background:var(--warm);padding:16px;border-radius:12px;margin:10px 0;}
-.call-btn{background:var(--sage-dark);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block;}
-.day-section{margin-bottom:16px;}
-.day-section-head{background:var(--sage-dark);color:#fff;padding:8px 14px;border-radius:10px 10px 0 0;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;}
-.day-section-body{background:#fff;border-radius:0 0 10px 10px;border:1px solid var(--border);border-top:none;}
-.empty{text-align:center;padding:32px 16px;color:var(--muted);}
-.empty-icon{font-size:36px;margin-bottom:8px;}
-.empty-text{font-size:13px;}
-#loading{position:fixed;inset:0;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
-#loading h1{font-family:'Noto Serif TC',serif;color:#fff;font-size:22px;letter-spacing:3px;margin-bottom:8px;}
-#loading p{color:rgba(255,255,255,0.6);font-size:13px;}
-.spinner{width:32px;height:32px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:20px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-#toast{position:fixed;bottom:calc(var(--safe-bottom) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:#2e2a22;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap;}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.cbtn{padding:14px 8px;border-radius:10px;border:none;background:#2a2a3e;color:#fff;font-size:17px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;}
-.cbtn-fn{background:#3a3a4e;color:#e0e0e0;}
-.cbtn-op{background:#4a6240;color:#fff;}
-.cbtn-eq{background:#c4963a;color:#fff;}
+:root{--sage:#8a9e7e;--sage-light:#c5d4bc;--sage-dark:#4a6240;--cream:#faf7f2;--warm:#f0ead8;--text:#2e2a22;--muted:#7a7060;--border:rgba(138,158,126,0.25);--shadow:0 2px 16px rgba(74,98,64,.10);--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--text)}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--cream);z-index:10}
+.screen.hidden{display:none}
+#screen-auth{background:linear-gradient(160deg,var(--sage-dark),#2d3d28);justify-content:center;align-items:center;padding:40px 24px}
+.auth-logo{text-align:center;margin-bottom:40px}
+.auth-logo h1{font-family:'Noto Serif TC',serif;color:#fff;font-size:26px;letter-spacing:3px;margin-bottom:6px}
+.auth-logo p{color:rgba(255,255,255,.6);font-size:13px}
+.auth-card{background:rgba(255,255,255,.95);border-radius:20px;padding:28px 24px;width:100%;max-width:400px}
+.auth-tabs{display:flex;margin-bottom:22px;background:#f0ece4;border-radius:10px;padding:3px}
+.auth-tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:13px;color:var(--muted)}
+.auth-tab.active{background:#fff;color:var(--sage-dark);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.af input{width:100%;padding:12px 14px;border:1.5px solid #ddd8cc;border-radius:10px;font-size:14px;margin-bottom:12px;background:var(--cream);font-family:'Noto Sans TC',sans-serif}
+.af input:focus{outline:none;border-color:var(--sage)}
+.btn-auth{width:100%;padding:13px;background:var(--sage-dark);color:#fff;border:none;border-radius:10px;font-size:15px;font-family:'Noto Serif TC',serif;cursor:pointer;margin-top:4px}
+.amsg{font-size:12px;text-align:center;margin-top:10px;min-height:18px}
+.amsg.err{color:#c04020}.amsg.ok{color:#2a7050}
+#screen-home{padding-top:var(--st)}
+.hh{background:var(--sage-dark);padding:16px;display:flex;align-items:center;justify-content:space-between}
+.htitle{font-family:'Noto Serif TC',serif;color:#fff;font-size:16px}
+.huser{color:rgba(255,255,255,.7);font-size:12px}
+.hbody{flex:1;overflow-y:auto;padding:16px}
+.pc{background:#fff;border-radius:16px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer}
+.pn{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--sage-dark);margin-bottom:4px}
+.pm{font-size:12px;color:var(--muted)}
+.pbadge{display:inline-block;padding:2px 8px;border-radius:8px;font-size:10px;font-weight:600;background:#e8f0e4;color:var(--sage-dark);margin-left:6px}
+.fab{position:fixed;bottom:calc(var(--sb) + 20px);right:20px;background:var(--sage-dark);color:#fff;border:none;border-radius:28px;padding:14px 20px;font-size:14px;font-family:'Noto Serif TC',serif;cursor:pointer;box-shadow:0 4px 20px rgba(74,98,64,.4);z-index:50}
+#screen-project{padding-top:var(--st)}
+.ph{background:var(--sage-dark);padding:12px 16px;display:flex;align-items:center;gap:12px}
+.bb{color:#fff;font-size:22px;background:none;border:none;cursor:pointer;padding:4px;line-height:1}
+.phi{flex:1}
+.phn{font-family:'Noto Serif TC',serif;color:#fff;font-size:15px}
+.phs{color:rgba(255,255,255,.6);font-size:11px}
+.pmt{display:flex;gap:6px}
+.mb{padding:5px 10px;border-radius:16px;border:1.5px solid rgba(255,255,255,.4);background:none;color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.mb.active{background:#fff;color:var(--sage-dark);border-color:#fff;font-weight:600}
+.tbar{background:#fff;border-top:1px solid var(--border);display:flex;padding-bottom:var(--sb);flex-shrink:0}
+.ti{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 2px 6px;cursor:pointer;border:none;background:none;color:var(--muted);font-size:9px;font-family:'Noto Sans TC',sans-serif;gap:3px}
+.ti.active{color:var(--sage-dark)}
+.tic{font-size:18px;line-height:1}
+.tcont{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.tp{display:none;padding:14px;padding-bottom:80px}
+.tp.active{display:block}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.ct{font-size:14px;font-weight:600;color:var(--sage-dark)}
+.sl{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;padding:4px 0 8px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.btn{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:12px}
+.bp{background:var(--sage-dark);color:#fff}
+.bo{background:none;border:1.5px solid var(--sage-light);color:var(--sage-dark)}
+.bs{padding:5px 10px;font-size:11px;border-radius:6px}
+.bx{background:none;border:none;color:#bbb;font-size:15px;cursor:pointer;padding:2px 5px;line-height:1}
+.bar{width:100%;padding:10px;border:1.5px dashed var(--sage-light);border-radius:10px;background:none;color:var(--sage);font-size:12px;cursor:pointer;margin-top:8px}
+input,textarea,select{width:100%;padding:9px 12px;border:1.5px solid #ddd8cc;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:14px;color:var(--text);background:var(--cream)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--sage)}
+textarea{resize:vertical;min-height:70px}
+label{display:block;font-size:11px;color:var(--muted);margin:10px 0 3px}
+.ii{width:60px!important;padding:5px 7px!important;font-size:12px!important}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.sb{background:var(--warm);border-radius:10px;padding:12px;text-align:center}
+.sb.hi{background:var(--sage-dark)}
+.ssl{font-size:11px;color:var(--muted);margin-bottom:3px}
+.sb.hi .ssl{color:rgba(255,255,255,.65)}
+.sv{font-family:'Noto Serif TC',serif;font-size:20px;font-weight:700;color:var(--sage-dark)}
+.sb.hi .sv{color:#fff}
+.su{font-size:10px;color:var(--muted)}
+.sb.hi .su{color:rgba(255,255,255,.55)}
+.pw{margin:4px 0 10px}
+.pl{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px}
+.pb{height:7px;background:#e8e4dc;border-radius:99px;overflow:hidden}
+.pf{height:100%;background:linear-gradient(90deg,var(--sage),var(--sage-dark));border-radius:99px}
+.pf.over{background:linear-gradient(90deg,#e08060,#c04020)}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:var(--warm);color:var(--muted);font-size:11px;font-weight:500;padding:6px 8px;text-align:left}
+.tbl td{padding:8px;border-bottom:1px solid #f0ece4;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.nr{text-align:right}.hi{color:var(--sage-dark);font-weight:600}
+.cw{overflow-x:auto}
+.cr{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f5f0e8}
+.cr:last-child{border-bottom:none}
+.cb{width:22px;height:22px;border-radius:6px;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff}
+.cb.on{background:var(--sage-dark);border-color:var(--sage-dark);color:#fff;font-size:13px}
+.tlp{margin-bottom:14px}
+.tlh{padding:8px 12px;border-radius:10px 10px 0 0;color:#fff;display:flex;align-items:center;justify-content:space-between}
+.tlht{font-size:13px;font-weight:600}
+.tlb{background:#fff;border-radius:0 0 10px 10px;border:1px solid var(--border);border-top:none}
+.tlch{padding:6px 12px;background:#faf8f4;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0ece4}
+.tlcl{font-size:12px;font-weight:600;color:var(--muted)}
+.tdr{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-bottom:1px solid #f5f0e8}
+.tdr:last-child{border-bottom:none}
+.tdc{width:18px;height:18px;border-radius:50%;border:2px solid var(--sage-light);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;margin-top:2px}
+.tdc.on{background:var(--sage);border-color:var(--sage);color:#fff;font-size:10px}
+.tdt{font-size:13px;flex:1;line-height:1.5}
+.tdt.done{text-decoration:line-through;color:var(--muted)}
+.p0{background:#7a6450}.p1{background:#6a5878}.p2{background:#3a6898}.p3{background:#2a7858}.p4{background:#983a3a}.p5{background:#585858}.p6{background:#4a6090}.p7{background:#507050}
+.pchip{display:inline-flex;align-items:center;gap:5px;background:var(--warm);border-radius:20px;padding:4px 10px 4px 5px;margin:3px;cursor:pointer;border:1.5px solid transparent;font-size:12px}
+.pchip.sel{background:var(--sage-dark);color:#fff}
+.pav{width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.pchip.sel .pav{background:rgba(255,255,255,.3);color:#fff}
+.ctag{background:#e8f0e4;color:var(--sage-dark);border-radius:8px;padding:2px 7px;font-size:11px;margin:2px;display:inline-block}
+.ovl{position:fixed;inset:0;background:rgba(20,16,10,.55);z-index:100;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.ovl.open{opacity:1;pointer-events:all}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:16px 16px calc(var(--sb) + 32px);width:100%;max-width:600px;transform:translateY(100%);transition:transform .3s ease;max-height:92vh;overflow-y:auto}
+.ovl.open .modal{transform:translateY(0)}
+.mh{width:36px;height:4px;background:#ddd;border-radius:99px;margin:0 auto 14px}
+.mt{font-family:'Noto Serif TC',serif;font-size:16px;color:var(--sage-dark);margin-bottom:14px}
+.br{display:flex;gap:8px;margin-top:14px}
+.br .btn{flex:1;padding:11px;font-size:13px}
+.tr{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.tog{padding:5px 12px;border-radius:18px;border:1.5px solid var(--border);background:#fff;font-size:12px;cursor:pointer;color:var(--muted)}
+.tog.sel{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark)}
+.icode{font-family:monospace;font-size:28px;font-weight:700;letter-spacing:4px;color:var(--sage-dark);text-align:center;background:var(--warm);padding:16px;border-radius:12px;margin:10px 0}
+.callbtn{background:var(--sage-dark);color:#fff;border:none;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-block}
+.ds{margin-bottom:16px}
+.dsh{background:var(--sage-dark);color:#fff;padding:8px 14px;border-radius:10px 10px 0 0;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.dsb{background:#fff;border-radius:0 0 10px 10px;border:1px solid var(--border);border-top:none}
+.empty{text-align:center;padding:32px 16px;color:var(--muted)}
+.ei{font-size:36px;margin-bottom:8px}
+.et{font-size:13px}
+#loading{position:fixed;inset:0;background:var(--sage-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999}
+#loading h1{font-family:'Noto Serif TC',serif;color:#fff;font-size:22px;letter-spacing:3px;margin-bottom:8px}
+#loading p{color:rgba(255,255,255,.6);font-size:13px}
+.spin{width:32px;height:32px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite;margin-bottom:20px}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toast{position:fixed;bottom:calc(var(--sb) + 80px);left:50%;transform:translateX(-50%) translateY(20px);background:#2e2a22;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;transition:all .3s;pointer-events:none;z-index:200;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.echip{display:inline-flex;align-items:center;padding:5px 10px;border-radius:16px;font-size:12px;border:1.5px solid var(--border);background:#fff;cursor:pointer;color:var(--muted);margin:2px}
+.echip.sel{background:var(--sage-dark);color:#fff;border-color:var(--sage-dark)}
+.cbtn{padding:14px 8px;border-radius:10px;border:none;background:#2a2a3e;color:#fff;font-size:17px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.cbtf{background:#3a3a4e;color:#e0e0e0}.cbto{background:#4a6240;color:#fff}.cbte{background:#c4963a;color:#fff}
 </style>
 </head>
 <body>
-
-<div id="loading">
-  <div class="spinner"></div>
-  <h1>婚禮茶點管家</h1>
-  <p>載入中...</p>
-</div>
+<div id="loading"><div class="spin"></div><h1>婚禮茶點管家</h1><p>載入中...</p></div>
 <div id="toast"></div>
-
 <div class="screen hidden" id="screen-auth">
-  <div class="auth-logo">
-    <h1>🌿 婚禮茶點管家</h1>
-    <p>一站式婚禮茶點籌備工具</p>
-  </div>
+  <div class="auth-logo"><h1>🌿 婚禮茶點管家</h1><p>一站式婚禮茶點籌備工具</p></div>
   <div class="auth-card">
-    <div class="auth-tabs">
-      <div class="auth-tab active" data-tab="login">登入</div>
-      <div class="auth-tab" data-tab="register">註冊</div>
-    </div>
-    <div class="auth-form" id="auth-login-form">
+    <div class="auth-tabs"><div class="auth-tab active" data-tab="login">登入</div><div class="auth-tab" data-tab="register">註冊</div></div>
+    <div class="af" id="af-login">
       <input type="email" id="login-email" placeholder="Email">
       <input type="password" id="login-password" placeholder="密碼">
       <button class="btn-auth" id="btn-login">登入</button>
       <div style="text-align:center;margin-top:10px"><span style="font-size:12px;color:var(--muted);cursor:pointer;text-decoration:underline" id="btn-forgot">忘記密碼？</span></div>
-      <div class="auth-msg" id="login-msg"></div>
+      <div class="amsg" id="login-msg"></div>
     </div>
-    <div class="auth-form" id="auth-register-form" style="display:none">
+    <div class="af" id="af-reg" style="display:none">
       <input type="text" id="reg-name" placeholder="姓名 / 暱稱">
       <input type="email" id="reg-email" placeholder="Email">
       <input type="password" id="reg-password" placeholder="密碼（至少6位）">
       <button class="btn-auth" id="btn-register">建立帳號</button>
-      <div class="auth-msg" id="register-msg"></div>
+      <div class="amsg" id="reg-msg"></div>
     </div>
   </div>
 </div>
-
 <div class="screen hidden" id="screen-home">
-  <div class="home-header">
-    <div>
-      <div class="home-title">🌿 婚禮茶點管家</div>
-      <div class="home-user" id="home-user-name"></div>
-    </div>
-    <button class="btn btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.4);font-size:11px" id="btn-logout">登出</button>
+  <div class="hh">
+    <div><div class="htitle">🌿 婚禮茶點管家</div><div class="huser" id="home-user"></div></div>
+    <button class="btn bo bs" style="color:#fff;border-color:rgba(255,255,255,.4)" id="btn-logout">登出</button>
   </div>
-  <div class="home-body">
-    <div style="margin-bottom:16px">
-      <button class="btn btn-block btn-outline" id="btn-join-project" style="margin-bottom:10px">🔗 用邀請碼加入專案</button>
-    </div>
-    <div id="project-list"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">還沒有婚禮專案</div></div></div>
+  <div class="hbody">
+    <div style="margin-bottom:16px"><button class="btn bo" style="width:100%;padding:12px;font-family:'Noto Serif TC',serif;font-size:14px;border-radius:10px" id="btn-join">🔗 用邀請碼加入專案</button></div>
+    <div id="proj-list"><div class="empty"><div class="ei">📋</div><div class="et">還沒有婚禮專案</div></div></div>
   </div>
-  <button class="fab-home" id="btn-new-project">＋ 新建婚禮專案</button>
+  <button class="fab" id="btn-new-proj">＋ 新建婚禮專案</button>
 </div>
-
 <div class="screen hidden" id="screen-project">
-  <div class="proj-header">
-    <button class="back-btn" id="btn-back">‹</button>
-    <div class="proj-header-info">
-      <div class="proj-header-name" id="proj-header-name">婚禮專案</div>
-      <div class="proj-header-sub" id="proj-header-sub"></div>
-    </div>
-    <div class="proj-mode-toggle">
-      <button class="mode-btn active" data-mode="plan" id="mode-plan">籌備</button>
-      <button class="mode-btn" data-mode="day" id="mode-day">當天</button>
+  <div class="ph">
+    <button class="bb" id="btn-back">‹</button>
+    <div class="phi"><div class="phn" id="proj-name">婚禮專案</div><div class="phs" id="proj-sub"></div></div>
+    <div class="pmt">
+      <button class="mb active" id="mode-plan">籌備</button>
+      <button class="mb" id="mode-day">當天</button>
     </div>
   </div>
-
-  <div id="plan-tabs" class="tab-bar">
-    <button class="tab-item active" data-tab="venue"><div class="tab-icon">🏛️</div>場地</button>
-    <button class="tab-item" data-tab="dishes"><div class="tab-icon">🍽️</div>餐點</button>
-    <button class="tab-item" data-tab="compare"><div class="tab-icon">🔍</div>比價</button>
-    <button class="tab-item" data-tab="equip"><div class="tab-icon">🧺</div>器具</button>
-    <button class="tab-item" data-tab="procure"><div class="tab-icon">💰</div>採購</button>
-    <button class="tab-item" data-tab="team"><div class="tab-icon">👥</div>分工</button>
-    <button class="tab-item" data-tab="todos"><div class="tab-icon">🗓️</div>待辦</button>
-    <button class="tab-item" data-tab="settings"><div class="tab-icon">⚙️</div>設定</button>
+  <div id="plan-tabs" class="tbar">
+    <button class="ti active" data-tab="venue"><div class="tic">🏛️</div>場地</button>
+    <button class="ti" data-tab="dishes"><div class="tic">🍽️</div>餐點</button>
+    <button class="ti" data-tab="compare"><div class="tic">🔍</div>比價</button>
+    <button class="ti" data-tab="equip"><div class="tic">🧺</div>器具</button>
+    <button class="ti" data-tab="procure"><div class="tic">💰</div>採購</button>
+    <button class="ti" data-tab="team"><div class="tic">👥</div>分工</button>
+    <button class="ti" data-tab="todos"><div class="tic">🗓️</div>待辦</button>
+    <button class="ti" data-tab="settings"><div class="tic">⚙️</div>設定</button>
   </div>
-
-  <div class="tab-content" id="plan-content">
-    <div class="tab-pane active" id="pane-venue">
-      <div class="card">
-        <div class="card-head"><div class="card-title">🏛️ 場地確認清單</div><div id="venue-prog" style="font-size:11px;color:var(--muted)"></div></div>
-        <div id="venue-list"></div>
-      </div>
+  <div class="tcont" id="plan-content">
+    <div class="tp active" id="pane-venue">
+      <div class="card"><div class="ch"><div class="ct">🏛️ 場地確認清單</div><div id="venue-prog" style="font-size:11px;color:var(--muted)"></div></div><div id="venue-list"></div></div>
     </div>
-    <div class="tab-pane" id="pane-dishes">
-      <div class="card">
-        <div class="card-head"><div class="card-title">💰 預算設定</div></div>
-        <div style="display:flex;gap:10px">
-          <div style="flex:1"><label>食物預算 NT$</label><input type="number" id="inp-budget" value="25000"></div>
-          <div style="flex:1"><label>賓客人數</label><input type="number" id="inp-guests" value="150"></div>
-        </div>
-        <button class="btn btn-outline btn-sm" style="margin-top:8px;width:100%" id="btn-save-budget">儲存預算</button>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">👐 手作點心</div><button class="btn btn-primary btn-sm" id="btn-add-handmade">＋ 新增</button></div>
-        <div id="list-handmade"><div class="empty"><div class="empty-icon" style="font-size:24px">👐</div><div class="empty-text">還沒有手作點心</div></div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">🛍️ 外購品項</div><button class="btn btn-primary btn-sm" id="btn-add-bought">＋ 新增</button></div>
-        <div id="list-bought"><div class="empty"><div class="empty-icon" style="font-size:24px">🛒</div><div class="empty-text">還沒有外購品項</div></div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">🧮 規劃小計</div></div>
-        <div class="sg">
-          <div class="sb hi"><div class="sl">總預算</div><div class="sv" id="s1-budget">—</div><div class="su">NT$</div></div>
-          <div class="sb"><div class="sl">規劃預估</div><div class="sv" id="s1-planned">—</div><div class="su">NT$</div></div>
-        </div>
-        <div class="pw"><div class="pl"><span>預算使用率</span><span id="s1-pct">0%</span></div><div class="pb"><div class="pf" id="s1-prog" style="width:0%"></div></div></div>
-      </div>
+    <div class="tp" id="pane-dishes">
+      <div class="card"><div class="ch"><div class="ct">💰 預算設定</div></div><div style="display:flex;gap:10px"><div style="flex:1"><label>食物預算 NT$</label><input type="number" id="inp-budget" value="25000"></div><div style="flex:1"><label>賓客人數</label><input type="number" id="inp-guests" value="150"></div></div><button class="btn bo bs" style="margin-top:8px;width:100%" id="btn-save-budget">儲存預算</button></div>
+      <div class="card"><div class="ch"><div class="ct">👐 手作點心</div><button class="btn bp bs" id="btn-add-hm">＋ 新增</button></div><div id="list-hm"><div class="empty"><div class="ei" style="font-size:24px">👐</div><div class="et">還沒有手作點心</div></div></div></div>
+      <div class="card"><div class="ch"><div class="ct">🛍️ 外購品項</div><button class="btn bp bs" id="btn-add-bt">＋ 新增</button></div><div id="list-bt"><div class="empty"><div class="ei" style="font-size:24px">🛒</div><div class="et">還沒有外購品項</div></div></div></div>
+      <div class="card"><div class="ch"><div class="ct">🧮 規劃小計</div></div><div class="sg"><div class="sb hi"><div class="ssl">總預算</div><div class="sv" id="s1-budget">—</div><div class="su">NT$</div></div><div class="sb"><div class="ssl">規劃預估</div><div class="sv" id="s1-planned">—</div><div class="su">NT$</div></div></div><div class="pw"><div class="pl"><span>預算使用率</span><span id="s1-pct">0%</span></div><div class="pb"><div class="pf" id="s1-prog" style="width:0%"></div></div></div></div>
     </div>
-    <div class="tab-pane" id="pane-compare">
-      <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-        <button class="btn btn-outline btn-sm" id="btn-open-calc">🧮 計算機</button>
-      </div>
-      <div id="compare-list"><div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">請先在「餐點」新增手作點心</div></div></div>
+    <div class="tp" id="pane-compare">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:10px"><button class="btn bo bs" id="btn-calc">🧮 計算機</button></div>
+      <div id="compare-list"><div class="empty"><div class="ei">🔍</div><div class="et">請先在「餐點」新增手作點心</div></div></div>
     </div>
-    <div class="tab-pane" id="pane-equip">
-      <div class="ph" style="margin-bottom:12px"><div class="pt" style="font-size:16px">器具清單</div><div class="pd">為每道餐點指定容器，設定數量模式，系統自動彙總總需求。</div></div>
-      <div id="equip-assign-section"><div class="empty"><div class="empty-icon">🧺</div><div class="empty-text">請先新增餐點</div></div></div>
-      <div class="card"><div class="card-head"><div class="card-title">📦 器具總需求彙總</div></div><div id="equip-summary"><div style="font-size:12px;color:var(--muted);padding:6px">請先為餐點指定容器</div></div></div>
+    <div class="tp" id="pane-equip">
+      <div style="margin-bottom:12px;font-size:13px;color:var(--muted)">為每道餐點指定容器，系統自動彙總總需求</div>
+      <div id="equip-assign"><div class="empty"><div class="ei">🧺</div><div class="et">請先新增餐點</div></div></div>
+      <div class="card"><div class="ch"><div class="ct">📦 器具總需求彙總</div></div><div id="equip-summary"><div style="font-size:12px;color:var(--muted);padding:6px">請先為餐點指定容器</div></div></div>
     </div>
-
-    <div class="tab-pane" id="pane-procure">
-      <div class="sg">
-        <div class="sb hi"><div class="sl">採購預算</div><div class="sv" id="s4-total">—</div><div class="su">NT$</div></div>
-        <div class="sb"><div class="sl">實際花費</div><div class="sv" id="s4-actual">—</div><div class="su">NT$</div></div>
-      </div>
+    <div class="tp" id="pane-procure">
+      <div class="sg"><div class="sb hi"><div class="ssl">採購預算</div><div class="sv" id="s4-total">—</div><div class="su">NT$</div></div><div class="sb"><div class="ssl">實際花費</div><div class="sv" id="s4-actual">—</div><div class="su">NT$</div></div></div>
       <div class="pw"><div class="pl"><span>執行率</span><span id="s4-pct">尚未填入</span></div><div class="pb"><div class="pf" id="s4-prog" style="width:0%"></div></div></div>
-      <div class="card"><div class="card-head"><div class="card-title">🥬 食材</div></div><div id="buy-ing"></div></div>
-      <div class="card"><div class="card-head"><div class="card-title">🛍️ 外購品項</div></div><div id="buy-bought"></div></div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">🧺 器具 &amp; 耗材</div><button class="btn btn-primary btn-sm" id="btn-add-equip">＋ 新增</button></div>
-        <div id="buy-equip"></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">💸 算帳清單</div><button class="btn btn-outline btn-sm" id="btn-refresh-accounting">重新計算</button></div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">根據「誰付的」自動統計每人需補貼金額</div>
-        <div id="accounting-list"><div style="font-size:12px;color:var(--muted)">請先填入實際花費並選擇付款人</div></div>
-      </div>
+      <div class="card"><div class="ch"><div class="ct">🥬 食材</div></div><div id="buy-ing"></div></div>
+      <div class="card"><div class="ch"><div class="ct">🛍️ 外購品項</div></div><div id="buy-bt"></div></div>
+      <div class="card"><div class="ch"><div class="ct">🧺 器具 &amp; 耗材</div><button class="btn bp bs" id="btn-add-equip">＋ 新增</button></div><div id="buy-equip"></div></div>
+      <div class="card"><div class="ch"><div class="ct">💸 算帳清單</div><button class="btn bo bs" id="btn-reaccount">重新計算</button></div><div style="font-size:12px;color:var(--muted);margin-bottom:8px">根據「誰去買」統計每人採買金額</div><div id="accounting"></div></div>
     </div>
-    <div class="tab-pane" id="pane-team">
-      <div class="card">
-        <div class="card-head"><div class="card-title">👥 幫忙人員</div><button class="btn btn-outline btn-sm" id="btn-add-person">＋ 新增</button></div>
-        <div id="person-chips-wrap" style="margin-top:4px"></div>
-      </div>
+    <div class="tp" id="pane-team">
+      <div class="card"><div class="ch"><div class="ct">👥 幫忙人員</div><button class="btn bo bs" id="btn-add-person">＋ 新增</button></div><div id="person-chips" style="margin-top:4px"></div></div>
       <div id="task-list"></div>
     </div>
-    <div class="tab-pane" id="pane-todos">
+    <div class="tp" id="pane-todos">
       <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-        <button class="btn btn-primary btn-sm" id="btn-add-todo">＋ 新增待辦</button>
-        <button class="btn btn-outline btn-sm" id="btn-load-presets">載入預設清單</button>
+        <button class="btn bp bs" id="btn-add-todo">＋ 新增待辦</button>
+        <button class="btn bo bs" id="btn-load-presets">載入預設清單</button>
         <div style="font-size:12px;color:var(--muted)" id="todo-prog"></div>
       </div>
       <div id="timeline-list"></div>
     </div>
-    <div class="tab-pane" id="pane-settings">
-      <div class="card">
-        <div class="card-head"><div class="card-title">🔗 邀請小組成員</div></div>
-        <div class="invite-code" id="invite-code-display">------</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn btn-primary btn-sm" style="flex:1" id="btn-copy-code">複製邀請碼</button>
-          <button class="btn btn-outline btn-sm" style="flex:1" id="btn-share-link">分享連結</button>
-        </div>
-      </div>
-      <div class="card"><div class="card-head"><div class="card-title">👥 成員列表</div></div><div id="members-list"></div></div>
-      <div class="card"><div class="card-head"><div class="card-title">📋 聯絡人</div><button class="btn btn-primary btn-sm" id="btn-add-contact">＋ 新增</button></div><div id="contacts-list"></div></div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">⚙️ 專案設定</div></div>
-        <div><label>婚禮日期</label><input type="date" id="inp-wedding-date"></div>
-        <button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%" id="btn-save-settings">儲存設定</button>
-      </div>
+    <div class="tp" id="pane-settings">
+      <div class="card"><div class="ch"><div class="ct">🔗 邀請小組成員</div></div><div class="icode" id="invite-code">------</div><div style="display:flex;gap:8px;margin-top:8px"><button class="btn bp bs" style="flex:1" id="btn-copy-code">複製邀請碼</button><button class="btn bo bs" style="flex:1" id="btn-share-link">分享連結</button></div></div>
+      <div class="card"><div class="ch"><div class="ct">👥 成員列表</div></div><div id="members-list"></div></div>
+      <div class="card"><div class="ch"><div class="ct">📋 聯絡人</div><button class="btn bp bs" id="btn-add-contact">＋ 新增</button></div><div id="contacts-list"></div></div>
+      <div class="card"><div class="ch"><div class="ct">⚙️ 專案設定</div></div><label>婚禮日期</label><input type="date" id="inp-wdate"><button class="btn bo bs" style="margin-top:10px;width:100%" id="btn-save-settings">儲存設定</button></div>
     </div>
   </div>
-
   <div id="day-mode" style="display:none;flex:1;overflow-y:auto;padding:14px;padding-bottom:20px">
-    <div class="day-section">
-      <div class="day-section-head">✅ 當天工作清單 <button class="btn btn-sm" style="background:rgba(255,255,255,0.2);color:#fff;border:none" id="btn-add-day-task">＋</button></div>
-      <div class="day-section-body" id="day-tasks-list"></div>
-    </div>
-    <div class="day-section">
-      <div class="day-section-head">🧺 器具攜帶清單</div>
-      <div class="day-section-body" id="day-equip-list"></div>
-    </div>
-    <div class="day-section">
-      <div class="day-section-head">🍽️ 擺盤提醒</div>
-      <div class="day-section-body" id="day-plate-list"></div>
-    </div>
-    <div class="day-section">
-      <div class="day-section-head">📞 聯絡人</div>
-      <div class="day-section-body" id="day-contacts-list"></div>
-    </div>
+    <div class="ds"><div class="dsh">✅ 當天工作清單 <button class="btn bs" style="background:rgba(255,255,255,.2);color:#fff;border:none" id="btn-add-daytask">＋</button></div><div class="dsb" id="day-tasks"></div></div>
+    <div class="ds"><div class="dsh">🧺 器具攜帶清單</div><div class="dsb" id="day-equip"></div></div>
+    <div class="ds"><div class="dsh">🍽️ 擺盤提醒</div><div class="dsb" id="day-plate"></div></div>
+    <div class="ds"><div class="dsh">📞 聯絡人</div><div class="dsb" id="day-contacts"></div></div>
   </div>
 </div>
-
-<div class="ovl" id="ovl">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title" id="modal-title"></div>
-    <div id="modal-body"></div>
-  </div>
-</div>
-
+<div class="ovl" id="ovl"><div class="modal"><div class="mh"></div><div class="mt" id="modal-title"></div><div id="modal-body"></div></div></div>
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+const sb=createClient('https://amgnhyomtdjyrknghukl.supabase.co','sb_publishable_FidwPg28NPTu5mmZEpweiw_2Mamon0c');
+let U=null,P=null;
+let D={dishes:[],ings:[],equip:[],persons:[],tasks:[],todos:[],vc:[],actuals:{},dayTasks:[]};
+const $=id=>document.getElementById(id);
+const fN=n=>Number(n||0).toLocaleString();
+const eH=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const eA=s=>String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+function toast(msg,d=2500){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),d);}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));$(id).classList.remove('hidden');}
+function closeModal(){$('ovl').classList.remove('open');}
+$('ovl').addEventListener('click',e=>{if(e.target===$('ovl'))closeModal();});
 
-const SB_URL = 'https://amgnhyomtdjyrknghukl.supabase.co';
-const SB_KEY = 'sb_publishable_FidwPg28NPTu5mmZEpweiw_2Mamon0c';
-const sb = createClient(SB_URL, SB_KEY);
-
-let currentUser = null, currentProject = null, currentMode = 'plan';
-let D = { dishes:[], ingredients:[], equipCustom:[], persons:[], tasks:[], todos:[], venueChecks:[], actuals:{}, dayTasks:[] };
-
-const eid = i => document.getElementById(i);
-const fmtN = n => Number(n||0).toLocaleString();
-const escH = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-const escA = s => String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-
-function showToast(msg, dur=2000) {
-  const t = eid('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), dur);
-}
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
-  eid(id).classList.remove('hidden');
-}
-
-// AUTH TABS
-document.querySelectorAll('.auth-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const isLogin = tab.dataset.tab === 'login';
-    eid('auth-login-form').style.display = isLogin ? 'block' : 'none';
-    eid('auth-register-form').style.display = isLogin ? 'none' : 'block';
-  });
-});
-
-eid('btn-login').addEventListener('click', async () => {
-  const email = eid('login-email').value.trim();
-  const pw = eid('login-password').value;
-  const msg = eid('login-msg');
-  if (!email || !pw) { msg.className='auth-msg err'; msg.textContent='請填入Email與密碼'; return; }
-  eid('btn-login').textContent = '登入中...';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
-  eid('btn-login').textContent = '登入';
-  if (error) { msg.className='auth-msg err'; msg.textContent='登入失敗：'+error.message; }
-  else { currentUser = data.user; await gotoHome(); }
-});
-
-eid('btn-register').addEventListener('click', async () => {
-  const name = eid('reg-name').value.trim();
-  const email = eid('reg-email').value.trim();
-  const pw = eid('reg-password').value;
-  const msg = eid('register-msg');
-  if (!name||!email||!pw) { msg.className='auth-msg err'; msg.textContent='請填寫所有欄位'; return; }
-  if (pw.length < 6) { msg.className='auth-msg err'; msg.textContent='密碼至少6位'; return; }
-  eid('btn-register').textContent = '建立中...';
-  const { error } = await sb.auth.signUp({ email, password: pw, options: { data: { name } } });
-  eid('btn-register').textContent = '建立帳號';
-  if (error) { msg.className='auth-msg err'; msg.textContent='失敗：'+error.message; }
-  else { msg.className='auth-msg ok'; msg.textContent='✓ 帳號建立成功！請查收確認信後登入'; }
-});
-
-eid('btn-forgot').addEventListener('click', () => openModal('forgotPassword', null));
-
-eid('btn-logout').addEventListener('click', async () => {
-  await sb.auth.signOut();
-  currentUser = null; currentProject = null;
-  showScreen('screen-auth');
-});
+// AUTH
+document.querySelectorAll('.auth-tab').forEach(t=>t.addEventListener('click',()=>{document.querySelectorAll('.auth-tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const l=t.dataset.tab==='login';$('af-login').style.display=l?'block':'none';$('af-reg').style.display=l?'none':'block';}));
+$('btn-login').addEventListener('click',async()=>{const e=$('login-email').value.trim(),p=$('login-password').value,m=$('login-msg');if(!e||!p){m.className='amsg err';m.textContent='請填入Email與密碼';return;}$('btn-login').textContent='登入中...';const{data,error}=await sb.auth.signInWithPassword({email:e,password:p});$('btn-login').textContent='登入';if(error){m.className='amsg err';m.textContent='登入失敗：'+error.message;}else{U=data.user;await gotoHome();}});
+$('btn-register').addEventListener('click',async()=>{const n=$('reg-name').value.trim(),e=$('reg-email').value.trim(),p=$('reg-password').value,m=$('reg-msg');if(!n||!e||!p){m.className='amsg err';m.textContent='請填寫所有欄位';return;}if(p.length<6){m.className='amsg err';m.textContent='密碼至少6位';return;}$('btn-register').textContent='建立中...';const{error}=await sb.auth.signUp({email:e,password:p,options:{data:{name:n}}});$('btn-register').textContent='建立帳號';if(error){m.className='amsg err';m.textContent='失敗：'+error.message;}else{m.className='amsg ok';m.textContent='✓ 帳號建立成功！請查收確認信後登入';}});
+$('btn-forgot').addEventListener('click',()=>openModal('forgotPw',null));
+$('btn-logout').addEventListener('click',async()=>{await sb.auth.signOut();U=null;P=null;showScreen('screen-auth');});
 
 // HOME
-async function gotoHome() {
-  showScreen('screen-home');
-  try {
-    const { data: profile } = await sb.from('profiles').select('name').eq('id', currentUser.id).single();
-    eid('home-user-name').textContent = profile?.name || currentUser.email;
-  } catch(e) { eid('home-user-name').textContent = currentUser.email; }
-  await loadProjects();
-}
-
-async function loadProjects() {
-  const el = eid('project-list');
-  el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">載入中...</div>';
-  try {
-    const { data: owned } = await sb.from('projects').select('*').eq('owner_id', currentUser.id).order('created_at', { ascending: false });
-    const { data: memberships } = await sb.from('project_members').select('project_id').eq('user_id', currentUser.id);
-    let memberProjects = [];
-    if (memberships?.length) {
-      const ids = memberships.map(m => m.project_id);
-      const { data: mp } = await sb.from('projects').select('*').in('id', ids);
-      memberProjects = mp || [];
-    }
-    const all = [...(owned||[]), ...memberProjects.filter(p => !owned?.find(o => o.id===p.id))];
-    if (!all.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">還沒有婚禮專案<br>點下方按鈕建立第一個</div></div>';
-      return;
-    }
-    el.innerHTML = all.map(p => {
-      const isOwner = p.owner_id === currentUser.id;
-      return '<div class="project-card" data-pid="'+p.id+'">'
-        +'<div class="project-name">'+escH(p.name)+'</div>'
-        +'<div class="project-meta">'+(p.wedding_date?'💒 '+p.wedding_date:'')+(p.guest_count?' 👥 '+p.guest_count+'人':'')
-        +'<span class="project-badge">'+(isOwner?'主辦人':'協作者')+'</span></div></div>';
-    }).join('');
-    el.querySelectorAll('.project-card').forEach(card => {
-      card.addEventListener('click', () => openProject(card.dataset.pid, all.find(p => p.id===card.dataset.pid)));
-    });
-  } catch(e) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">載入失敗，請重新整理</div></div>';
-  }
-}
-
-eid('btn-new-project').addEventListener('click', () => openModal('newProject', null));
-eid('btn-join-project').addEventListener('click', () => openModal('joinProject', null));
+async function gotoHome(){showScreen('screen-home');try{const{data:pr}=await sb.from('profiles').select('name').eq('id',U.id).single();$('home-user').textContent=pr?.name||U.email;}catch(e){$('home-user').textContent=U.email;}await loadProjs();}
+async function loadProjs(){const el=$('proj-list');el.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">載入中...</div>';try{const{data:own}=await sb.from('projects').select('*').eq('owner_id',U.id).order('created_at',{ascending:false});const{data:mbr}=await sb.from('project_members').select('project_id').eq('user_id',U.id);let mp=[];if(mbr?.length){const ids=mbr.map(m=>m.project_id);const{data:r}=await sb.from('projects').select('*').in('id',ids);mp=r||[];}const all=[...(own||[]),...mp.filter(p=>!own?.find(o=>o.id===p.id))];if(!all.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><div class="et">還沒有婚禮專案<br>點下方按鈕建立第一個</div></div>';return;}el.innerHTML=all.map(p=>'<div class="pc" data-pid="'+p.id+'"><div class="pn">'+eH(p.name)+'</div><div class="pm">'+(p.wedding_date?'💒 '+p.wedding_date:'')+(p.guest_count?' 👥 '+p.guest_count+'人':'')+'<span class="pbadge">'+(p.owner_id===U.id?'主辦人':'協作者')+'</span></div></div>').join('');el.querySelectorAll('.pc').forEach(c=>c.addEventListener('click',()=>openProj(c.dataset.pid,all.find(p=>p.id===c.dataset.pid))));}catch(e){el.innerHTML='<div class="empty"><div class="ei">⚠️</div><div class="et">載入失敗，請重新整理</div></div>';}}
+$('btn-new-proj').addEventListener('click',()=>openModal('newProj',null));
+$('btn-join').addEventListener('click',()=>openModal('joinProj',null));
 
 // PROJECT
-async function openProject(pid, projData) {
-  currentProject = projData || { id: pid };
-  eid('proj-header-name').textContent = currentProject.name || '婚禮專案';
-  eid('proj-header-sub').textContent = currentProject.wedding_date ? '💒 '+currentProject.wedding_date : '';
-  eid('invite-code-display').textContent = currentProject.invite_code || '——';
-  if (eid('inp-wedding-date')) eid('inp-wedding-date').value = currentProject.wedding_date || '';
-  if (eid('inp-budget')) eid('inp-budget').value = currentProject.budget || 25000;
-  if (eid('inp-guests')) eid('inp-guests').value = currentProject.guest_count || 150;
-  showScreen('screen-project');
-  switchMode('plan');
-  switchTab('venue');
-  await loadAllData();
-}
-
-eid('btn-back').addEventListener('click', () => { showScreen('screen-home'); loadProjects(); });
-eid('mode-plan').addEventListener('click', () => switchMode('plan'));
-eid('mode-day').addEventListener('click', () => switchMode('day'));
-
-function switchMode(mode) {
-  currentMode = mode;
-  eid('mode-plan').classList.toggle('active', mode==='plan');
-  eid('mode-day').classList.toggle('active', mode==='day');
-  eid('plan-tabs').style.display = mode==='plan' ? 'flex' : 'none';
-  eid('plan-content').style.display = mode==='plan' ? 'flex' : 'none';
-  eid('day-mode').style.display = mode==='day' ? 'block' : 'none';
-  if (mode==='day') renderDayMode();
-}
-
-eid('plan-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.tab-item');
-  if (btn) switchTab(btn.dataset.tab);
-});
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab-item').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.toggle('active', p.id==='pane-'+tab));
-  if (tab==='compare') renderCompare();
-  if (tab==='equip') renderEquipAssign();
-  if (tab==='procure') renderProcure();
-  if (tab==='team') renderTasks();
-  if (tab==='todos') renderTimeline();
-  if (tab==='settings') renderSettings();
-}
-
-async function loadAllData() {
-  const pid = currentProject.id;
-  const [r1,r2,r3,r4,r5,r6,r7,r8,r9] = await Promise.all([
-    sb.from('dishes').select('*').eq('project_id',pid).order('created_at'),
-    sb.from('ingredients').select('*').eq('project_id',pid).order('created_at'),
-    sb.from('equip_custom').select('*').eq('project_id',pid).order('created_at'),
-    sb.from('persons').select('*').eq('project_id',pid).order('created_at'),
-    sb.from('tasks').select('*').eq('project_id',pid),
-    sb.from('todos').select('*').eq('project_id',pid).order('created_at'),
-    sb.from('venue_checks').select('*').eq('project_id',pid),
-    sb.from('actuals').select('*').eq('project_id',pid),
-    sb.from('day_tasks').select('*').eq('project_id',pid).order('sort_order')
-  ]);
-  D.dishes = r1.data||[];
-  D.ingredients = r2.data||[];
-  D.equipCustom = r3.data||[];
-  D.persons = r4.data||[];
-  D.tasks = r5.data||[];
-  D.todos = r6.data||[];
-  D.venueChecks = r7.data||[];
-  D.actuals = {};
-  (r8.data||[]).forEach(a => { D.actuals[a.ref_key] = a.actual_value; });
-  D.dayTasks = r9.data||[];
-  renderVenue();
-  renderDishes();
-  recalcBudget();
-}
+async function openProj(pid,pd){P=pd||{id:pid};$('proj-name').textContent=P.name||'婚禮專案';$('proj-sub').textContent=P.wedding_date?'💒 '+P.wedding_date:'';$('invite-code').textContent=P.invite_code||'——';$('inp-wdate').value=P.wedding_date||'';$('inp-budget').value=P.budget||25000;$('inp-guests').value=P.guest_count||150;showScreen('screen-project');switchMode('plan');switchTab('venue');await loadAll();}
+$('btn-back').addEventListener('click',()=>{showScreen('screen-home');loadProjs();});
+$('mode-plan').addEventListener('click',()=>switchMode('plan'));
+$('mode-day').addEventListener('click',()=>switchMode('day'));
+function switchMode(m){$('mode-plan').classList.toggle('active',m==='plan');$('mode-day').classList.toggle('active',m==='day');$('plan-tabs').style.display=m==='plan'?'flex':'none';$('plan-content').style.display=m==='plan'?'flex':'none';$('day-mode').style.display=m==='day'?'block':'none';if(m==='day')renderDay();}
+$('plan-tabs').addEventListener('click',e=>{const b=e.target.closest('.ti');if(b)switchTab(b.dataset.tab);});
+function switchTab(tab){document.querySelectorAll('.ti').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.tp').forEach(p=>p.classList.toggle('active',p.id==='pane-'+tab));if(tab==='compare')renderCompare();if(tab==='equip')renderEquip();if(tab==='procure')renderProcure();if(tab==='team')renderTeam();if(tab==='todos')renderTodos();if(tab==='settings')renderSettings();}
+async function loadAll(){const pid=P.id;const[r1,r2,r3,r4,r5,r6,r7,r8,r9]=await Promise.all([sb.from('dishes').select('*').eq('project_id',pid).order('created_at'),sb.from('ingredients').select('*').eq('project_id',pid).order('created_at'),sb.from('equip_custom').select('*').eq('project_id',pid).order('created_at'),sb.from('persons').select('*').eq('project_id',pid).order('created_at'),sb.from('tasks').select('*').eq('project_id',pid),sb.from('todos').select('*').eq('project_id',pid).order('created_at'),sb.from('venue_checks').select('*').eq('project_id',pid),sb.from('actuals').select('*').eq('project_id',pid),sb.from('day_tasks').select('*').eq('project_id',pid).order('sort_order')]);D.dishes=r1.data||[];D.ings=r2.data||[];D.equip=r3.data||[];D.persons=r4.data||[];D.tasks=r5.data||[];D.todos=r6.data||[];D.vc=r7.data||[];D.actuals={};(r8.data||[]).forEach(a=>D.actuals[a.ref_key]=a.actual_value);D.dayTasks=r9.data||[];renderVenue();renderDishes();recalc();}
 
 // VENUE
-const VENUE_ITEMS = ['確認場地可使用廚房','確認場地有冰箱可存放食材','確認場地有洗水槽','確認場地有電源插座','確認場地有桌子可擺設茶點','確認場地允許帶外食','確認垃圾處理方式','確認進場時間與離場時間'];
-
-async function renderVenue() {
-  const pid = currentProject.id;
-  for (const item of VENUE_ITEMS) {
-    if (!D.venueChecks.find(v => v.item===item)) {
-      const { data } = await sb.from('venue_checks').insert({ project_id:pid, item, checked:false, note:'' }).select().single();
-      if (data) D.venueChecks.push(data);
-    }
-  }
-  const done = D.venueChecks.filter(v => v.checked).length;
-  eid('venue-prog').textContent = done+' / '+VENUE_ITEMS.length+' 已確認';
-  eid('venue-list').innerHTML = VENUE_ITEMS.map(item => {
-    const vc = D.venueChecks.find(v => v.item===item) || { checked:false, note:'' };
-    return '<div class="chk-row">'
-      +'<div class="chk-box'+(vc.checked?' on':'')+'" data-action="toggle-venue" data-item="'+escA(item)+'">'+(vc.checked?'✓':'')+'</div>'
-      +'<div style="flex:1"><div style="font-size:13px'+(vc.checked?';text-decoration:line-through;color:var(--muted)':'')+'">'+escH(item)+'</div>'
-      +'<textarea style="margin-top:5px;font-size:12px;min-height:0;padding:5px 8px;border-radius:6px;width:100%" rows="1" placeholder="備註：可以 / 不行..." data-action="venue-note" data-item="'+escA(item)+'">'+escH(vc.note||'')+'</textarea>'
-      +'</div></div>';
-  }).join('');
-}
-
-eid('pane-venue').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action="toggle-venue"]');
-  if (!btn) return;
-  const item = btn.dataset.item;
-  const vc = D.venueChecks.find(v => v.item===item);
-  if (!vc) return;
-  vc.checked = !vc.checked;
-  await sb.from('venue_checks').update({ checked: vc.checked }).eq('id', vc.id);
-  renderVenue();
-});
-
-eid('pane-venue').addEventListener('change', async e => {
-  const el = e.target;
-  if (el.dataset.action !== 'venue-note') return;
-  const vc = D.venueChecks.find(v => v.item===el.dataset.item);
-  if (!vc) return;
-  vc.note = el.value;
-  await sb.from('venue_checks').update({ note: el.value }).eq('id', vc.id);
-});
+const VI=['確認場地可使用廚房','確認場地有冰箱可存放食材','確認場地有洗水槽','確認場地有電源插座','確認場地有桌子可擺設茶點','確認場地允許帶外食','確認垃圾處理方式','確認進場時間與離場時間'];
+async function renderVenue(){const pid=P.id;for(const item of VI){if(!D.vc.find(v=>v.item===item)){const{data}=await sb.from('venue_checks').insert({project_id:pid,item,checked:false,note:''}).select().single();if(data)D.vc.push(data);}}const done=D.vc.filter(v=>v.checked).length;$('venue-prog').textContent=done+'/'+VI.length+' 已確認';$('venue-list').innerHTML=VI.map(item=>{const vc=D.vc.find(v=>v.item===item)||{checked:false,note:''};return'<div class="cr"><div class="cb'+(vc.checked?' on':'')+'" data-action="toggle-vc" data-item="'+eA(item)+'">'+(vc.checked?'✓':'')+'</div><div style="flex:1"><div style="font-size:13px'+(vc.checked?';text-decoration:line-through;color:var(--muted)':'')+'">'+eH(item)+'</div><textarea style="margin-top:5px;font-size:12px;min-height:0;padding:5px 8px;border-radius:6px;width:100%" rows="1" placeholder="備註：可以 / 不行..." data-action="vc-note" data-item="'+eA(item)+'">'+eH(vc.note||'')+'</textarea></div></div>';}).join('');}
+$('pane-venue').addEventListener('click',async e=>{const b=e.target.closest('[data-action="toggle-vc"]');if(!b)return;const vc=D.vc.find(v=>v.item===b.dataset.item);if(!vc)return;vc.checked=!vc.checked;await sb.from('venue_checks').update({checked:vc.checked}).eq('id',vc.id);renderVenue();});
+$('pane-venue').addEventListener('change',async e=>{const el=e.target;if(el.dataset.action!=='vc-note')return;const vc=D.vc.find(v=>v.item===el.dataset.item);if(!vc)return;vc.note=el.value;await sb.from('venue_checks').update({note:el.value}).eq('id',vc.id);});
 
 // DISHES
-function calcIngCost(dishId) {
-  return D.ingredients.filter(i => i.dish_id===dishId).reduce((s,i) => s+(i.total_cost||0), 0);
-}
-
-function renderDishes() {
-  const guests = parseInt(eid('inp-guests').value) || 150;
-  ['handmade','bought'].forEach(type => {
-    const list = D.dishes.filter(d => d.type===type);
-    const el = eid('list-'+type);
-    if (!list.length) {
-      el.innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:22px">'+(type==='handmade'?'👐':'🛒')+'</div><div class="empty-text">還沒有'+(type==='handmade'?'手作點心':'外購品項')+'</div></div>';
-      return;
-    }
-    if (type === 'bought') {
-      let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">份數</th><th class="nr">規格</th><th class="nr">需幾盤</th><th class="nr">小計</th><th></th></tr></thead><tbody>';
-      list.forEach(d => {
-        const u = d.unit_size||1, qty = d.qty||1, price = d.est_price||0;
-        const units = Math.ceil(qty/u), total = units*price;
-        h += '<tr><td><b>'+escH(d.name)+'</b></td>'
-          +'<td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td>'
-          +'<td class="nr"><input type="number" class="ii" value="'+qty+'" min="1" data-action="upd-qty" data-id="'+d.id+'"></td>'
-          +'<td class="nr">'+u+'個<br><small>NT$'+fmtN(price)+'/盤</small></td>'
-          +'<td class="nr hi">'+units+'盤</td>'
-          +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
-          +'<td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
-      });
-      el.innerHTML = h + '</tbody></table></div>';
-    } else {
-      let h = '<table class="tbl"><thead><tr><th>品項</th><th class="nr">份數</th><th class="nr">食材成本</th><th class="nr">單個</th><th class="nr">每人</th><th></th></tr></thead><tbody>';
-      list.forEach(d => {
-        const qty = d.qty||1, total = calcIngCost(d.id);
-        const uc = qty>0 ? Math.round(total/qty*10)/10 : 0;
-        const gc = guests>0 ? Math.round(total/guests*10)/10 : 0;
-        h += '<tr><td><b>'+escH(d.name)+'</b></td>'
-          +'<td class="nr"><input type="number" class="ii" value="'+qty+'" min="1" data-action="upd-qty" data-id="'+d.id+'"></td>'
-          +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
-          +'<td class="nr" style="font-size:11px;color:var(--muted)">NT$'+uc+'</td>'
-          +'<td class="nr" style="font-size:11px;color:var(--muted)">NT$'+gc+'</td>'
-          +'<td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';
-      });
-      el.innerHTML = h + '</tbody></table>';
-    }
-  });
-  recalcBudget();
-}
-
-function recalcBudget() {
-  const budget = parseInt(eid('inp-budget').value)||0;
-  let planned = 0;
-  D.dishes.forEach(d => {
-    if (d.type==='bought') { const u=d.unit_size||1; planned+=Math.ceil((d.qty||1)/u)*(d.est_price||0); }
-  });
-  D.ingredients.forEach(i => planned += i.total_cost||0);
-  D.equipCustom.forEach(e => { if (e.src_type==='buy') planned += (e.price||0)*(e.qty||1); });
-  eid('s1-budget').textContent = fmtN(budget);
-  eid('s1-planned').textContent = fmtN(planned);
-  const pct = budget ? Math.round(planned/budget*100) : 0;
-  eid('s1-pct').textContent = pct+'%';
-  const f = eid('s1-prog'); f.style.width = Math.min(pct,100)+'%'; f.classList.toggle('over', pct>100);
-}
-
-function handleDishListClick(e) {
-  const btn = e.target.closest('[data-action="del-dish"]');
-  if (!btn) return;
-  const id = btn.dataset.id;
-  sb.from('dishes').delete().eq('id', id);
-  sb.from('ingredients').delete().eq('dish_id', id);
-  D.dishes = D.dishes.filter(d => d.id!==id);
-  D.ingredients = D.ingredients.filter(i => i.dish_id!==id);
-  renderDishes();
-}
-
-async function handleDishListChange(e) {
-  const el = e.target;
-  if (el.dataset.action !== 'upd-qty') return;
-  const qty = parseInt(el.value)||1;
-  const dish = D.dishes.find(d => d.id===el.dataset.id);
-  if (!dish) return;
-  dish.qty = qty;
-  await sb.from('dishes').update({ qty }).eq('id', dish.id);
-  // Recalc ingredient costs for this dish
-  const ings = D.ingredients.filter(i => i.dish_id===dish.id);
-  for (const ing of ings) {
-    if (ing.selected_channel != null && ing.channels[ing.selected_channel]) {
-      const r = chTotal(ing.channels[ing.selected_channel], ing, dish);
-      ing.total_cost = Math.ceil(r.total);
-      await sb.from('ingredients').update({ total_cost: ing.total_cost }).eq('id', ing.id);
-    }
-  }
-  renderDishes();
-}
-
-eid('list-handmade').addEventListener('click', handleDishListClick);
-eid('list-bought').addEventListener('click', handleDishListClick);
-eid('list-handmade').addEventListener('change', handleDishListChange);
-eid('list-bought').addEventListener('change', handleDishListChange);
-eid('btn-add-handmade').addEventListener('click', () => openModal('dish', 'handmade'));
-eid('btn-add-bought').addEventListener('click', () => openModal('dish', 'bought'));
-eid('btn-save-budget').addEventListener('click', async () => {
-  const budget = parseInt(eid('inp-budget').value)||0;
-  const guests = parseInt(eid('inp-guests').value)||0;
-  await sb.from('projects').update({ budget, guest_count: guests }).eq('id', currentProject.id);
-  currentProject.budget = budget; currentProject.guest_count = guests;
-  recalcBudget(); showToast('✓ 預算已儲存');
-});
+function ingCost(did){return D.ings.filter(i=>i.dish_id===did).reduce((s,i)=>s+(i.total_cost||0),0);}
+function renderDishes(){const g=parseInt($('inp-guests').value)||150;['hm','bt'].forEach(t=>{const type=t==='hm'?'handmade':'bought';const list=D.dishes.filter(d=>d.type===type);const el=$('list-'+t);if(!list.length){el.innerHTML='<div class="empty"><div class="ei" style="font-size:22px">'+(t==='hm'?'👐':'🛒')+'</div><div class="et">還沒有'+(t==='hm'?'手作點心':'外購品項')+'</div></div>';return;}if(t==='bt'){let h='<div class="cw"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">份數</th><th class="nr">規格</th><th class="nr">需幾盤</th><th class="nr">小計</th><th></th></tr></thead><tbody>';list.forEach(d=>{const u=d.unit_size||1,q=d.qty||1,p=d.est_price||0;const un=Math.ceil(q/u);h+='<tr><td><b>'+eH(d.name)+'</b></td><td style="font-size:11px;color:var(--muted)">'+eH(d.store||'—')+'</td><td class="nr"><input type="number" class="ii" value="'+q+'" min="1" data-action="upd-qty" data-id="'+d.id+'"></td><td class="nr">'+u+'個<br><small>NT$'+fN(p)+'/盤</small></td><td class="nr hi">'+un+'盤</td><td class="nr hi">NT$'+fN(un*p)+'</td><td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';});el.innerHTML=h+'</tbody></table></div>';}else{let h='<table class="tbl"><thead><tr><th>品項</th><th class="nr">份數</th><th class="nr">食材成本</th><th class="nr">單個</th><th class="nr">每人</th><th></th></tr></thead><tbody>';list.forEach(d=>{const q=d.qty||1,tot=ingCost(d.id);const uc=q>0?Math.round(tot/q*10)/10:0,gc=g>0?Math.round(tot/g*10)/10:0;h+='<tr><td><b>'+eH(d.name)+'</b></td><td class="nr"><input type="number" class="ii" value="'+q+'" min="1" data-action="upd-qty" data-id="'+d.id+'"></td><td class="nr hi">NT$'+fN(tot)+'</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$'+uc+'</td><td class="nr" style="font-size:11px;color:var(--muted)">NT$'+gc+'</td><td><button class="bx" data-action="del-dish" data-id="'+d.id+'">×</button></td></tr>';});el.innerHTML=h+'</tbody></table>';}});recalc();}
+function recalc(){const budget=parseInt($('inp-budget').value)||0;let pl=0;D.dishes.forEach(d=>{if(d.type==='bought'){const u=d.unit_size||1;pl+=Math.ceil((d.qty||1)/u)*(d.est_price||0);}});D.ings.forEach(i=>pl+=i.total_cost||0);D.equip.filter(e=>e.src_type==='buy').forEach(e=>pl+=(e.price||0)*(e.qty||1));$('s1-budget').textContent=fN(budget);$('s1-planned').textContent=fN(pl);const pct=budget?Math.round(pl/budget*100):0;$('s1-pct').textContent=pct+'%';const f=$('s1-prog');f.style.width=Math.min(pct,100)+'%';f.classList.toggle('over',pct>100);}
+function hdlDishClick(e){const b=e.target.closest('[data-action="del-dish"]');if(!b)return;const id=b.dataset.id;sb.from('dishes').delete().eq('id',id);sb.from('ingredients').delete().eq('dish_id',id);D.dishes=D.dishes.filter(d=>d.id!==id);D.ings=D.ings.filter(i=>i.dish_id!==id);renderDishes();}
+async function hdlDishChange(e){const el=e.target;if(el.dataset.action!=='upd-qty')return;const q=parseInt(el.value)||1;const dish=D.dishes.find(d=>d.id===el.dataset.id);if(!dish)return;dish.qty=q;await sb.from('dishes').update({qty:q}).eq('id',dish.id);const ings=D.ings.filter(i=>i.dish_id===dish.id);for(const ing of ings){if(ing.selected_channel!=null&&ing.channels?.[ing.selected_channel]){const r=chTotal(ing.channels[ing.selected_channel],ing,dish);ing.total_cost=Math.ceil(r.total);await sb.from('ingredients').update({total_cost:ing.total_cost}).eq('id',ing.id);}}renderDishes();}
+$('list-hm').addEventListener('click',hdlDishClick);$('list-bt').addEventListener('click',hdlDishClick);
+$('list-hm').addEventListener('change',hdlDishChange);$('list-bt').addEventListener('change',hdlDishChange);
+$('btn-add-hm').addEventListener('click',()=>openModal('dish','handmade'));
+$('btn-add-bt').addEventListener('click',()=>openModal('dish','bought'));
+$('btn-save-budget').addEventListener('click',async()=>{const b=parseInt($('inp-budget').value)||0,g=parseInt($('inp-guests').value)||0;await sb.from('projects').update({budget:b,guest_count:g}).eq('id',P.id);P.budget=b;P.guest_count=g;recalc();toast('✓ 預算已儲存');});
 
 // COMPARE
-function chTotal(ch, ing, dish) {
-  if (ing.use_weight) {
-    const totalG = (dish.qty||1)*(ing.qty_per_item||1);
-    const packs = Math.ceil(totalG/(ch.pkgWeight||1));
-    return { mode:'weight', needed:totalG, packs, uc:ch.pkgWeight>0?ch.pkgPrice/ch.pkgWeight:0, total:packs*(ch.pkgPrice||0) };
-  } else if (ing.use_yield) {
-    const needed = Math.ceil((dish.qty||1)/(ing.yields_per_unit||1));
-    return { mode:'yield', needed, packs:null, uc:ch.pkgPrice||0, total:(ch.pkgPrice||0)*needed };
-  } else {
-    const needed = Math.ceil((dish.qty||1)*(ing.qty_per_item||1));
-    const uc = (ch.pkgQty&&ch.pkgQty>0) ? ch.pkgPrice/ch.pkgQty : (ch.pkgPrice||0);
-    return { mode:'count', needed, packs:null, uc, total:uc*needed };
-  }
-}
+function chTotal(ch,ing,dish){if(ing.use_weight){const g=(dish.qty||1)*(ing.qty_per_item||1);const p=Math.ceil(g/(ch.pkgWeight||1));return{mode:'weight',needed:g,packs:p,uc:ch.pkgWeight>0?ch.pkgPrice/ch.pkgWeight:0,total:p*(ch.pkgPrice||0)};}else if(ing.use_yield){const n=Math.ceil((dish.qty||1)/(ing.yields_per_unit||1));return{mode:'yield',needed:n,packs:null,uc:ch.pkgPrice||0,total:(ch.pkgPrice||0)*n};}else{const n=Math.ceil((dish.qty||1)*(ing.qty_per_item||1));const u=(ch.pkgQty&&ch.pkgQty>0)?ch.pkgPrice/ch.pkgQty:(ch.pkgPrice||0);return{mode:'count',needed:n,packs:null,uc:u,total:u*n};}}
+function renderCompare(){const hm=D.dishes.filter(d=>d.type==='handmade');const el=$('compare-list');if(!hm.length){el.innerHTML='<div class="empty"><div class="ei">🔍</div><div class="et">請先新增手作點心</div></div>';return;}el.innerHTML=hm.map(dish=>{const ings=D.ings.filter(i=>i.dish_id===dish.id);const tot=ings.reduce((s,i)=>s+(i.total_cost||0),0);let h='<div class="card"><div class="ch"><div class="ct">👐 '+eH(dish.name)+' <span style="font-size:11px;font-weight:400;color:var(--muted)">× '+dish.qty+' 份</span></div><button class="btn bo bs" data-action="add-ing" data-did="'+dish.id+'">＋ 食材</button></div>';if(!ings.length)h+='<div style="font-size:12px;color:var(--muted)">還沒有食材</div>';ings.forEach(ing=>{const chs=ing.channels||[];const tots=chs.map(ch=>chTotal(ch,ing,dish).total);const minT=tots.length?Math.min(...tots.filter(t=>t>0)):0;const isW=ing.use_weight,isY=ing.use_yield;const desc=isW?'每份'+ing.qty_per_item+'g':isY?'每'+eH(ing.unit)+'可做'+ing.yields_per_unit+'份':'每份'+ing.qty_per_item+eH(ing.unit);const nN=isW?(dish.qty||1)*(ing.qty_per_item||1):isY?Math.ceil((dish.qty||1)/(ing.yields_per_unit||1)):Math.ceil((dish.qty||1)*(ing.qty_per_item||1));const nS=isW?nN+'g':nN+eH(ing.unit);h+='<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0ece4"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div><b style="font-size:13px">'+eH(ing.name)+'</b> <span style="font-size:11px;color:var(--muted)">'+desc+'</span> <button class="btn bo bs" style="padding:1px 6px;font-size:10px;margin-left:4px" data-action="edit-ing" data-iid="'+ing.id+'">✏️</button></div><div style="display:flex;gap:4px"><button class="btn bo bs" data-action="add-ch" data-iid="'+ing.id+'">＋ 通路</button><button class="bx" data-action="del-ing" data-iid="'+ing.id+'">×</button></div></div><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-bottom:6px">📦 共需 <b>'+nS+'</b></div>';if(!chs.length){h+='<div style="font-size:12px;color:var(--muted)">點「＋ 通路」新增比價</div>';}else{h+='<div class="cw"><table class="tbl"><thead><tr><th>通路</th><th>售價</th><th>'+(isW?'規格g':isY?'需幾'+eH(ing.unit):'每包數')+'</th><th>單個成本</th><th>總花費</th><th>選</th><th></th></tr></thead><tbody>';chs.forEach((ch,ci)=>{const r=chTotal(ch,ing,dish);const isBest=r.total>0&&r.total===minT,isSel=ing.selected_channel===ci;const uc=isW?(r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/g':'—'):(r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/'+eH(ing.unit):'—');const c3=isY?r.needed:(isW?(ch.pkgWeight||0):(ch.pkgQty||1));h+='<tr style="'+(isSel?'background:#f0f6ee':'')+'"><td><input type="text" style="width:65px;padding:3px 5px;font-size:11px;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+eA(ch.store||'')+'" data-action="upd-ch-store" data-iid="'+ing.id+'" data-ci="'+ci+'"></td><td>NT$<input type="number" style="width:50px;padding:3px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(ch.pkgPrice||0)+'" data-action="upd-ch-price" data-iid="'+ing.id+'" data-ci="'+ci+'"></td><td>'+(isY?c3:'<input type="number" style="width:40px;padding:3px 4px;font-size:11px;text-align:center;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+c3+'" data-action="'+(isW?'upd-ch-weight':'upd-ch-qty')+'" data-iid="'+ing.id+'" data-ci="'+ci+'">')+'</td><td style="font-size:11px;color:var(--muted)">'+uc+'</td><td style="'+(isBest?'color:#2a6a2a;font-weight:700':'')+'">'+(isBest?'✓ ':'')+( r.total>0?'NT$'+fN(Math.ceil(r.total)):'—')+'</td><td><input type="radio" name="rg'+ing.id+'" '+(isSel?'checked':'')+' data-action="sel-ch" data-iid="'+ing.id+'" data-ci="'+ci+'" data-did="'+dish.id+'" style="width:16px;height:16px;accent-color:var(--sage-dark)"></td><td><button class="bx" style="font-size:12px" data-action="del-ch" data-iid="'+ing.id+'" data-ci="'+ci+'">×</button></td></tr>';});h+='</tbody></table></div>';if(ing.selected_channel!=null&&chs[ing.selected_channel])h+='<div style="font-size:11px;color:var(--sage-dark);background:#e8f0e4;padding:4px 8px;border-radius:6px;margin-top:5px">✓ 已選：'+eH(chs[ing.selected_channel].store||'')+'，NT$'+fN(ing.total_cost||0)+'</div>';}h+='</div>';});if(ings.length)h+='<div style="text-align:right;font-size:12px;color:var(--sage-dark);font-weight:600">食材合計：NT$'+fN(tot)+'</div>';return h+'</div>';}).join('');}
+$('compare-list').addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const act=b.dataset.action;if(act==='add-ing')openModal('ingredient',b.dataset.did);if(act==='edit-ing')openModal('editIng',b.dataset.iid);if(act==='del-ing'){await sb.from('ingredients').delete().eq('id',b.dataset.iid);D.ings=D.ings.filter(i=>i.id!==b.dataset.iid);renderCompare();renderDishes();}if(act==='add-ch')openModal('channel',b.dataset.iid);if(act==='del-ch'){const iid=b.dataset.iid,ci=parseInt(b.dataset.ci);const ing=D.ings.find(i=>i.id===iid);if(!ing)return;const chs=[...(ing.channels||[])];chs.splice(ci,1);if(ing.selected_channel===ci){ing.selected_channel=null;ing.total_cost=0;}else if(ing.selected_channel>ci)ing.selected_channel--;await sb.from('ingredients').update({channels:chs,selected_channel:ing.selected_channel,total_cost:ing.total_cost}).eq('id',iid);ing.channels=chs;renderCompare();renderDishes();}});
+$('compare-list').addEventListener('change',async e=>{const el=e.target,act=el.dataset.action;if(!act)return;const iid=el.dataset.iid,ci=parseInt(el.dataset.ci);const ing=D.ings.find(i=>i.id===iid);if(!ing)return;const chs=[...(ing.channels||[])];if(act==='upd-ch-store')chs[ci]={...chs[ci],store:el.value};if(act==='upd-ch-price')chs[ci]={...chs[ci],pkgPrice:parseFloat(el.value)||0};if(act==='upd-ch-qty')chs[ci]={...chs[ci],pkgQty:parseFloat(el.value)||1};if(act==='upd-ch-weight')chs[ci]={...chs[ci],pkgWeight:parseFloat(el.value)||1};if(act==='sel-ch'){const dish=D.dishes.find(d=>d.id===el.dataset.did);if(dish){const r=chTotal(chs[ci],ing,dish);ing.selected_channel=ci;ing.total_cost=Math.ceil(r.total);}}ing.channels=chs;await sb.from('ingredients').update({channels:chs,selected_channel:ing.selected_channel,total_cost:ing.total_cost}).eq('id',iid);renderCompare();renderDishes();});
 
-function renderCompare() {
-  const hm = D.dishes.filter(d => d.type==='handmade');
-  const el = eid('compare-list');
-  if (!hm.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><div class="empty-text">請先新增手作點心</div></div>'; return; }
-  el.innerHTML = hm.map(dish => {
-    const ings = D.ingredients.filter(i => i.dish_id===dish.id);
-    const tot = ings.reduce((s,i) => s+(i.total_cost||0), 0);
-    let h = '<div class="card"><div class="card-head"><div class="card-title">👐 '+escH(dish.name)+' <span style="font-size:11px;font-weight:400;color:var(--muted)">× '+dish.qty+' 份</span></div><button class="btn btn-outline btn-sm" data-action="add-ing" data-dish-id="'+dish.id+'">＋ 食材</button></div>';
-    if (!ings.length) h += '<div style="font-size:12px;color:var(--muted)">還沒有食材</div>';
-    ings.forEach(ing => {
-      const chs = ing.channels||[];
-      const tots = chs.map(ch => chTotal(ch,ing,dish).total);
-      const minT = tots.length ? Math.min(...tots.filter(t=>t>0)) : 0;
-      const isW = ing.use_weight, isY = ing.use_yield;
-      const descStr = isW ? '每份'+ing.qty_per_item+'g' : isY ? '每'+escH(ing.unit)+'可做'+ing.yields_per_unit+'份' : '每份'+ing.qty_per_item+escH(ing.unit);
-      const neededNum = isW ? (dish.qty||1)*(ing.qty_per_item||1) : isY ? Math.ceil((dish.qty||1)/(ing.yields_per_unit||1)) : Math.ceil((dish.qty||1)*(ing.qty_per_item||1));
-      const neededStr = isW ? neededNum+'g' : neededNum+escH(ing.unit);
-      h += '<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f0ece4">'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-        +'<div><b style="font-size:13px">'+escH(ing.name)+'</b> <span style="font-size:11px;color:var(--muted)">'+descStr+'</span>'
-        +' <button class="btn btn-outline btn-sm" style="padding:1px 6px;font-size:10px;margin-left:4px" data-action="edit-ing" data-ing-id="'+ing.id+'">✏️</button></div>'
-        +'<div style="display:flex;gap:4px"><button class="btn btn-outline btn-sm" data-action="add-ch" data-ing-id="'+ing.id+'">＋ 通路</button>'
-        +'<button class="bx" data-action="del-ing" data-ing-id="'+ing.id+'">×</button></div></div>'
-        +'<div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-bottom:6px">📦 共需 <b>'+neededStr+'</b></div>';
-      if (!chs.length) {
-        h += '<div style="font-size:12px;color:var(--muted)">點「＋ 通路」新增比價</div>';
-      } else {
-        h += '<div class="cwrap"><table class="tbl"><thead><tr><th>通路</th><th>售價</th><th>'+(isW?'規格g':isY?'需幾'+escH(ing.unit):'每包數')+'</th><th>單個成本</th><th>總花費</th><th>選</th><th></th></tr></thead><tbody>';
-        chs.forEach((ch, ci) => {
-          const r = chTotal(ch, ing, dish);
-          const isBest = r.total>0 && r.total===minT;
-          const isSel = ing.selected_channel===ci;
-          const ucStr = isW ? (r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/g':'—') : (r.uc>0?'NT$'+(Math.round(r.uc*100)/100)+'/'+escH(ing.unit):'—');
-          const col3 = isY ? r.needed : (isW ? (ch.pkgWeight||0) : (ch.pkgQty||1));
-          h += '<tr style="'+(isSel?'background:#f0f6ee':'')+'"><td>'
-            +'<input type="text" style="width:65px;padding:3px 5px;font-size:11px;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+escA(ch.store||'')+'" data-action="upd-ch-store" data-ing-id="'+ing.id+'" data-ci="'+ci+'">'
-            +'</td><td>NT$<input type="number" style="width:50px;padding:3px 4px;font-size:11px;text-align:right;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+(ch.pkgPrice||0)+'" data-action="upd-ch-price" data-ing-id="'+ing.id+'" data-ci="'+ci+'">'
-            +'</td><td>'+(isY ? col3 : '<input type="number" style="width:40px;padding:3px 4px;font-size:11px;text-align:center;background:var(--cream);border:1px solid #ddd;border-radius:4px" value="'+col3+'" data-action="'+(isW?'upd-ch-weight':'upd-ch-qty')+'" data-ing-id="'+ing.id+'" data-ci="'+ci+'">')
-            +'</td><td style="font-size:11px;color:var(--muted)">'+ucStr+'</td>'
-            +'<td style="'+(isBest?'color:#2a6a2a;font-weight:700':'')+'">'+( isBest?'✓ ':'')+( r.total>0?'NT$'+fmtN(Math.ceil(r.total)):'—')+'</td>'
-            +'<td><input type="radio" name="rg'+ing.id+'" '+(isSel?'checked':'')+' data-action="sel-ch" data-ing-id="'+ing.id+'" data-ci="'+ci+'" data-dish-id="'+dish.id+'" style="width:16px;height:16px;accent-color:var(--sage-dark)"></td>'
-            +'<td><button class="bx" style="font-size:12px" data-action="del-ch" data-ing-id="'+ing.id+'" data-ci="'+ci+'">×</button></td></tr>';
-        });
-        h += '</tbody></table></div>';
-        if (ing.selected_channel!=null && chs[ing.selected_channel]) {
-          h += '<div style="font-size:11px;color:var(--sage-dark);background:#e8f0e4;padding:4px 8px;border-radius:6px;margin-top:5px">✓ 已選：'+escH(chs[ing.selected_channel].store||'')+'，NT$'+fmtN(ing.total_cost||0)+'</div>';
-        }
-      }
-      h += '</div>';
-    });
-    if (ings.length) h += '<div style="text-align:right;font-size:12px;color:var(--sage-dark);font-weight:600">食材合計：NT$'+fmtN(tot)+'</div>';
-    return h + '</div>';
-  }).join('');
-}
-
-eid('compare-list').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const act = btn.dataset.action;
-  if (act==='add-ing') openModal('ingredient', btn.dataset.dishId);
-  if (act==='edit-ing') openModal('editIng', btn.dataset.ingId);
-  if (act==='del-ing') {
-    await sb.from('ingredients').delete().eq('id', btn.dataset.ingId);
-    D.ingredients = D.ingredients.filter(i => i.id!==btn.dataset.ingId);
-    renderCompare(); renderDishes();
-  }
-  if (act==='add-ch') openModal('channel', btn.dataset.ingId);
-  if (act==='del-ch') {
-    const ingId = btn.dataset.ingId, ci = parseInt(btn.dataset.ci);
-    const ing = D.ingredients.find(i => i.id===ingId);
-    if (!ing) return;
-    const chs = [...(ing.channels||[])]; chs.splice(ci, 1);
-    if (ing.selected_channel===ci) { ing.selected_channel=null; ing.total_cost=0; }
-    else if (ing.selected_channel>ci) ing.selected_channel--;
-    await sb.from('ingredients').update({ channels:chs, selected_channel:ing.selected_channel, total_cost:ing.total_cost }).eq('id', ingId);
-    ing.channels = chs; renderCompare(); renderDishes();
-  }
-});
-
-eid('compare-list').addEventListener('change', async e => {
-  const el = e.target, act = el.dataset.action;
-  if (!act) return;
-  const ingId = el.dataset.ingId, ci = parseInt(el.dataset.ci);
-  const ing = D.ingredients.find(i => i.id===ingId);
-  if (!ing) return;
-  const chs = [...(ing.channels||[])];
-  if (act==='upd-ch-store') chs[ci] = {...chs[ci], store: el.value};
-  if (act==='upd-ch-price') chs[ci] = {...chs[ci], pkgPrice: parseFloat(el.value)||0};
-  if (act==='upd-ch-qty') chs[ci] = {...chs[ci], pkgQty: parseFloat(el.value)||1};
-  if (act==='upd-ch-weight') chs[ci] = {...chs[ci], pkgWeight: parseFloat(el.value)||1};
-  if (act==='sel-ch') {
-    const dish = D.dishes.find(d => d.id===el.dataset.dishId);
-    if (dish) { const r = chTotal(chs[ci], ing, dish); ing.selected_channel=ci; ing.total_cost=Math.ceil(r.total); }
-  }
-  ing.channels = chs;
-  await sb.from('ingredients').update({ channels:chs, selected_channel:ing.selected_channel, total_cost:ing.total_cost }).eq('id', ingId);
-  renderCompare(); renderDishes();
-});
-
-// EQUIP ASSIGN
-const EQUIP_CATS = [
-  {cat:'刀具/工具', items:['剪刀','食物剪刀','砧板','菜刀','食物夾','手套','湯匙','模具']},
-  {cat:'容器/盛裝', items:['大木托盤','小木托盤','塑膠托盤','木籃','木盆','鋼盆','冷水壺','飲料桶','快煮壺','店家自有']},
-  {cat:'一次性', items:['烘焙紙','保鮮袋','保鮮盒','保鮮膜','紙盤','紙杯','塑膠杯','紙托','塑膠湯匙','塑膠叉子']},
-  {cat:'清潔/衛生', items:['衛生紙','餐巾紙','廚房紙巾','酒精']},
-  {cat:'其他', items:['冰塊']}
-];
-
-function renderEquipAssign() {
-  const el = eid('equip-assign-section');
-  if (!D.dishes.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🧺</div><div class="empty-text">請先新增餐點</div></div>'; renderEquipSummary(); return; }
-  el.innerHTML = D.dishes.map(dish => {
-    if (!dish.containers) dish.containers = [];
-    const ctrs = dish.containers;
-    let h = '<div class="card"><div class="card-head"><div class="card-title">'+(dish.type==='handmade'?'👐':'🛍️')+' '+escH(dish.name)+' <span style="font-size:11px;font-weight:400;color:var(--muted)">× '+dish.qty+' 份</span></div>'
-      +'<button class="btn btn-primary btn-sm" data-action="add-container" data-dish-id="'+dish.id+'">＋ 加容器</button></div>';
-    if (!ctrs.length) h += '<div style="font-size:12px;color:var(--muted);padding:4px 0">尚未指定容器</div>';
-    ctrs.forEach((ctr, ci) => {
-      h += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f0e8">'
-        +'<span class="ctag" style="flex-shrink:0">'+escH(ctr.equipName)+'</span>'
-        +'<div style="display:flex;align-items:center;gap:6px;flex:1">'
-        +'<span class="tog'+(ctr.qtyMode==='fixed'?' sel':'')+'" data-action="set-ctr-mode" data-dish-id="'+dish.id+'" data-ci="'+ci+'" data-mode="fixed">固定</span>'
-        +'<span class="tog'+(ctr.qtyMode==='per'?' sel':'')+'" data-action="set-ctr-mode" data-dish-id="'+dish.id+'" data-ci="'+ci+'" data-mode="per">每份一個</span>'
-        +(ctr.qtyMode==='fixed'
-          ? '<input class="ii" type="number" value="'+(ctr.fixedQty||1)+'" data-action="upd-ctr-qty" data-dish-id="'+dish.id+'" data-ci="'+ci+'"> 個'
-          : '<span style="font-size:11px;color:var(--sage-dark);font-weight:600">= '+dish.qty+' 個</span>')
-        +'</div>'
-        +'<button class="bx" data-action="del-container" data-dish-id="'+dish.id+'" data-ci="'+ci+'">×</button>'
-        +'</div>';
-    });
-    return h + '</div>';
-  }).join('');
-  renderEquipSummary();
-}
-
-function renderEquipSummary() {
-  const summary = {};
-  D.dishes.forEach(dish => {
-    (dish.containers||[]).forEach(ctr => {
-      if (!summary[ctr.equipName]) summary[ctr.equipName] = 0;
-      summary[ctr.equipName] += ctr.qtyMode==='per' ? (dish.qty||1) : (ctr.fixedQty||1);
-    });
-  });
-  const keys = Object.keys(summary);
-  const el = eid('equip-summary');
-  if (!keys.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px">請先為餐點指定容器</div>'; return; }
-  el.innerHTML = '<table class="tbl"><thead><tr><th>器具/容器</th><th class="nr">總需求量</th></tr></thead><tbody>'
-    +keys.map(k => '<tr><td>'+escH(k)+'</td><td class="nr hi">'+summary[k]+' 個</td></tr>').join('')
-    +'</tbody></table><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-top:8px">💡 此彙總會帶入「採購」頁面的器具欄位</div>';
-}
-
-eid('pane-equip').addEventListener('click', e => {
-  const btn = e.target.closest('[data-action]'); if (!btn) return;
-  const act = btn.dataset.action, dishId = btn.dataset.dishId;
-  const dish = D.dishes.find(d => d.id===dishId);
-  if (act==='add-container') openModal('pickContainer', dishId);
-  if (act==='del-container' && dish) {
-    if (!dish.containers) dish.containers = [];
-    dish.containers.splice(parseInt(btn.dataset.ci), 1);
-    sb.from('dishes').update({ containers: dish.containers }).eq('id', dishId);
-    renderEquipAssign();
-  }
-  if (act==='set-ctr-mode' && dish) {
-    if (!dish.containers) dish.containers = [];
-    dish.containers[parseInt(btn.dataset.ci)].qtyMode = btn.dataset.mode;
-    sb.from('dishes').update({ containers: dish.containers }).eq('id', dishId);
-    renderEquipAssign();
-  }
-});
-
-eid('pane-equip').addEventListener('change', e => {
-  const el = e.target; if (el.dataset.action!=='upd-ctr-qty') return;
-  const dish = D.dishes.find(d => d.id===el.dataset.dishId);
-  if (dish && dish.containers[parseInt(el.dataset.ci)]) {
-    dish.containers[parseInt(el.dataset.ci)].fixedQty = parseInt(el.value)||1;
-    sb.from('dishes').update({ containers: dish.containers }).eq('id', el.dataset.dishId);
-    renderEquipSummary();
-  }
-});
+// EQUIP
+const EC=[{cat:'刀具/工具',items:['剪刀','食物剪刀','砧板','菜刀','食物夾','手套','湯匙','模具']},{cat:'容器/盛裝',items:['大木托盤','小木托盤','塑膠托盤','木籃','木盆','鋼盆','冷水壺','飲料桶','快煮壺','店家自有']},{cat:'一次性',items:['烘焙紙','保鮮袋','保鮮盒','保鮮膜','紙盤','紙杯','塑膠杯','紙托','塑膠湯匙','塑膠叉子']},{cat:'清潔/衛生',items:['衛生紙','餐巾紙','廚房紙巾','酒精']},{cat:'其他',items:['冰塊']}];
+function renderEquip(){const el=$('equip-assign');if(!D.dishes.length){el.innerHTML='<div class="empty"><div class="ei">🧺</div><div class="et">請先新增餐點</div></div>';renderEquipSummary();return;}el.innerHTML=D.dishes.map(dish=>{if(!dish.containers)dish.containers=[];let h='<div class="card"><div class="ch"><div class="ct">'+(dish.type==='handmade'?'👐':'🛍️')+' '+eH(dish.name)+' <span style="font-size:11px;font-weight:400;color:var(--muted)">× '+dish.qty+' 份</span></div><button class="btn bp bs" data-action="add-ctr" data-did="'+dish.id+'">＋ 加容器</button></div>';if(!dish.containers.length)h+='<div style="font-size:12px;color:var(--muted);padding:4px 0">尚未指定容器</div>';dish.containers.forEach((ctr,ci)=>{h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f0e8"><span class="ctag" style="flex-shrink:0">'+eH(ctr.equipName)+'</span><div style="display:flex;align-items:center;gap:6px;flex:1"><span class="tog'+(ctr.qtyMode==='fixed'?' sel':'')+'" data-action="set-ctr-mode" data-did="'+dish.id+'" data-ci="'+ci+'" data-mode="fixed">固定</span><span class="tog'+(ctr.qtyMode==='per'?' sel':'')+'" data-action="set-ctr-mode" data-did="'+dish.id+'" data-ci="'+ci+'" data-mode="per">每份一個</span>'+(ctr.qtyMode==='fixed'?'<input class="ii" type="number" value="'+(ctr.fixedQty||1)+'" data-action="upd-ctr-qty" data-did="'+dish.id+'" data-ci="'+ci+'"> 個':'<span style="font-size:11px;color:var(--sage-dark);font-weight:600">= '+dish.qty+' 個</span>')+'</div><button class="bx" data-action="del-ctr" data-did="'+dish.id+'" data-ci="'+ci+'">×</button></div>';});return h+'</div>';}).join('');renderEquipSummary();}
+function renderEquipSummary(){const s={};D.dishes.forEach(d=>{(d.containers||[]).forEach(c=>{if(!s[c.equipName])s[c.equipName]=0;s[c.equipName]+=c.qtyMode==='per'?(d.qty||1):(c.fixedQty||1);});});const keys=Object.keys(s);const el=$('equip-summary');if(!keys.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:6px">請先為餐點指定容器</div>';return;}el.innerHTML='<table class="tbl"><thead><tr><th>器具/容器</th><th class="nr">總需求量</th></tr></thead><tbody>'+keys.map(k=>'<tr><td>'+eH(k)+'</td><td class="nr hi">'+s[k]+' 個</td></tr>').join('')+'</tbody></table><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:6px 10px;margin-top:8px">💡 此彙總會帶入採購頁器具欄位</div>';}
+$('pane-equip').addEventListener('click',e=>{const b=e.target.closest('[data-action]');if(!b)return;const act=b.dataset.action,did=b.dataset.did;const dish=D.dishes.find(d=>d.id===did);if(act==='add-ctr')openModal('pickCtr',did);if(act==='del-ctr'&&dish){if(!dish.containers)dish.containers=[];dish.containers.splice(parseInt(b.dataset.ci),1);sb.from('dishes').update({containers:dish.containers}).eq('id',did);renderEquip();}if(act==='set-ctr-mode'&&dish){if(!dish.containers)dish.containers=[];dish.containers[parseInt(b.dataset.ci)].qtyMode=b.dataset.mode;sb.from('dishes').update({containers:dish.containers}).eq('id',did);renderEquip();}});
+$('pane-equip').addEventListener('change',e=>{const el=e.target;if(el.dataset.action!=='upd-ctr-qty')return;const dish=D.dishes.find(d=>d.id===el.dataset.did);if(dish&&dish.containers[parseInt(el.dataset.ci)]){dish.containers[parseInt(el.dataset.ci)].fixedQty=parseInt(el.value)||1;sb.from('dishes').update({containers:dish.containers}).eq('id',el.dataset.did);renderEquipSummary();}});
 
 // PROCURE
-function getRoleLabel(role) {
-  const map = { lead:'主要負責人', co_lead:'副負責人', treasurer:'管錢', usher:'Usher', usher_king:'Usher King', vendor:'廠商', venue:'場地負責人', driver:'運送司機' };
-  return map[role] || role || '一般幫忙';
-}
-
-function getPersonName(pid) {
-  const p = D.persons.find(p => p.id===pid);
-  return p ? p.name : '';
-}
-
-function personSelector(key, currentPid) {
-  if (!D.persons.length) return '<span style="font-size:11px;color:var(--muted)">先新增人員</span>';
-  return '<select style="padding:3px 6px;font-size:11px;border:1px solid #ddd8cc;border-radius:6px;background:var(--cream)" data-action="upd-buyer" data-key="'+key+'">'
-    +'<option value="">— 誰去買 —</option>'
-    +D.persons.map(p => '<option value="'+p.id+'"'+(currentPid===p.id?' selected':'')+'>'+escH(p.name)+'</option>').join('')
-    +'</select>';
-}
-
-function syncEquipFromSummary() {
-  // Build summary from dish containers
-  const summary = {};
-  D.dishes.forEach(dish => {
-    (dish.containers||[]).forEach(ctr => {
-      if (!summary[ctr.equipName]) summary[ctr.equipName] = 0;
-      summary[ctr.equipName] += ctr.qtyMode==='per' ? (dish.qty||1) : (ctr.fixedQty||1);
-    });
-  });
-  // Sync into equipCustom (from_summary items)
-  const summaryNames = Object.keys(summary);
-  // Remove old summary items that no longer exist
-  D.equipCustom = D.equipCustom.filter(e => !e.from_summary || summaryNames.includes(e.name));
-  // Add/update summary items
-  summaryNames.forEach(name => {
-    const existing = D.equipCustom.find(e => e.from_summary && e.name===name);
-    if (existing) { existing.qty = summary[name]; }
-    else { D.equipCustom.push({ id:'summary_'+name, name, from_summary:true, src_type:'buy', src_name:'', price:0, qty:summary[name] }); }
-  });
-}
-
-function renderProcure() {
-  syncEquipFromSummary();
-
-  // Food ingredients
-  const ings = D.ingredients.filter(i => i.selected_channel!=null && (i.total_cost||0)>0);
-  const iEl = eid('buy-ing');
-  if (!ings.length) { iEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在食材比價頁勾選通路</div>'; }
-  else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
-    ings.forEach(ing => {
-      const d = D.dishes.find(d => d.id===ing.dish_id);
-      const ch = (ing.channels||[])[ing.selected_channel]||{};
-      const akey = 'ing'+ing.id;
-      const aval = D.actuals[akey];
-      const buyer = D.actuals[akey+'_buyer']||'';
-      h += '<tr>'
-        +'<td>'+escH(ing.name)+'</td>'
-        +'<td style="font-size:11px;color:var(--muted)">'+(d?escH(d.name):'')+'</td>'
-        +'<td style="font-size:11px">'+escH(ch.store||'')+'</td>'
-        +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
-        +'<td class="nr hi">NT$'+fmtN(ing.total_cost)+'</td>'
-        +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'</tr>';
-    });
-    iEl.innerHTML = h + '</tbody></table></div>';
-  }
-
-  // Bought dishes
-  const bought = D.dishes.filter(d => d.type==='bought');
-  const bEl = eid('buy-bought');
-  if (!bought.length) { bEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">請在餐點規劃頁新增外購品項</div>'; }
-  else {
-    let h = '<div class="cwrap"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';
-    bought.forEach(d => {
-      const u = d.unit_size||1, total = Math.ceil((d.qty||1)/u)*(d.est_price||0);
-      const akey = 'b'+d.id;
-      const aval = D.actuals[akey];
-      const buyer = D.actuals[akey+'_buyer']||'';
-      h += '<tr>'
-        +'<td>'+escH(d.name)+'</td>'
-        +'<td style="font-size:11px;color:var(--muted)">'+escH(d.store||'—')+'</td>'
-        +'<td class="nr">'+Math.ceil((d.qty||1)/u)+'盤</td>'
-        +'<td>'+personSelector(akey+'_buyer', buyer)+'</td>'
-        +'<td class="nr hi">NT$'+fmtN(total)+'</td>'
-        +'<td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></td>'
-        +'</tr>';
-    });
-    bEl.innerHTML = h + '</tbody></table></div>';
-  }
-
-  // Equip & supplies - card style for mobile
-  const eEl = eid('buy-equip');
-  if (!D.equipCustom.length) {
-    eEl.innerHTML = '<div style="padding:8px;font-size:12px;color:var(--muted)">器具清單的容器會自動帶入，也可點「＋ 新增」手動加入</div>';
-  } else {
-    const srcOpts = [['buy','買'],['borrow','借'],['gift','付出']];
-    eEl.innerHTML = D.equipCustom.map(eq => {
-      const sub = eq.src_type==='buy' ? (eq.price||0)*(eq.qty||1) : 0;
-      const akey = 'eq'+eq.id;
-      const aval = D.actuals[akey];
-      const buyer = D.actuals[akey+'_buyer']||'';
-      const tag = eq.from_summary ? '<span style="background:#e8f0e4;color:var(--sage-dark);font-size:10px;padding:1px 5px;border-radius:6px;margin-left:4px">自動</span>' : '';
-      const srcSel = '<select style="padding:5px 8px;font-size:12px;border:1.5px solid #ddd8cc;border-radius:8px;background:var(--cream);width:auto" data-action="upd-eq-src" data-id="'+eq.id+'">'
-        +srcOpts.map(o => '<option value="'+o[0]+'"'+(eq.src_type===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')
-        +'</select>';
-      const noteSection = (eq.src_type==='borrow'||eq.src_type==='gift')
-        ? '<div style="margin-top:8px"><input type="text" style="font-size:12px;padding:6px 10px;border:1.5px solid #ddd8cc;border-radius:8px;background:var(--cream)" placeholder="'+(eq.src_type==='borrow'?'跟誰借 / 在哪裡':'付出說明')+'" value="'+escA(eq.src_name||'')+'" data-action="upd-eq-note" data-id="'+eq.id+'"></div>'
-        : '';
-      const priceSection = eq.src_type==='buy'
-        ? '<div style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="font-size:12px;color:var(--muted)">單價</span>NT$<input type="number" style="width:70px;padding:4px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'"><span style="font-size:12px;color:var(--muted)">小計：</span><span style="font-size:12px;font-weight:600;color:var(--sage-dark)">'+(sub>0?'NT$'+fmtN(sub):'—')+'</span></div>'
-        : '<div style="font-size:12px;color:var(--muted);margin-top:4px">'+(eq.src_type==='borrow'?'借用，不需費用':'付出，不需費用')+'</div>';
-
-      return '<div style="padding:12px;border-bottom:1px solid #f0ece4">'
-        // Row 1: name + qty + delete
-        +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">'
-        +'<div style="font-size:14px;font-weight:600">'+escH(eq.name)+tag+'</div>'
-        +'<div style="display:flex;align-items:center;gap:8px">'
-        +'<span style="font-size:12px;color:var(--muted)">需求：<b style="color:var(--sage-dark)">'+eq.qty+'</b></span>'
-        +(eq.from_summary?'':'<button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button>')
-        +'</div></div>'
-        // Row 2: source + buyer
-        +'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
-        +srcSel
-        +personSelector(akey+'_buyer', buyer)
-        +'</div>'
-        // Note for borrow/gift
-        +noteSection
-        // Price
-        +priceSection
-        // Actual
-        +(eq.src_type==='buy'
-          ? '<div style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="font-size:12px;color:var(--muted)">實際花費</span><input type="number" style="flex:1;padding:5px 8px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:8px" placeholder="填入實際" value="'+(aval!=null?aval:'')+'" data-action="upd-actual" data-key="'+akey+'"></div>'
-          : '')
-        +'</div>';
-    }).join('');
-  }
-
-  updateProcureTotals();
-  renderAccounting();
-}
-
-function renderAccounting() {
-  const totals = {}; // personId -> {name, items:[{label,amount}], total}
-  const allKeys = [];
-  D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => allKeys.push({key:'ing'+i.id, label:i.name, est:i.total_cost}));
-  D.dishes.filter(d => d.type==='bought').forEach(d => { const u=d.unit_size||1; allKeys.push({key:'b'+d.id, label:d.name, est:Math.ceil((d.qty||1)/u)*(d.est_price||0)}); });
-  D.equipCustom.filter(e => e.src_type==='buy').forEach(e => allKeys.push({key:'eq'+e.id, label:e.name, est:(e.price||0)*(e.qty||1)}));
-
-  allKeys.forEach(({key, label, est}) => {
-    const buyerId = D.actuals[key+'_buyer'];
-    const actual = D.actuals[key];
-    const amount = actual!=null ? actual : est; // use actual if filled, else estimate
-    if (buyerId && amount>0) {
-      if (!totals[buyerId]) totals[buyerId] = { items:[], total:0 };
-      totals[buyerId].items.push({ label, amount });
-      totals[buyerId].total += amount;
-    }
-  });
-
-  const el = eid('accounting-list');
-  const pids = Object.keys(totals);
-  if (!pids.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">請先為採購項目選擇「誰去買」</div>'; return; }
-
-  const grandTotal = pids.reduce((s,pid) => s+totals[pid].total, 0);
-  let h = '';
-  pids.forEach(pid => {
-    const name = getPersonName(pid)||'未知';
-    const data = totals[pid];
-    h += '<div style="padding:12px 0;border-bottom:1px solid #f0ece4">'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<div style="width:34px;height:34px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center">'+escH(name[0])+'</div>'
-      +'<div style="font-size:14px;font-weight:600">'+escH(name)+'</div></div>'
-      +'<div style="font-size:17px;font-weight:700;color:var(--sage-dark)">NT$'+fmtN(Math.round(data.total))+'</div></div>'
-      +'<div style="margin-left:42px">'
-      +data.items.map(item => '<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:2px 0"><span>'+escH(item.label)+'</span><span>NT$'+fmtN(Math.round(item.amount))+'</span></div>').join('')
-      +'</div></div>';
-  });
-  h += '<div style="background:var(--sage-dark);color:#fff;border-radius:10px;padding:12px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">'
-    +'<span style="font-size:13px">💸 總需補貼</span>'
-    +'<span style="font-size:18px;font-weight:700">NT$'+fmtN(Math.round(grandTotal))+'</span></div>';
-  el.innerHTML = h;
-}
-
-function updateProcureTotals() {
-  let pT=0, aT=0, aN=0;
-  D.ingredients.filter(i => i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i => { pT+=i.total_cost||0; const v=D.actuals['ing'+i.id]; if(v!=null){aT+=v;aN++;} });
-  D.dishes.filter(d => d.type==='bought').forEach(d => { const u=d.unit_size||1; pT+=Math.ceil((d.qty||1)/u)*(d.est_price||0); const v=D.actuals['b'+d.id]; if(v!=null){aT+=v;aN++;} });
-  D.equipCustom.filter(e => e.src_type==='buy').forEach(e => { pT+=(e.price||0)*(e.qty||1); const v=D.actuals['eq'+e.id]; if(v!=null){aT+=v;aN++;} });
-  eid('s4-total').textContent = fmtN(pT);
-  eid('s4-actual').textContent = aN>0 ? fmtN(aT) : '—';
-  const pct = pT ? Math.round(aT/pT*100) : 0;
-  eid('s4-pct').textContent = aN>0 ? pct+'%' : '尚未填入';
-  const f = eid('s4-prog'); f.style.width = Math.min(pct,100)+'%'; f.classList.toggle('over', pct>100);
-}
-
-eid('pane-procure').addEventListener('change', async e => {
-  const el = e.target;
-  const act = el.dataset.action;
-  if (act==='upd-actual') {
-    const val = el.value==='' ? null : +el.value;
-    D.actuals[el.dataset.key] = val;
-    await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:val }, { onConflict:'project_id,ref_key' });
-    updateProcureTotals(); renderAccounting();
-  }
-  if (act==='upd-buyer') {
-    const val = el.value||'';
-    D.actuals[el.dataset.key] = val||null;
-    await sb.from('actuals').upsert({ project_id:currentProject.id, ref_key:el.dataset.key, actual_value:0 }, { onConflict:'project_id,ref_key' });
-    renderAccounting();
-  }
-  if (act==='upd-eq-note') {
-    const eq = D.equipCustom.find(e => e.id===el.dataset.id);
-    if (eq) {
-      eq.src_name = el.value;
-      if (!eq.from_summary) await sb.from('equip_custom').update({ src_name:eq.src_name }).eq('id', eq.id);
-    }
-  }
-  if (act==='upd-eq-src') {
-    const eq = D.equipCustom.find(e => e.id===el.dataset.id);
-    if (eq) {
-      eq.src_type = el.value;
-      if (!eq.from_summary) await sb.from('equip_custom').update({ src_type:eq.src_type }).eq('id', eq.id);
-      renderProcure();
-    }
-  }
-  if (act==='upd-eq-price') {
-    const eq = D.equipCustom.find(e => e.id===el.dataset.id);
-    if (eq) {
-      eq.price = parseFloat(el.value)||0;
-      if (!eq.from_summary) await sb.from('equip_custom').update({ price:eq.price }).eq('id', eq.id);
-      updateProcureTotals();
-    }
-  }
-});
-
-eid('pane-procure').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action="del-equip"]');
-  if (!btn) return;
-  await sb.from('equip_custom').delete().eq('id', btn.dataset.id);
-  D.equipCustom = D.equipCustom.filter(e => e.id!==btn.dataset.id);
-  renderProcure();
-});
-
-eid('btn-add-equip').addEventListener('click', () => openModal('supply', null));
-eid('btn-refresh-accounting').addEventListener('click', () => renderAccounting());
+function roleLabel(r){return({lead:'主要負責人',co_lead:'副負責人',treasurer:'管錢',usher:'Usher',usher_king:'Usher King',vendor:'廠商',venue:'場地負責人',driver:'運送司機'})[r]||r||'一般幫忙';}
+function pName(pid){const p=D.persons.find(p=>p.id===pid);return p?p.name:'';}
+function pSel(key,cur){if(!D.persons.length)return'<span style="font-size:11px;color:var(--muted)">先新增人員</span>';return'<select style="padding:4px 8px;font-size:11px;border:1px solid #ddd8cc;border-radius:6px;background:var(--cream)" data-action="upd-buyer" data-key="'+key+'"><option value="">— 誰去買 —</option>'+D.persons.map(p=>'<option value="'+p.id+'"'+(cur===p.id?' selected':'')+'>'+eH(p.name)+'</option>').join('')+'</select>';}
+function syncEquip(){const s={};D.dishes.forEach(d=>{(d.containers||[]).forEach(c=>{if(!s[c.equipName])s[c.equipName]=0;s[c.equipName]+=c.qtyMode==='per'?(d.qty||1):(c.fixedQty||1);});});const names=Object.keys(s);D.equip=D.equip.filter(e=>!e.from_summary||names.includes(e.name));names.forEach(name=>{const ex=D.equip.find(e=>e.from_summary&&e.name===name);if(ex)ex.qty=s[name];else D.equip.push({id:'sum_'+name,name,from_summary:true,src_type:'buy',src_name:'',price:0,qty:s[name]});});}
+function renderProcure(){syncEquip();const ings=D.ings.filter(i=>i.selected_channel!=null&&(i.total_cost||0)>0);const iEl=$('buy-ing');if(!ings.length){iEl.innerHTML='<div style="padding:8px;font-size:12px;color:var(--muted)">請在食材比價頁勾選通路</div>';}else{let h='<div class="cw"><table class="tbl"><thead><tr><th>食材</th><th>餐點</th><th>通路</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';ings.forEach(ing=>{const d=D.dishes.find(d=>d.id===ing.dish_id);const ch=(ing.channels||[])[ing.selected_channel]||{};const ak='ing'+ing.id,av=D.actuals[ak],buyer=D.actuals[ak+'_buyer']||'';h+='<tr><td>'+eH(ing.name)+'</td><td style="font-size:11px;color:var(--muted)">'+(d?eH(d.name):'')+'</td><td style="font-size:11px">'+eH(ch.store||'')+'</td><td>'+pSel(ak+'_buyer',buyer)+'</td><td class="nr hi">NT$'+fN(ing.total_cost)+'</td><td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(av!=null?av:'')+'" data-action="upd-actual" data-key="'+ak+'"></td></tr>';});iEl.innerHTML=h+'</tbody></table></div>';}const bt=D.dishes.filter(d=>d.type==='bought');const bEl=$('buy-bt');if(!bt.length){bEl.innerHTML='<div style="padding:8px;font-size:12px;color:var(--muted)">請在餐點規劃頁新增外購品項</div>';}else{let h='<div class="cw"><table class="tbl"><thead><tr><th>品項</th><th>店家</th><th class="nr">需幾盤</th><th>誰去買</th><th class="nr">預估</th><th class="nr">實際</th></tr></thead><tbody>';bt.forEach(d=>{const u=d.unit_size||1,tot=Math.ceil((d.qty||1)/u)*(d.est_price||0);const ak='b'+d.id,av=D.actuals[ak],buyer=D.actuals[ak+'_buyer']||'';h+='<tr><td>'+eH(d.name)+'</td><td style="font-size:11px;color:var(--muted)">'+eH(d.store||'—')+'</td><td class="nr">'+Math.ceil((d.qty||1)/u)+'盤</td><td>'+pSel(ak+'_buyer',buyer)+'</td><td class="nr hi">NT$'+fN(tot)+'</td><td class="nr"><input type="number" style="width:72px;padding:3px 5px;font-size:11px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" placeholder="填入" value="'+(av!=null?av:'')+'" data-action="upd-actual" data-key="'+ak+'"></td></tr>';});bEl.innerHTML=h+'</tbody></table></div>';}const eEl=$('buy-equip');if(!D.equip.length){eEl.innerHTML='<div style="padding:8px;font-size:12px;color:var(--muted)">器具清單的容器會自動帶入，也可點「＋ 新增」手動加入</div>';}else{const sopts=[['buy','買'],['borrow','借'],['gift','付出']];eEl.innerHTML=D.equip.map(eq=>{const sub=eq.src_type==='buy'?(eq.price||0)*(eq.qty||1):0;const ak='eq'+eq.id,av=D.actuals[ak],buyer=D.actuals[ak+'_buyer']||'';const tag=eq.from_summary?'<span style="background:#e8f0e4;color:var(--sage-dark);font-size:10px;padding:1px 5px;border-radius:6px;margin-left:4px">自動</span>':'';const srcSel='<select style="padding:5px 8px;font-size:12px;border:1.5px solid #ddd8cc;border-radius:8px;background:var(--cream)" data-action="upd-eq-src" data-id="'+eq.id+'">'+sopts.map(o=>'<option value="'+o[0]+'"'+(eq.src_type===o[0]?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';const noteSection=(eq.src_type==='borrow'||eq.src_type==='gift')?'<div style="margin-top:8px"><input type="text" style="font-size:12px;padding:6px 10px;border:1.5px solid #ddd8cc;border-radius:8px;background:var(--cream)" placeholder="'+(eq.src_type==='borrow'?'跟誰借 / 在哪裡':'付出說明')+'" value="'+eA(eq.src_name||'')+'" data-action="upd-eq-note" data-id="'+eq.id+'"></div>':'';const priceSection=eq.src_type==='buy'?'<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap"><span style="font-size:12px;color:var(--muted)">單價</span>NT$<input type="number" style="width:70px;padding:4px 6px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:6px" value="'+(eq.price||0)+'" data-action="upd-eq-price" data-id="'+eq.id+'"><span style="font-size:12px;color:var(--muted)">小計：</span><span style="font-size:12px;font-weight:600;color:var(--sage-dark)">'+(sub>0?'NT$'+fN(sub):'—')+'</span></div>':'<div style="font-size:12px;color:var(--muted);margin-top:4px">'+(eq.src_type==='borrow'?'借用，不需費用':'付出，不需費用')+'</div>';const actualSection=eq.src_type==='buy'?'<div style="display:flex;align-items:center;gap:6px;margin-top:6px"><span style="font-size:12px;color:var(--muted)">實際花費</span><input type="number" style="flex:1;padding:5px 8px;font-size:12px;text-align:right;background:var(--cream);border:1.5px solid #ddd8cc;border-radius:8px" placeholder="填入實際" value="'+(av!=null?av:'')+'" data-action="upd-actual" data-key="'+ak+'"></div>':'';return'<div style="padding:12px;border-bottom:1px solid #f0ece4"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:14px;font-weight:600">'+eH(eq.name)+tag+'</div><div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:var(--muted)">需求：<b style="color:var(--sage-dark)">'+eq.qty+'</b></span>'+(eq.from_summary?'':'<button class="bx" data-action="del-equip" data-id="'+eq.id+'">×</button>')+'</div></div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+srcSel+pSel(ak+'_buyer',buyer)+'</div>'+noteSection+priceSection+actualSection+'</div>';}).join('');}updateProcureTotals();renderAccounting();}
+function renderAccounting(){const tots={};const all=[];D.ings.filter(i=>i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i=>all.push({key:'ing'+i.id,label:i.name,est:i.total_cost}));D.dishes.filter(d=>d.type==='bought').forEach(d=>{const u=d.unit_size||1;all.push({key:'b'+d.id,label:d.name,est:Math.ceil((d.qty||1)/u)*(d.est_price||0)});});D.equip.filter(e=>e.src_type==='buy').forEach(e=>all.push({key:'eq'+e.id,label:e.name,est:(e.price||0)*(e.qty||1)}));all.forEach(({key,label,est})=>{const bid=D.actuals[key+'_buyer'];const amt=D.actuals[key]!=null?D.actuals[key]:est;if(bid&&amt>0){if(!tots[bid])tots[bid]={items:[],total:0};tots[bid].items.push({label,amount:amt});tots[bid].total+=amt;}});const el=$('accounting');const pids=Object.keys(tots);if(!pids.length){el.innerHTML='<div style="font-size:12px;color:var(--muted)">請先為採購項目選擇「誰去買」</div>';return;}const gt=pids.reduce((s,pid)=>s+tots[pid].total,0);let h='';pids.forEach(pid=>{const name=pName(pid)||'未知';const data=tots[pid];h+='<div style="padding:12px 0;border-bottom:1px solid #f0ece4"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><div style="width:34px;height:34px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center">'+eH(name[0])+'</div><div style="font-size:14px;font-weight:600">'+eH(name)+'</div></div><div style="font-size:17px;font-weight:700;color:var(--sage-dark)">NT$'+fN(Math.round(data.total))+'</div></div><div style="margin-left:42px">'+data.items.map(i=>'<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:2px 0"><span>'+eH(i.label)+'</span><span>NT$'+fN(Math.round(i.amount))+'</span></div>').join('')+'</div></div>';});h+='<div style="background:var(--sage-dark);color:#fff;border-radius:10px;padding:12px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:13px">💸 總需補貼</span><span style="font-size:18px;font-weight:700">NT$'+fN(Math.round(gt))+'</span></div>';el.innerHTML=h;}
+function updateProcureTotals(){let pT=0,aT=0,aN=0;D.ings.filter(i=>i.selected_channel!=null&&(i.total_cost||0)>0).forEach(i=>{pT+=i.total_cost||0;const v=D.actuals['ing'+i.id];if(v!=null){aT+=v;aN++;}});D.dishes.filter(d=>d.type==='bought').forEach(d=>{const u=d.unit_size||1;pT+=Math.ceil((d.qty||1)/u)*(d.est_price||0);const v=D.actuals['b'+d.id];if(v!=null){aT+=v;aN++;}});D.equip.filter(e=>e.src_type==='buy').forEach(e=>{pT+=(e.price||0)*(e.qty||1);const v=D.actuals['eq'+e.id];if(v!=null){aT+=v;aN++;}});$('s4-total').textContent=fN(pT);$('s4-actual').textContent=aN>0?fN(aT):'—';const pct=pT?Math.round(aT/pT*100):0;$('s4-pct').textContent=aN>0?pct+'%':'尚未填入';const f=$('s4-prog');f.style.width=Math.min(pct,100)+'%';f.classList.toggle('over',pct>100);}
+$('pane-procure').addEventListener('change',async e=>{const el=e.target,act=el.dataset.action;if(act==='upd-actual'){const val=el.value===''?null:+el.value;D.actuals[el.dataset.key]=val;await sb.from('actuals').upsert({project_id:P.id,ref_key:el.dataset.key,actual_value:val},{onConflict:'project_id,ref_key'});updateProcureTotals();renderAccounting();}if(act==='upd-buyer'){const val=el.value||null;D.actuals[el.dataset.key]=val;if(val)await sb.from('actuals').upsert({project_id:P.id,ref_key:el.dataset.key,actual_value:0},{onConflict:'project_id,ref_key'});renderAccounting();}if(act==='upd-eq-note'){const eq=D.equip.find(e=>e.id===el.dataset.id);if(eq){eq.src_name=el.value;if(!eq.from_summary)await sb.from('equip_custom').update({src_name:eq.src_name}).eq('id',eq.id);}}if(act==='upd-eq-src'){const eq=D.equip.find(e=>e.id===el.dataset.id);if(eq){eq.src_type=el.value;if(!eq.from_summary)await sb.from('equip_custom').update({src_type:eq.src_type}).eq('id',eq.id);renderProcure();}}if(act==='upd-eq-price'){const eq=D.equip.find(e=>e.id===el.dataset.id);if(eq){eq.price=parseFloat(el.value)||0;if(!eq.from_summary)await sb.from('equip_custom').update({price:eq.price}).eq('id',eq.id);updateProcureTotals();}}});
+$('pane-procure').addEventListener('click',async e=>{const b=e.target.closest('[data-action="del-equip"]');if(!b)return;await sb.from('equip_custom').delete().eq('id',b.dataset.id);D.equip=D.equip.filter(e=>e.id!==b.dataset.id);renderProcure();});
+$('btn-add-equip').addEventListener('click',()=>openModal('supply',null));
+$('btn-reaccount').addEventListener('click',()=>renderAccounting());
 
 // TEAM
-function renderPersonChips() {
-  const el = eid('person-chips-wrap');
-  if (!D.persons.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">還沒有人員</div>'; return; }
-  el.innerHTML = D.persons.map(p =>
-    '<span class="person-chip"><div class="pav">'+p.name[0]+'</div>'+escH(p.name)
-    +'<span data-action="del-person" data-pid="'+p.id+'" style="color:#ccc;margin-left:3px;cursor:pointer;font-size:13px">×</span></span>'
-  ).join('');
-}
+function renderChips(){const el=$('person-chips');if(!D.persons.length){el.innerHTML='<div style="font-size:12px;color:var(--muted)">還沒有人員</div>';return;}el.innerHTML=D.persons.map(p=>'<span class="pchip"><div class="pav">'+p.name[0]+'</div>'+eH(p.name)+' <span style="font-size:11px;color:var(--muted)">('+roleLabel(p.role)+')</span><span data-action="del-person" data-pid="'+p.id+'" style="color:#ccc;margin-left:3px;cursor:pointer;font-size:13px">×</span></span>').join('');}
+$('person-chips').addEventListener('click',async e=>{const b=e.target.closest('[data-action="del-person"]');if(!b)return;await sb.from('persons').delete().eq('id',b.dataset.pid);D.persons=D.persons.filter(p=>p.id!==b.dataset.pid);renderTeam();});
 
-eid('person-chips-wrap').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action="del-person"]');
-  if (!btn) return;
-  await sb.from('persons').delete().eq('id', btn.dataset.pid);
-  D.persons = D.persons.filter(p => p.id!==btn.dataset.pid);
-  renderTasks();
-});
+// FIX #2: renderTeam - improved task saving with proper upsert
+function renderTeam(){renderChips();const hm=D.dishes.filter(d=>d.type==='handmade');const el=$('task-list');if(!hm.length){el.innerHTML='<div class="empty"><div class="ei">📋</div><div class="et">請先新增手作點心</div></div>';return;}el.innerHTML=hm.map(dish=>{let t=D.tasks.find(t=>t.dish_id===dish.id);if(!t){t={id:null,dish_id:dish.id,person_ids:[],steps:[],plate_note:''};D.tasks.push(t);}if(!t.person_ids)t.person_ids=[];const ctrs=(dish.containers||[]).map(c=>c.equipName).filter(Boolean);return'<div class="card"><div class="ch"><div class="ct">👐 '+eH(dish.name)+'</div></div><div class="sl">負責人（可多選）</div><div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px">'+(!D.persons.length?'<div style="font-size:12px;color:var(--muted)">請先新增人員</div>':'')+D.persons.map(p=>'<span class="pchip'+(t.person_ids.indexOf(p.id)>=0?' sel':'')+'" data-action="assign-p" data-did="'+dish.id+'" data-pid="'+p.id+'"><div class="pav">'+p.name[0]+'</div>'+eH(p.name)+'</span>').join('')+'</div>'+(ctrs.length?'<div class="sl">容器</div><div style="margin-bottom:10px">'+ctrs.map(c=>'<span class="ctag">'+eH(c)+'</span>').join('')+'</div>':'')+'<div class="sl">擺盤說明</div><div style="margin-bottom:10px"><input type="text" value="'+eA(t.plate_note||'')+'" placeholder="例：花型排列" data-action="upd-note" data-did="'+dish.id+'"></div><div class="sl">製作步驟</div><ol style="list-style:none;counter-reset:sc">'+(t.steps||[]).map((s,si)=>'<li style="counter-increment:sc;display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f0ece4"><div style="min-width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">'+(si+1)+'</div><input type="text" value="'+eA(s)+'" style="border:none;background:none;padding:0;font-size:13px;flex:1" data-action="upd-step" data-did="'+dish.id+'" data-si="'+si+'"><button class="bx" style="font-size:12px" data-action="del-step" data-did="'+dish.id+'" data-si="'+si+'">×</button></li>').join('')+'</ol><button class="bar" data-action="add-step" data-did="'+dish.id+'">＋ 新增步驟</button></div>';}).join('');}
 
-function renderTasks() {
-  renderPersonChips();
-  const hm = D.dishes.filter(d => d.type==='handmade');
-  const el = eid('task-list');
-  if (!hm.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><div class="empty-text">請先新增手作點心</div></div>'; return; }
-  hm.forEach(dish => {
-    if (!D.tasks.find(t => t.dish_id===dish.id)) {
-      D.tasks.push({ id: 'new_'+dish.id, dish_id:dish.id, person_ids:[], steps:[], plate_note:'' });
-    }
-  });
-  el.innerHTML = hm.map(dish => {
-    const t = D.tasks.find(t => t.dish_id===dish.id);
-    const pids = t.person_ids||[];
-    return '<div class="card"><div class="card-head"><div class="card-title">👐 '+escH(dish.name)+'</div></div>'
-      +'<div class="section-label">負責人（可多選）</div>'
-      +'<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px">'
-      +(!D.persons.length ? '<div style="font-size:12px;color:var(--muted)">請先新增人員</div>' : '')
-      +D.persons.map(p => '<span class="person-chip'+(pids.indexOf(p.id)>=0?' sel':'')+'" data-action="assign-p" data-dish-id="'+dish.id+'" data-pid="'+p.id+'"><div class="pav">'+p.name[0]+'</div>'+escH(p.name)+'</span>').join('')
-      +'</div>'
-      +'<div class="section-label">擺盤說明</div>'
-      +'<div style="margin-bottom:10px"><input type="text" value="'+escA(t.plate_note||'')+'" placeholder="例：花型排列" data-action="upd-platenote" data-dish-id="'+dish.id+'"></div>'
-      +'<div class="section-label">製作步驟</div>'
-      +'<ol style="list-style:none;counter-reset:sc">'
-      +(t.steps||[]).map((s,si) =>
-        '<li style="counter-increment:sc;display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #f0ece4">'
-        +'<div style="min-width:20px;height:20px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px">'+(si+1)+'</div>'
-        +'<input type="text" value="'+escA(s)+'" style="border:none;background:none;padding:0;font-size:13px;flex:1" data-action="upd-step" data-dish-id="'+dish.id+'" data-si="'+si+'">'
-        +'<button class="bx" style="font-size:12px" data-action="del-step" data-dish-id="'+dish.id+'" data-si="'+si+'">×</button></li>'
-      ).join('')
-      +'</ol>'
-      +'<button class="btn-add-row" data-action="add-step" data-dish-id="'+dish.id+'">＋ 新增步驟</button></div>';
-  }).join('');
-}
+async function saveTask(t){const payload={project_id:P.id,dish_id:t.dish_id,person_ids:t.person_ids||[],steps:t.steps||[],plate_note:t.plate_note||''};if(t.id){await sb.from('tasks').update(payload).eq('id',t.id);}else{const{data}=await sb.from('tasks').insert(payload).select().single();if(data)t.id=data.id;}}
 
-eid('task-list').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const act = btn.dataset.action, dishId = btn.dataset.dishId;
-  let t = D.tasks.find(t => t.dish_id===dishId);
-  if (!t) return;
-  if (t.id && t.id.startsWith('new_')) {
-    const { data } = await sb.from('tasks').insert({ project_id:currentProject.id, dish_id:dishId, person_ids:[], steps:[], plate_note:'' }).select().single();
-    if (data) { t.id = data.id; }
-  }
-  if (act==='assign-p') {
-    const pid = btn.dataset.pid;
-    const ids = [...(t.person_ids||[])];
-    const idx = ids.indexOf(pid);
-    if (idx>=0) ids.splice(idx,1); else ids.push(pid);
-    t.person_ids = ids;
-    await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:ids, steps:t.steps, plate_note:t.plate_note });
-    renderTasks();
-  }
-  if (act==='add-step') {
-    const steps = [...(t.steps||[]), ''];
-    t.steps = steps;
-    await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps, plate_note:t.plate_note });
-    renderTasks();
-  }
-  if (act==='del-step') {
-    const steps = [...(t.steps||[])]; steps.splice(parseInt(btn.dataset.si), 1);
-    t.steps = steps;
-    await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps, plate_note:t.plate_note });
-    renderTasks();
-  }
-});
+$('task-list').addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const act=b.dataset.action,did=b.dataset.did;let t=D.tasks.find(t=>t.dish_id===did);if(!t){t={id:null,dish_id:did,person_ids:[],steps:[],plate_note:''};D.tasks.push(t);}if(!t.person_ids)t.person_ids=[];
+  if(act==='assign-p'){const pid=b.dataset.pid;const ids=[...t.person_ids];const idx=ids.indexOf(pid);if(idx>=0)ids.splice(idx,1);else ids.push(pid);t.person_ids=ids;await saveTask(t);renderTeam();}
+  if(act==='add-step'){t.steps=[...(t.steps||[]),''];await saveTask(t);renderTeam();}
+  if(act==='del-step'){const steps=[...(t.steps||[])];steps.splice(parseInt(b.dataset.si),1);t.steps=steps;await saveTask(t);renderTeam();}});
+$('task-list').addEventListener('change',async e=>{const el=e.target,act=el.dataset.action,did=el.dataset.did;let t=D.tasks.find(t=>t.dish_id===did);if(!t)return;if(act==='upd-note'){t.plate_note=el.value;await saveTask(t);}if(act==='upd-step'){const steps=[...(t.steps||[])];steps[parseInt(el.dataset.si)]=el.value;t.steps=steps;await saveTask(t);}});
+$('btn-add-person').addEventListener('click',()=>openModal('person',null));
 
-eid('task-list').addEventListener('change', async e => {
-  const el = e.target, act = el.dataset.action, dishId = el.dataset.dishId;
-  const t = D.tasks.find(t => t.dish_id===dishId);
-  if (!t) return;
-  if (act==='upd-platenote') { t.plate_note=el.value; await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps:t.steps, plate_note:el.value }); }
-  if (act==='upd-step') { const steps=[...(t.steps||[])]; steps[parseInt(el.dataset.si)]=el.value; t.steps=steps; await sb.from('tasks').upsert({ id:t.id, project_id:currentProject.id, dish_id:dishId, person_ids:t.person_ids, steps, plate_note:t.plate_note }); }
-});
+// TODOS
+const PHASES=[{key:'pre',label:'婚前一個月以上',col:'p0'},{key:'w2',label:'婚前兩週',col:'p1'},{key:'w1',label:'婚前一週',col:'p2'},{key:'d2',label:'婚前兩天',col:'p3'},{key:'d1',label:'前一天',col:'p4'},{key:'d0am',label:'當天早上',col:'p5'},{key:'d0',label:'當天進行中',col:'p6'},{key:'after',label:'收尾離場',col:'p7'}];
+const CATS=[{key:'buy',icon:'🛒',label:'採購'},{key:'prep',icon:'🍳',label:'製作準備'},{key:'check',icon:'📋',label:'確認'},{key:'pack',icon:'📦',label:'打包運送'},{key:'setup',icon:'🎪',label:'現場佈置'},{key:'wrap',icon:'✅',label:'收尾'}];
+const PRESETS=[['pre','check','確認婚禮日期與時間'],['pre','check','確認場地狀況（廚房/冰箱/插座）'],['pre','check','確認賓客人數，決定各品項份量'],['pre','buy','完成所有餐點與食材比價'],['pre','check','確認各餐點分工人員'],['w2','buy','訂購外購品項（飯糰/麵包等）'],['w2','buy','列出食材採購清單，確認通路'],['w2','check','確認所有器具清單，確認借用/購買'],['w1','buy','採購所有食材'],['w1','buy','採購器具、耗材（紙盤/手套/保鮮袋等）'],['w1','prep','清洗、消毒所有盛裝容器'],['w1','check','與所有幫忙人員確認分工與時間'],['d2','check','再次確認各品項數量，補購不足食材'],['d2','prep','製作可提前做好的點心'],['d1','prep','食材前處理（切片、醃漬、分裝）'],['d1','prep','製作手作點心（主要製作日）'],['d1','pack','清點所有器具，開始裝箱'],['d1','pack','需冷藏食材放入冰箱'],['d0am','pack','最後確認所有食物與器具齊全'],['d0am','pack','食物保冷/保溫處理'],['d0am','pack','裝車/安排運送'],['d0','setup','抵達場地，確認擺放區域'],['d0','setup','擺設茶點桌（容器擺放、佈置）'],['d0','setup','飲料備置（冰塊、杯具）'],['d0','check','確認所有品項皆已擺出'],['after','wrap','收拾剩餘食物'],['after','wrap','清理桌面、垃圾分類'],['after','wrap','歸還借用器具'],['after','wrap','結帳、報帳（實際花費填入採購預算頁）']];
 
-eid('btn-add-person').addEventListener('click', () => openModal('person', null));
+// FIX #3: define doLoadPresets as regular async function BEFORE addEventListener
+async function doLoadPresets(){const rows=PRESETS.map(p=>({project_id:P.id,phase:p[0],cat:p[1],text:p[2],done:false}));const{data}=await sb.from('todos').insert(rows).select();D.todos=[...D.todos,...(data||[])];renderTodos();toast('✓ 已載入 '+PRESETS.length+' 個預設待辦');}
 
-// TIMELINE
-const PHASES = [
-  {key:'pre',label:'婚前一個月以上',col:'ph-0'},{key:'w2',label:'婚前兩週',col:'ph-1'},
-  {key:'w1',label:'婚前一週',col:'ph-2'},{key:'d2',label:'婚前兩天',col:'ph-3'},
-  {key:'d1',label:'前一天',col:'ph-4'},{key:'d0am',label:'當天早上',col:'ph-5'},
-  {key:'d0',label:'當天進行中',col:'ph-6'},{key:'after',label:'收尾離場',col:'ph-7'}
-];
-const TODO_CATS = [
-  {key:'buy',icon:'🛒',label:'採購'},{key:'prep',icon:'🍳',label:'製作準備'},
-  {key:'check',icon:'📋',label:'確認'},{key:'pack',icon:'📦',label:'打包運送'},
-  {key:'setup',icon:'🎪',label:'現場佈置'},{key:'wrap',icon:'✅',label:'收尾'}
-];
-const PRESETS = [
-  ['pre','check','確認婚禮日期與時間'],['pre','check','確認場地狀況（廚房/冰箱/插座）'],
-  ['pre','check','確認賓客人數，決定各品項份量'],['pre','buy','完成所有餐點與食材比價'],
-  ['pre','check','確認各餐點分工人員'],['w2','buy','訂購外購品項（飯糰/麵包等）'],
-  ['w2','buy','列出食材採購清單，確認通路'],['w2','check','確認所有器具清單，確認借用/購買'],
-  ['w1','buy','採購所有食材'],['w1','buy','採購器具、耗材（紙盤/手套/保鮮袋等）'],
-  ['w1','prep','清洗、消毒所有盛裝容器'],['w1','check','與所有幫忙人員確認分工與時間'],
-  ['d2','check','再次確認各品項數量，補購不足食材'],['d2','prep','製作可提前做好的點心'],
-  ['d1','prep','食材前處理（切片、醃漬、分裝）'],['d1','prep','製作手作點心（主要製作日）'],
-  ['d1','pack','清點所有器具，開始裝箱'],['d1','pack','需冷藏食材放入冰箱'],
-  ['d0am','pack','最後確認所有食物與器具齊全'],['d0am','pack','食物保冷/保溫處理'],
-  ['d0am','pack','裝車/安排運送'],['d0','setup','抵達場地，確認擺放區域'],
-  ['d0','setup','擺設茶點桌（容器擺放、佈置）'],['d0','setup','飲料備置（冰塊、杯具）'],
-  ['d0','check','確認所有品項皆已擺出'],['after','wrap','收拾剩餘食物'],
-  ['after','wrap','清理桌面、垃圾分類'],['after','wrap','歸還借用器具'],
-  ['after','wrap','結帳、報帳（實際花費填入採購預算頁）']
-];
-
-function renderTimeline() {
-  const done = D.todos.filter(t => t.done).length;
-  eid('todo-prog').textContent = D.todos.length ? done+' / '+D.todos.length+' 完成' : '';
-  const el = eid('timeline-list');
-  if (!D.todos.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">🗓️</div><div class="empty-text">還沒有待辦，點「＋ 新增待辦」或「載入預設清單」</div></div>'; return; }
-  el.innerHTML = PHASES.map(phase => {
-    const pTodos = D.todos.filter(t => t.phase===phase.key);
-    if (!pTodos.length) return '';
-    let h = '<div class="tl-phase"><div class="tl-head '+phase.col+'"><span class="tl-head-title">'+phase.label+'</span><span style="font-size:11px;opacity:0.75">'+pTodos.filter(t=>t.done).length+'/'+pTodos.length+'</span></div><div class="tl-body">';
-    TODO_CATS.forEach(cat => {
-      const cTodos = pTodos.filter(t => t.cat===cat.key);
-      if (!cTodos.length) return;
-      h += '<div class="tl-cat-head"><span class="tl-cat-label">'+cat.icon+' '+cat.label+'</span><span style="font-size:11px;color:var(--muted)">'+cTodos.filter(t=>t.done).length+'/'+cTodos.length+'</span></div>';
-      cTodos.forEach(todo => {
-        h += '<div class="todo-row"><div class="todo-chk'+(todo.done?' on':'')+'" data-action="toggle-todo" data-tid="'+todo.id+'">'+(todo.done?'✓':'')+'</div>'
-          +'<div style="flex:1"><div class="todo-text'+(todo.done?' done':'')+'">'+escH(todo.text)+'</div>'
-          +(todo.date?'<div class="todo-meta">📅 '+escH(todo.date)+'</div>':'')+'</div>'
-          +'<button class="bx" style="font-size:13px" data-action="del-todo" data-tid="'+todo.id+'">×</button></div>';
-      });
-    });
-    return h + '</div></div>';
-  }).join('');
-}
-
-eid('timeline-list').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-  const tid = btn.dataset.tid;
-  if (btn.dataset.action==='toggle-todo') {
-    const t = D.todos.find(t => t.id===tid);
-    if (!t) return;
-    t.done = !t.done;
-    await sb.from('todos').update({ done:t.done }).eq('id', tid);
-    renderTimeline();
-  }
-  if (btn.dataset.action==='del-todo') {
-    await sb.from('todos').delete().eq('id', tid);
-    D.todos = D.todos.filter(t => t.id!==tid);
-    renderTimeline();
-  }
-});
-
-eid('btn-add-todo').addEventListener('click', () => openModal('todo', null));
-eid('btn-load-presets').addEventListener('click', async () => {
-  if (D.todos.length > 0) {
-    openModal('confirmPresets', null);
-    return;
-  }
-  await doLoadPresets();
-});
-
-async function doLoadPresets() {
-  const rows = PRESETS.map(p => ({ project_id:currentProject.id, phase:p[0], cat:p[1], text:p[2], done:false }));
-  const { data } = await sb.from('todos').insert(rows).select();
-  D.todos = [...D.todos, ...(data||[])];
-  renderTimeline();
-  showToast('✓ 已載入 '+PRESETS.length+' 個預設待辦');
-}
+function renderTodos(){const done=D.todos.filter(t=>t.done).length;$('todo-prog').textContent=D.todos.length?(done+'/'+D.todos.length+' 完成'):'';const el=$('timeline-list');if(!D.todos.length){el.innerHTML='<div class="empty"><div class="ei">🗓️</div><div class="et">還沒有待辦，點「＋ 新增待辦」或「載入預設清單」</div></div>';return;}el.innerHTML=PHASES.map(phase=>{const pt=D.todos.filter(t=>t.phase===phase.key);if(!pt.length)return'';let h='<div class="tlp"><div class="tlh '+phase.col+'"><span class="tlht">'+phase.label+'</span><span style="font-size:11px;opacity:.75">'+pt.filter(t=>t.done).length+'/'+pt.length+'</span></div><div class="tlb">';CATS.forEach(cat=>{const ct=pt.filter(t=>t.cat===cat.key);if(!ct.length)return;h+='<div class="tlch"><span class="tlcl">'+cat.icon+' '+cat.label+'</span><span style="font-size:11px;color:var(--muted)">'+ct.filter(t=>t.done).length+'/'+ct.length+'</span></div>';ct.forEach(todo=>{h+='<div class="tdr"><div class="tdc'+(todo.done?' on':'')+'" data-action="toggle-todo" data-tid="'+todo.id+'">'+(todo.done?'✓':'')+'</div><div style="flex:1"><div class="tdt'+(todo.done?' done':'')+'">'+eH(todo.text)+'</div>'+(todo.date?'<div style="font-size:10px;color:var(--muted);margin-top:2px">📅 '+eH(todo.date)+'</div>':'')+'</div><button class="bx" style="font-size:13px" data-action="del-todo" data-tid="'+todo.id+'">×</button></div>';});});return h+'</div></div>';}).join('');}
+$('timeline-list').addEventListener('click',async e=>{const b=e.target.closest('[data-action]');if(!b)return;const tid=b.dataset.tid;if(b.dataset.action==='toggle-todo'){const t=D.todos.find(t=>t.id===tid);if(!t)return;t.done=!t.done;await sb.from('todos').update({done:t.done}).eq('id',tid);renderTodos();}if(b.dataset.action==='del-todo'){await sb.from('todos').delete().eq('id',tid);D.todos=D.todos.filter(t=>t.id!==tid);renderTodos();}});
+$('btn-add-todo').addEventListener('click',()=>openModal('todo',null));
+$('btn-load-presets').addEventListener('click',async()=>{if(D.todos.length>0){openModal('confirmPresets',null);}else{await doLoadPresets();}});
 
 // SETTINGS
-async function renderSettings() {
-  eid('invite-code-display').textContent = currentProject.invite_code || '——';
-  const { data: owner } = await sb.from('profiles').select('name,email').eq('id', currentProject.owner_id).single();
-  const { data: members } = await sb.from('project_members').select('*,profiles(name,email)').eq('project_id', currentProject.id);
-  let h = '<div class="list-item" style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece4">'
-    +'<div style="flex:1"><div style="font-size:14px;font-weight:500">👑 '+escH(owner?.name||'主辦人')+'</div><div style="font-size:11px;color:var(--muted)">'+escH(owner?.email||'')+'</div></div>'
-    +'<span style="font-size:11px;color:var(--sage-dark)">主辦人</span></div>';
-  (members||[]).forEach(m => {
-    h += '<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece4">'
-      +'<div style="flex:1"><div style="font-size:14px;font-weight:500">'+escH(m.profiles?.name||'')+'</div><div style="font-size:11px;color:var(--muted)">'+escH(m.profiles?.email||'')+'</div></div>'
-      +'<span style="font-size:11px;color:var(--muted)">'+(m.role==='editor'?'協作者':'觀看者')+'</span></div>';
-  });
-  eid('members-list').innerHTML = h;
-  const contacts = D.persons.filter(p => p.phone);
-  eid('contacts-list').innerHTML = contacts.length ? contacts.map(p =>
-    '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0ece4">'
-    +'<div style="width:40px;height:40px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+p.name[0]+'</div>'
-    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:11px;color:var(--muted)">'+getRoleLabel(p.role)+'</div><div style="font-size:13px;color:var(--sage-dark)">'+escH(p.phone||'')+'</div></div>'
-    +'<a class="call-btn" href="tel:'+escH(p.phone||'')+'">📞 撥打</a></div>'
-  ).join('') : '<div style="font-size:12px;color:var(--muted);padding:8px 0">還沒有聯絡人</div>';
-}
-
-eid('btn-copy-code').addEventListener('click', () => {
-  navigator.clipboard?.writeText(currentProject.invite_code||'').then(() => showToast('✓ 邀請碼已複製'));
-});
-eid('btn-share-link').addEventListener('click', () => {
-  const url = window.location.origin+window.location.pathname+'?join='+currentProject.invite_code;
-  if (navigator.share) { navigator.share({ title:'加入婚禮茶點管家', url }); }
-  else { navigator.clipboard?.writeText(url).then(() => showToast('✓ 連結已複製')); }
-});
-eid('btn-save-settings').addEventListener('click', async () => {
-  const wd = eid('inp-wedding-date').value;
-  await sb.from('projects').update({ wedding_date:wd||null }).eq('id', currentProject.id);
-  currentProject.wedding_date = wd;
-  eid('proj-header-sub').textContent = wd ? '💒 '+wd : '';
-  showToast('✓ 設定已儲存');
-});
-eid('btn-add-contact').addEventListener('click', () => openModal('contact', null));
+async function renderSettings(){$('invite-code').textContent=P.invite_code||'——';const{data:own}=await sb.from('profiles').select('name,email').eq('id',P.owner_id).single();const{data:mbrs}=await sb.from('project_members').select('*,profiles(name,email)').eq('project_id',P.id);let h='<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece4"><div style="flex:1"><div style="font-size:14px;font-weight:500">👑 '+eH(own?.name||'主辦人')+'</div><div style="font-size:11px;color:var(--muted)">'+eH(own?.email||'')+'</div></div><span style="font-size:11px;color:var(--sage-dark)">主辦人</span></div>';(mbrs||[]).forEach(m=>{h+='<div style="display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #f0ece4"><div style="flex:1"><div style="font-size:14px;font-weight:500">'+eH(m.profiles?.name||'')+'</div><div style="font-size:11px;color:var(--muted)">'+eH(m.profiles?.email||'')+'</div></div><span style="font-size:11px;color:var(--muted)">'+(m.role==='editor'?'協作者':'觀看者')+'</span></div>';});$('members-list').innerHTML=h;const contacts=D.persons.filter(p=>p.phone);$('contacts-list').innerHTML=contacts.length?contacts.map(p=>'<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0ece4"><div style="width:40px;height:40px;border-radius:50%;background:var(--sage-light);color:var(--sage-dark);font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+p.name[0]+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px">'+eH(p.name)+'</div><div style="font-size:11px;color:var(--muted)">'+roleLabel(p.role)+'</div><div style="font-size:13px;color:var(--sage-dark)">'+eH(p.phone||'')+'</div></div><a class="callbtn" href="tel:'+eH(p.phone||'')+'">📞</a></div>').join(''):'<div style="font-size:12px;color:var(--muted);padding:8px 0">還沒有聯絡人</div>';}
+$('btn-copy-code').addEventListener('click',()=>{navigator.clipboard?.writeText(P.invite_code||'').then(()=>toast('✓ 邀請碼已複製'));});
+$('btn-share-link').addEventListener('click',()=>{const url=location.origin+location.pathname+'?join='+P.invite_code;if(navigator.share)navigator.share({title:'加入婚禮茶點管家',url});else navigator.clipboard?.writeText(url).then(()=>toast('✓ 連結已複製'));});
+$('btn-save-settings').addEventListener('click',async()=>{const wd=$('inp-wdate').value;await sb.from('projects').update({wedding_date:wd||null}).eq('id',P.id);P.wedding_date=wd;$('proj-sub').textContent=wd?'💒 '+wd:'';toast('✓ 設定已儲存');});
+$('btn-add-contact').addEventListener('click',()=>openModal('contact',null));
 
 // DAY MODE
-function renderDayMode() {
-  const dtEl = eid('day-tasks-list');
-  dtEl.innerHTML = D.dayTasks.length ? D.dayTasks.map(t =>
-    '<div class="chk-row" style="padding:10px 12px">'
-    +'<div class="chk-box'+(t.done?' on':'')+'" data-action="toggle-day" data-id="'+t.id+'">'+(t.done?'✓':'')+'</div>'
-    +'<div style="flex:1"><div style="font-size:13px'+(t.done?';text-decoration:line-through;color:var(--muted)':'')+'">'+escH(t.text)+'</div>'
-    +(t.time_note?'<div style="font-size:11px;color:var(--muted)">⏰ '+escH(t.time_note)+'</div>':'')+'</div></div>'
-  ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">還沒有當天工作</div>';
-
-  const equipSummary = {};
-  D.dishes.forEach(dish => {
-    (dish.containers||[]).forEach(ctr => {
-      if (!equipSummary[ctr.equipName]) equipSummary[ctr.equipName] = 0;
-      equipSummary[ctr.equipName] += ctr.qtyMode==='per' ? (dish.qty||1) : (ctr.fixedQty||1);
-    });
-  });
-  const eqKeys = Object.keys(equipSummary);
-  eid('day-equip-list').innerHTML = eqKeys.length ? eqKeys.map(name =>
-    '<div class="chk-row" style="padding:10px 12px">'
-    +'<div class="chk-box" data-action="toggle-equip-carry"></div>'
-    +'<div style="font-size:13px">'+escH(name)+' <span style="color:var(--muted);font-size:12px">× '+equipSummary[name]+'</span></div></div>'
-  ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先在器具清單設定容器</div>';
-
-  const hm = D.dishes.filter(d => d.type==='handmade');
-  eid('day-plate-list').innerHTML = hm.length ? hm.map(dish => {
-    const t = D.tasks.find(t => t.dish_id===dish.id)||{};
-    const ctrs = (dish.containers||[]).map(c => c.equipName).filter(Boolean);
-    return '<div style="padding:12px;border-bottom:1px solid #f0ece4">'
-      +'<div style="font-weight:600;font-size:14px;margin-bottom:4px">👐 '+escH(dish.name)+'</div>'
-      +(ctrs.length?'<div style="margin-bottom:4px">'+ctrs.map(c=>'<span class="ctag">'+escH(c)+'</span>').join('')+'</div>':'')
-      +(t.plate_note?'<div style="font-size:12px;color:var(--muted)">📝 '+escH(t.plate_note)+'</div>':'')+'</div>';
-  }).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先新增手作點心</div>';
-
-  const contacts = D.persons.filter(p => p.phone);
-  eid('day-contacts-list').innerHTML = contacts.length ? contacts.map(p =>
-    '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0ece4">'
-    +'<div style="flex:1"><div style="font-weight:600;font-size:14px">'+escH(p.name)+'</div><div style="font-size:12px;color:var(--muted)">'+getRoleLabel(p.role)+' '+escH(p.phone||'')+'</div></div>'
-    +'<a class="call-btn" href="tel:'+escH(p.phone||'')+'">📞</a></div>'
-  ).join('') : '<div style="padding:12px;font-size:12px;color:var(--muted)">請先在「設定」新增聯絡人</div>';
-}
-
-eid('day-tasks-list').addEventListener('click', async e => {
-  const btn = e.target.closest('[data-action="toggle-day"]');
-  if (!btn) return;
-  const t = D.dayTasks.find(t => t.id===btn.dataset.id);
-  if (!t) return;
-  t.done = !t.done;
-  await sb.from('day_tasks').update({ done:t.done }).eq('id', t.id);
-  renderDayMode();
-});
-
-eid('day-equip-list').addEventListener('click', e => {
-  const btn = e.target.closest('[data-action="toggle-equip-carry"]');
-  if (!btn) return;
-  btn.classList.toggle('on');
-  btn.textContent = btn.classList.contains('on') ? '✓' : '';
-});
-
-eid('btn-add-day-task').addEventListener('click', () => openModal('dayTask', null));
+function renderDay(){const dEl=$('day-tasks');dEl.innerHTML=D.dayTasks.length?D.dayTasks.map(t=>'<div class="cr" style="padding:10px 12px"><div class="cb'+(t.done?' on':'')+'" data-action="toggle-day" data-id="'+t.id+'">'+(t.done?'✓':'')+'</div><div style="flex:1"><div style="font-size:13px'+(t.done?';text-decoration:line-through;color:var(--muted)':'')+'">'+eH(t.text)+'</div>'+(t.time_note?'<div style="font-size:11px;color:var(--muted)">⏰ '+eH(t.time_note)+'</div>':'')+'</div></div>').join(''):'<div style="padding:12px;font-size:12px;color:var(--muted)">還沒有當天工作</div>';const s={};D.dishes.forEach(d=>{(d.containers||[]).forEach(c=>{if(!s[c.equipName])s[c.equipName]=0;s[c.equipName]+=c.qtyMode==='per'?(d.qty||1):(c.fixedQty||1);});});const keys=Object.keys(s);$('day-equip').innerHTML=keys.length?keys.map(name=>'<div class="cr" style="padding:10px 12px"><div class="cb" data-action="toggle-equip"></div><div style="font-size:13px">'+eH(name)+' <span style="color:var(--muted);font-size:12px">× '+s[name]+'</span></div></div>').join(''):'<div style="padding:12px;font-size:12px;color:var(--muted)">請先在器具清單設定容器</div>';const hm=D.dishes.filter(d=>d.type==='handmade');$('day-plate').innerHTML=hm.length?hm.map(dish=>{const t=D.tasks.find(t=>t.dish_id===dish.id)||{};const ctrs=(dish.containers||[]).map(c=>c.equipName).filter(Boolean);return'<div style="padding:12px;border-bottom:1px solid #f0ece4"><div style="font-weight:600;font-size:14px;margin-bottom:4px">👐 '+eH(dish.name)+'</div>'+(ctrs.length?'<div style="margin-bottom:4px">'+ctrs.map(c=>'<span class="ctag">'+eH(c)+'</span>').join('')+'</div>':'')+(t.plate_note?'<div style="font-size:12px;color:var(--muted)">📝 '+eH(t.plate_note)+'</div>':'')+'</div>';}).join(''):'<div style="padding:12px;font-size:12px;color:var(--muted)">請先新增手作點心</div>';const contacts=D.persons.filter(p=>p.phone);$('day-contacts').innerHTML=contacts.length?contacts.map(p=>'<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0ece4"><div style="flex:1"><div style="font-weight:600;font-size:14px">'+eH(p.name)+'</div><div style="font-size:12px;color:var(--muted)">'+roleLabel(p.role)+' '+eH(p.phone||'')+'</div></div><a class="callbtn" href="tel:'+eH(p.phone||'')+'">📞</a></div>').join(''):'<div style="padding:12px;font-size:12px;color:var(--muted)">請先在「設定」新增聯絡人</div>';}
+$('day-tasks').addEventListener('click',async e=>{const b=e.target.closest('[data-action="toggle-day"]');if(!b)return;const t=D.dayTasks.find(t=>t.id===b.dataset.id);if(!t)return;t.done=!t.done;await sb.from('day_tasks').update({done:t.done}).eq('id',t.id);renderDay();});
+$('day-equip').addEventListener('click',e=>{const b=e.target.closest('[data-action="toggle-equip"]');if(!b)return;b.classList.toggle('on');b.textContent=b.classList.contains('on')?'✓':'';});
+$('btn-add-daytask').addEventListener('click',()=>openModal('dayTask',null));
 
 // MODAL
-let _mc = {};
+let _mc={};
+const mv=id=>{const el=document.getElementById(id);return el?el.value:null;};
+const getSelTog=rowId=>{const s=document.querySelector('#'+rowId+' .tog.sel');return s?s.dataset:{};};
 
-function openModal(type, ctx) {
-  _mc = { type, ctx };
-  const tEl = eid('modal-title'), bEl = eid('modal-body');
-  bEl.innerHTML = '';
+function openModal(type,ctx){
+  _mc={type,ctx};
+  const tEl=$('modal-title'),bEl=$('modal-body');
+  bEl.innerHTML='';
 
-  if (type==='confirmPresets') {
-    tEl.textContent = '載入預設清單';
-    bEl.innerHTML = '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">已有 '+D.todos.length+' 個待辦，確定要繼續新增 '+PRESETS.length+' 個預設待辦嗎？</div>'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確定載入</button></div>';
+  if(type==='confirmPresets'){
+    tEl.textContent='載入預設清單';
+    bEl.innerHTML='<div style="font-size:13px;color:var(--muted);margin-bottom:12px">已有 '+D.todos.length+' 個待辦，確定要繼續新增 '+PRESETS.length+' 個預設待辦嗎？</div><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確定載入</button></div>';
 
-  } else if (type==='forgotPassword') {
-    tEl.textContent = '重設密碼';
-    bEl.innerHTML = '<div style="font-size:13px;color:var(--muted);margin-bottom:12px">輸入你的 Email，我們會寄送重設密碼連結。</div>'
-      +'<label>Email</label><input id="m0" type="email" placeholder="your@email.com">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">寄送重設信</button></div>';
+  }else if(type==='forgotPw'){
+    tEl.textContent='重設密碼';
+    bEl.innerHTML='<div style="font-size:13px;color:var(--muted);margin-bottom:12px">輸入你的 Email，我們會寄送重設密碼連結。</div><label>Email</label><input id="m0" type="email" placeholder="your@email.com"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">寄送重設信</button></div>';
 
-  } else if (type==='newProject') {
-    tEl.textContent = '建立婚禮專案';
-    bEl.innerHTML = '<label>專案名稱</label><input id="m0" placeholder="例：Sarah & John 婚禮茶點">'
-      +'<label>婚禮日期</label><input id="m-date" type="date">'
-      +'<label>預計賓客人數</label><input id="m-guests" type="number" value="150">'
-      +'<label>食物預算 NT$</label><input id="m-budget" type="number" value="25000">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">建立</button></div>';
+  }else if(type==='newProj'){
+    tEl.textContent='建立婚禮專案';
+    bEl.innerHTML='<label>專案名稱</label><input id="m0" placeholder="例：Sarah & John 婚禮茶點"><label>婚禮日期</label><input id="m-date" type="date"><label>預計賓客人數</label><input id="m-guests" type="number" value="150"><label>食物預算 NT$</label><input id="m-budget" type="number" value="25000"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">建立</button></div>';
 
-  } else if (type==='joinProject') {
-    tEl.textContent = '加入婚禮專案';
-    bEl.innerHTML = '<label>邀請碼（8位英數字）</label>'
-      +'<input id="m0" placeholder="例：abc12345" maxlength="8" style="letter-spacing:4px;font-size:18px;text-align:center">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">加入</button></div>';
+  }else if(type==='joinProj'){
+    tEl.textContent='加入婚禮專案';
+    bEl.innerHTML='<label>邀請碼（8位英數字）</label><input id="m0" placeholder="例：abc12345" maxlength="8" style="letter-spacing:4px;font-size:18px;text-align:center"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">加入</button></div>';
 
-  } else if (type==='dish') {
-    const hm = ctx==='handmade';
-    tEl.textContent = hm ? '新增手作點心' : '新增外購品項';
-    bEl.innerHTML = '<label>名稱</label><input id="m0" placeholder="'+(hm?'例：可頌火腿起司':'例：松田飯糰')+'">'
-      +'<label>預計數量（份）</label><input id="m1" type="number" value="150">'
-      +(hm ? '' : '<label>店家名稱</label><input id="m-store" placeholder="例：一之軒、松田"><label>每盤/包幾個</label><input id="m-unitsize" type="number" value="1"><label>每盤/包售價 NT$</label><input id="m3" type="number" value="0">')
-      +'<label>備註</label><input id="m4" placeholder="（選填）">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+  }else if(type==='dish'){
+    const hm=ctx==='handmade';
+    tEl.textContent=hm?'新增手作點心':'新增外購品項';
+    bEl.innerHTML='<label>名稱</label><input id="m0" placeholder="'+(hm?'例：可頌火腿起司':'例：松田飯糰')+'"><label>預計數量（份）</label><input id="m1" type="number" value="150">'+(hm?'':'<label>店家名稱</label><input id="m-store" placeholder="例：一之軒、松田"><label>每盤/包幾個</label><input id="m-unitsize" type="number" value="1"><label>每盤/包售價 NT$</label><input id="m3" type="number" value="0">')+'<label>備註</label><input id="m4" placeholder="（選填）"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
 
-  } else if (type==='ingredient') {
-    const dish = D.dishes.find(d => d.id===ctx);
-    tEl.textContent = '新增食材 — '+(dish?.name||'');
-    bEl.innerHTML = '<label>食材名稱</label><input id="m0" placeholder="例：起司片、火腿、法國麵包">'
-      +'<label>計算方式</label>'
-      +'<div class="tog-row" id="ing-mode-row"><span class="tog sel" data-mode="count">數量</span><span class="tog" data-mode="weight">重量(g)</span><span class="tog" data-mode="yield">產出</span></div>'
-      +'<div id="m-count-s"><label>每份需要數量（小數如0.5）</label><input id="m1" type="number" step="0.01" value="1"><label>單位（片/個/條/罐）</label><input id="m2" value="個"></div>'
-      +'<div id="m-weight-s" style="display:none"><label>每份需要幾克</label><input id="m1w" type="number" step="0.1" value="10"></div>'
-      +'<div id="m-yield-s" style="display:none"><label>單位名稱（條/盒/罐）</label><input id="m-yu" value="條"><label>1條/盒/罐可做幾份</label><input id="m-yv" type="number" value="20"></div>'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
-    bEl.addEventListener('click', e => {
-      const mb = e.target.closest('#ing-mode-row .tog');
-      if (!mb) return;
-      bEl.querySelectorAll('#ing-mode-row .tog').forEach(t => t.classList.remove('sel'));
-      mb.classList.add('sel');
-      const m = mb.dataset.mode;
-      eid('m-count-s').style.display = m==='count'?'block':'none';
-      eid('m-weight-s').style.display = m==='weight'?'block':'none';
-      eid('m-yield-s').style.display = m==='yield'?'block':'none';
-    });
+  }else if(type==='pickCtr'){
+    // FIX #1: Use direct getElementById with unique IDs, wire chips manually
+    const dish=D.dishes.find(d=>d.id===ctx);
+    tEl.textContent='新增容器 — '+(dish?.name||'');
+    let h='<label>選擇器具（點選快速填入）</label>';
+    EC.forEach(gc=>{h+='<div style="font-size:11px;font-weight:600;color:var(--muted);margin:8px 0 4px">'+gc.cat+'</div><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px">';gc.items.forEach(name=>{h+='<span class="echip" data-equip="'+eA(name)+'">'+eH(name)+'</span>';});h+='</div>';});
+    h+='<label>容器名稱</label><input id="ctr-name-input" placeholder="點選上方快速填入，或直接輸入"><label>數量模式</label><div id="ctr-mode-row" class="tr"><span class="tog sel" data-mode="fixed">固定數量</span><span class="tog" data-mode="per">每份一個</span></div><div id="ctr-fixed-wrap"><label>固定數量（個）</label><input id="ctr-fixed-qty" type="number" value="1" min="1"></div><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
+    bEl.innerHTML=h;
+    // Wire chip clicks after innerHTML is set
+    bEl.querySelectorAll('.echip').forEach(chip=>{chip.addEventListener('click',()=>{bEl.querySelectorAll('.echip').forEach(c=>c.classList.remove('sel'));chip.classList.add('sel');document.getElementById('ctr-name-input').value=chip.dataset.equip;});});
+    // Wire mode toggle
+    bEl.querySelectorAll('#ctr-mode-row .tog').forEach(tog=>{tog.addEventListener('click',()=>{bEl.querySelectorAll('#ctr-mode-row .tog').forEach(t=>t.classList.remove('sel'));tog.classList.add('sel');document.getElementById('ctr-fixed-wrap').style.display=tog.dataset.mode==='fixed'?'block':'none';});});
 
-  } else if (type==='editIng') {
-    const ing = D.ingredients.find(i => i.id===ctx);
-    tEl.textContent = '修改食材';
-    bEl.innerHTML = '<label>食材名稱</label><input id="m0" value="'+escA(ing?.name||'')+'">'
-      +'<label>每份'+(ing?.use_weight?'幾克':ing?.use_yield?'（'+escH(ing.unit)+'）可做幾份':'數量')+'</label>'
-      +'<input id="m1" type="number" step="0.01" value="'+(ing?.use_yield?ing.yields_per_unit:ing?.qty_per_item||1)+'">'
-      +(!ing?.use_weight&&!ing?.use_yield ? '<label>單位</label><input id="m2" value="'+escA(ing?.unit||'')+'">':'')
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">儲存修改</button></div>';
+  }else if(type==='ingredient'){
+    const dish=D.dishes.find(d=>d.id===ctx);
+    tEl.textContent='新增食材 — '+(dish?.name||'');
+    bEl.innerHTML='<label>食材名稱</label><input id="m0" placeholder="例：起司片、火腿、法國麵包"><label>計算方式</label><div class="tr" id="ing-mode-row"><span class="tog sel" data-mode="count">數量</span><span class="tog" data-mode="weight">重量(g)</span><span class="tog" data-mode="yield">產出</span></div><div id="m-cs"><label>每份需要數量（小數如0.5）</label><input id="m1" type="number" step="0.01" value="1"><label>單位（片/個/條/罐）</label><input id="m2" value="個"></div><div id="m-ws" style="display:none"><label>每份需要幾克</label><input id="m1w" type="number" step="0.1" value="10"></div><div id="m-ys" style="display:none"><label>單位名稱（條/盒/罐）</label><input id="m-yu" value="條"><label>1條/盒/罐可做幾份</label><input id="m-yv" type="number" value="20"></div><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
+    bEl.querySelectorAll('#ing-mode-row .tog').forEach(tog=>{tog.addEventListener('click',()=>{bEl.querySelectorAll('#ing-mode-row .tog').forEach(t=>t.classList.remove('sel'));tog.classList.add('sel');const m=tog.dataset.mode;document.getElementById('m-cs').style.display=m==='count'?'block':'none';document.getElementById('m-ws').style.display=m==='weight'?'block':'none';document.getElementById('m-ys').style.display=m==='yield'?'block':'none';});});
 
-  } else if (type==='channel') {
-    const ing = D.ingredients.find(i => i.id===ctx);
-    tEl.textContent = '新增通路 — '+(ing?.name||'');
-    const isW = ing?.use_weight, isY = ing?.use_yield;
-    const storeOpts = ['家樂福','全聯','Costco','愛買','大潤發','美聯社','7-11','全家','萊爾富'];
-    bEl.innerHTML = '<label>通路（點選或自填）</label>'
-      +'<div class="tog-row" id="store-tog-row" style="margin-bottom:6px">'
-      +storeOpts.map(s => '<span class="tog" data-store="'+s+'">'+s+'</span>').join('')
-      +'</div>'
-      +'<input id="m0" placeholder="或直接填入通路名稱">'
-      +'<label>包裝售價 NT$</label><input id="m1" type="number" placeholder="例：259">'
-      +(isW ? '<label>每包幾克 (g)</label><input id="m2" type="number" value="500"><div style="background:var(--warm);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--muted);margin-top:6px">💡 例：火腿 500g/包 NT$80 → 系統自動算需幾包</div>'
-        : isY ? '<div style="background:var(--warm);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);margin-top:8px">售價即為每'+escH(ing?.unit||'個')+'的價格，系統自動計算需幾'+escH(ing?.unit||'個')+'</div>'
-        : '<label>每包數量（'+escH(ing?.unit||'個')+'）</label><input id="m2" type="number" value="1"><div style="background:var(--warm);border-radius:8px;padding:7px 10px;font-size:11px;color:var(--muted);margin-top:6px">💡 例：Costco 可頌 NT$259 / 30個 → 自動算每個成本再算總花費</div>')
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
-    bEl.addEventListener('click', e => {
-      const sb2 = e.target.closest('#store-tog-row .tog');
-      if (!sb2) return;
-      bEl.querySelectorAll('#store-tog-row .tog').forEach(t => t.classList.remove('sel'));
-      sb2.classList.add('sel');
-      eid('m0').value = sb2.dataset.store;
-    });
+  }else if(type==='editIng'){
+    const ing=D.ings.find(i=>i.id===ctx);
+    tEl.textContent='修改食材';
+    bEl.innerHTML='<label>食材名稱</label><input id="m0" value="'+eA(ing?.name||'')+'"><label>每份'+(ing?.use_weight?'幾克':ing?.use_yield?'（'+eH(ing.unit)+'）可做幾份':'數量')+'</label><input id="m1" type="number" step="0.01" value="'+(ing?.use_yield?ing.yields_per_unit:ing?.qty_per_item||1)+'">'+(!ing?.use_weight&&!ing?.use_yield?'<label>單位</label><input id="m2" value="'+eA(ing?.unit||'')+'">':'')+'<div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">儲存修改</button></div>';
 
-  } else if (type==='pickContainer') {
-    const dish = D.dishes.find(d => d.id===ctx);
-    tEl.textContent = '新增容器 — '+(dish?.name||'');
-    let h = '<label>選擇器具</label>';
-    EQUIP_CATS.forEach(gc => {
-      h += '<div style="font-size:11px;font-weight:600;color:var(--muted);margin:8px 0 4px">'+gc.cat+'</div><div class="tog-row" style="margin-bottom:4px">';
-      gc.items.forEach(name => { h += '<span class="tog" data-action="pick-equip" data-name="'+escA(name)+'">'+escH(name)+'</span>'; });
-      h += '</div>';
-    });
-    h += '<label>或自填名稱</label><input id="m-custom-equip" placeholder="自訂器具名稱">'
-      +'<label>數量模式</label>'
-      +'<div class="tog-row" id="qty-mode-row"><span class="tog sel" data-mode="fixed">固定數量</span><span class="tog" data-mode="per">每份一個</span></div>'
-      +'<div id="fixed-qty-section"><label>固定數量</label><input id="m-fixed-qty" type="number" value="1" min="1"></div>'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
-    bEl.innerHTML = h;
-    bEl.addEventListener('click', e => {
-      const chip = e.target.closest('[data-action="pick-equip"]');
-      if (chip) { eid('m-custom-equip').value=chip.dataset.name; bEl.querySelectorAll('[data-action="pick-equip"]').forEach(c=>c.classList.remove('sel')); chip.classList.add('sel'); }
-      const mb = e.target.closest('#qty-mode-row .tog');
-      if (mb) { bEl.querySelectorAll('#qty-mode-row .tog').forEach(t=>t.classList.remove('sel')); mb.classList.add('sel'); eid('fixed-qty-section').style.display=mb.dataset.mode==='fixed'?'block':'none'; }
-    });
+  }else if(type==='channel'){
+    const ing=D.ings.find(i=>i.id===ctx);
+    tEl.textContent='新增通路 — '+(ing?.name||'');
+    const isW=ing?.use_weight,isY=ing?.use_yield;
+    const stores=['家樂福','全聯','Costco','愛買','大潤發','美聯社','7-11','全家','萊爾富'];
+    bEl.innerHTML='<label>通路（點選或自填）</label><div class="tr" id="store-row" style="margin-bottom:6px">'+stores.map(s=>'<span class="tog" data-store="'+s+'">'+s+'</span>').join('')+'</div><input id="m0" placeholder="或直接填入通路名稱"><label>包裝售價 NT$</label><input id="m1" type="number" placeholder="例：259">'+(isW?'<label>每包幾克 (g)</label><input id="m2" type="number" value="500">':isY?'<div style="background:var(--warm);border-radius:8px;padding:8px;font-size:12px;color:var(--muted);margin-top:8px">售價即為每'+eH(ing?.unit||'個')+'的價格</div>':'<label>每包數量（'+eH(ing?.unit||'個')+'）</label><input id="m2" type="number" value="1">')+'<div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
+    bEl.querySelectorAll('#store-row .tog').forEach(tog=>{tog.addEventListener('click',()=>{bEl.querySelectorAll('#store-row .tog').forEach(t=>t.classList.remove('sel'));tog.classList.add('sel');document.getElementById('m0').value=tog.dataset.store;});});
 
-  } else if (type==='supply') {
-    tEl.textContent = '新增器具 / 耗材';
-    bEl.innerHTML = '<label>品項名稱</label><input id="m0" placeholder="例：烘焙紙、手套">'
-      +'<label>來源</label>'
-      +'<div class="tog-row" id="src-row"><span class="tog sel" data-src="buy">買</span><span class="tog" data-src="borrow">借</span><span class="tog" data-src="gift">付出</span></div>'
-      +'<label>來源說明（通路或誰借的）</label><input id="m-src" placeholder="例：蝦皮、Amy家裡">'
-      +'<label>數量</label><input id="m2" type="number" value="1">'
-      +'<label>預估單價 NT$</label><input id="m3" type="number" value="0">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
-    bEl.addEventListener('click', e => {
-      const sb2 = e.target.closest('#src-row .tog');
-      if (!sb2) return;
-      bEl.querySelectorAll('#src-row .tog').forEach(t => t.classList.remove('sel'));
-      sb2.classList.add('sel');
-    });
+  }else if(type==='supply'){
+    tEl.textContent='新增器具 / 耗材';
+    bEl.innerHTML='<label>品項名稱</label><input id="m0" placeholder="例：烘焙紙、手套"><label>來源</label><div class="tr" id="src-row"><span class="tog sel" data-src="buy">買</span><span class="tog" data-src="borrow">借</span><span class="tog" data-src="gift">付出</span></div><label>來源說明（通路或誰借的）</label><input id="m-src" placeholder="例：蝦皮、Amy家裡"><label>數量</label><input id="m2" type="number" value="1"><label>預估單價 NT$</label><input id="m3" type="number" value="0"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
+    bEl.querySelectorAll('#src-row .tog').forEach(tog=>{tog.addEventListener('click',()=>{bEl.querySelectorAll('#src-row .tog').forEach(t=>t.classList.remove('sel'));tog.classList.add('sel');});});
 
-  } else if (type==='person' || type==='contact') {
-    tEl.textContent = type==='person' ? '新增人員' : '新增聯絡人';
-    bEl.innerHTML = '<label>姓名 / 暱稱</label><input id="m0" placeholder="例：Amy、Ben">'
-      +'<label>角色</label>'
-      +'<select id="m-role">'
-      +'<option value="">一般幫忙</option>'
-      +'<option value="lead">主要負責人</option>'
-      +'<option value="co_lead">副負責人</option>'
-      +'<option value="treasurer">管錢</option>'
-      +'<option value="usher">Usher</option>'
-      +'<option value="usher_king">Usher King</option>'
-      +'<option value="vendor">廠商</option>'
-      +'<option value="venue">場地負責人</option>'
-      +'<option value="driver">運送司機</option>'
-      +'</select>'
-      +'<label>電話'+(type==='contact'?'':' （選填）')+'</label><input id="m-phone" type="tel" placeholder="0912345678">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+  }else if(type==='person'||type==='contact'){
+    tEl.textContent=type==='person'?'新增人員':'新增聯絡人';
+    bEl.innerHTML='<label>姓名 / 暱稱</label><input id="m0" placeholder="例：Amy、Ben"><label>角色</label><select id="m-role"><option value="">一般幫忙</option><option value="lead">主要負責人</option><option value="co_lead">副負責人</option><option value="treasurer">管錢</option><option value="usher">Usher</option><option value="usher_king">Usher King</option><option value="vendor">廠商</option><option value="venue">場地負責人</option><option value="driver">運送司機</option></select><label>電話'+(type==='contact'?'':' （選填）')+'</label><input id="m-phone" type="tel" placeholder="0912345678"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
 
-  } else if (type==='todo') {
-    tEl.textContent = '新增待辦事項';
-    bEl.innerHTML = '<label>待辦內容</label><input id="m0" placeholder="例：確認飯糰訂購數量">'
-      +'<label>時程階段</label>'
-      +'<div class="tog-row" id="phase-row">'+PHASES.map((p,i)=>'<span class="tog'+(i===0?' sel':'')+'" data-phase="'+p.key+'">'+p.label+'</span>').join('')+'</div>'
-      +'<label>分類</label>'
-      +'<div class="tog-row" id="cat-row">'+TODO_CATS.map((c,i)=>'<span class="tog'+(i===0?' sel':'')+'" data-cat="'+c.key+'">'+c.icon+' '+c.label+'</span>').join('')+'</div>'
-      +'<label>指定日期（選填）</label><input id="m-date" type="date">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
-    bEl.addEventListener('click', e => {
-      const pb = e.target.closest('#phase-row .tog');
-      if (pb) { bEl.querySelectorAll('#phase-row .tog').forEach(t=>t.classList.remove('sel')); pb.classList.add('sel'); }
-      const cb = e.target.closest('#cat-row .tog');
-      if (cb) { bEl.querySelectorAll('#cat-row .tog').forEach(t=>t.classList.remove('sel')); cb.classList.add('sel'); }
-    });
+  }else if(type==='todo'){
+    tEl.textContent='新增待辦事項';
+    bEl.innerHTML='<label>待辦內容</label><input id="m0" placeholder="例：確認飯糰訂購數量"><label>時程階段</label><div class="tr" id="phase-row">'+PHASES.map((p,i)=>'<span class="tog'+(i===0?' sel':'')+'" data-phase="'+p.key+'">'+p.label+'</span>').join('')+'</div><label>分類</label><div class="tr" id="cat-row">'+CATS.map((c,i)=>'<span class="tog'+(i===0?' sel':'')+'" data-cat="'+c.key+'">'+c.icon+' '+c.label+'</span>').join('')+'</div><label>指定日期（選填）</label><input id="m-date" type="date"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
+    bEl.querySelectorAll('#phase-row .tog').forEach(tog=>{tog.addEventListener('click',()=>{bEl.querySelectorAll('#phase-row .tog').forEach(t=>t.classList.remove('sel'));tog.classList.add('sel');});});
+    bEl.querySelectorAll('#cat-row .tog').forEach(tog=>{tog.addEventListener('click',()=>{bEl.querySelectorAll('#cat-row .tog').forEach(t=>t.classList.remove('sel'));tog.classList.add('sel');});});
 
-  } else if (type==='dayTask') {
-    tEl.textContent = '新增當天工作';
-    bEl.innerHTML = '<label>工作內容</label><input id="m0" placeholder="例：擺設茶點桌">'
-      +'<label>時間提醒（選填）</label><input id="m-time" placeholder="例：10:00前完成">'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">取消</button><button class="btn btn-primary" id="m-confirm">確認新增</button></div>';
+  }else if(type==='dayTask'){
+    tEl.textContent='新增當天工作';
+    bEl.innerHTML='<label>工作內容</label><input id="m0" placeholder="例：擺設茶點桌"><label>時間提醒（選填）</label><input id="m-time" placeholder="例：10:00前完成"><div class="br"><button class="btn bo" id="m-cancel">取消</button><button class="btn bp" id="m-confirm">確認新增</button></div>';
 
-  } else if (type==='calc') {
-    tEl.textContent = '🧮 小計算機';
-    bEl.innerHTML = '<div style="background:#1a1a2e;border-radius:12px;padding:12px;margin-bottom:12px">'
-      +'<div id="calc-expr" style="color:#aaa;font-size:11px;min-height:18px;text-align:right;margin-bottom:2px"></div>'
-      +'<div id="calc-display" style="color:#fff;font-size:28px;font-weight:700;text-align:right;min-height:40px;word-break:break-all">0</div></div>'
-      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'
-      +'<button class="cbtn cbtn-fn" data-v="AC">AC</button><button class="cbtn cbtn-fn" data-v="+/-">+/-</button><button class="cbtn cbtn-fn" data-v="%">%</button><button class="cbtn cbtn-op" data-v="÷">÷</button>'
-      +'<button class="cbtn" data-v="7">7</button><button class="cbtn" data-v="8">8</button><button class="cbtn" data-v="9">9</button><button class="cbtn cbtn-op" data-v="×">×</button>'
-      +'<button class="cbtn" data-v="4">4</button><button class="cbtn" data-v="5">5</button><button class="cbtn" data-v="6">6</button><button class="cbtn cbtn-op" data-v="−">−</button>'
-      +'<button class="cbtn" data-v="1">1</button><button class="cbtn" data-v="2">2</button><button class="cbtn" data-v="3">3</button><button class="cbtn cbtn-op" data-v="+">+</button>'
-      +'<button class="cbtn" data-v="0" style="grid-column:span 2">0</button><button class="cbtn" data-v=".">.</button><button class="cbtn cbtn-eq" data-v="=">=</button></div>'
-      +'<div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:7px 10px;margin-top:10px">💡 例：659 ÷ 8 = 82.375（每罐成本）</div>'
-      +'<div class="btn-row"><button class="btn btn-outline" id="m-cancel">關閉</button></div>';
-    const cSt = { expr:'', cur:'0', op:'', prev:null, jc:false };
-    function cUpd() { const d=eid('calc-display'),x=eid('calc-expr'); if(d) d.textContent=cSt.cur; if(x) x.textContent=cSt.expr; }
-    bEl.addEventListener('click', e => {
-      const btn = e.target.closest('.cbtn'); if (!btn) return;
-      const v = btn.dataset.v;
-      if (v==='AC') { Object.assign(cSt,{expr:'',cur:'0',op:'',prev:null,jc:false}); cUpd(); return; }
-      if (v==='+/-') { cSt.cur=String(-(parseFloat(cSt.cur)||0)); cUpd(); return; }
-      if (v==='%') { cSt.cur=String((parseFloat(cSt.cur)||0)/100); cUpd(); return; }
-      if ('÷×−+'.includes(v)) { cSt.prev=parseFloat(cSt.cur); cSt.op=v; cSt.expr=cSt.cur+' '+v; cSt.jc=false; cSt.cur='0'; cUpd(); return; }
-      if (v==='=') {
-        if (cSt.prev==null) { cUpd(); return; }
-        const a=cSt.prev, b=parseFloat(cSt.cur); let r;
-        if (cSt.op==='÷') r=b?a/b:0; else if (cSt.op==='×') r=a*b; else if (cSt.op==='−') r=a-b; else r=a+b;
-        cSt.expr=cSt.expr+' '+cSt.cur+' ='; cSt.cur=String(Math.round(r*1000000)/1000000); cSt.prev=null; cSt.op=''; cSt.jc=true; cUpd(); return;
-      }
-      if (v==='.') { if(cSt.jc){cSt.cur='0';cSt.jc=false;} if(!cSt.cur.includes('.')) cSt.cur+='.'; cUpd(); return; }
-      if (cSt.cur==='0'||cSt.jc) { cSt.cur=v; cSt.jc=false; } else cSt.cur+=v;
-      cUpd();
-    });
+  }else if(type==='calc'){
+    tEl.textContent='🧮 小計算機';
+    bEl.innerHTML='<div style="background:#1a1a2e;border-radius:12px;padding:12px;margin-bottom:12px"><div id="cexpr" style="color:#aaa;font-size:11px;min-height:18px;text-align:right;margin-bottom:2px"></div><div id="cdisp" style="color:#fff;font-size:28px;font-weight:700;text-align:right;min-height:40px;word-break:break-all">0</div></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px"><button class="cbtn cbtf" data-v="AC">AC</button><button class="cbtn cbtf" data-v="+/-">+/-</button><button class="cbtn cbtf" data-v="%">%</button><button class="cbtn cbto" data-v="÷">÷</button><button class="cbtn" data-v="7">7</button><button class="cbtn" data-v="8">8</button><button class="cbtn" data-v="9">9</button><button class="cbtn cbto" data-v="×">×</button><button class="cbtn" data-v="4">4</button><button class="cbtn" data-v="5">5</button><button class="cbtn" data-v="6">6</button><button class="cbtn cbto" data-v="−">−</button><button class="cbtn" data-v="1">1</button><button class="cbtn" data-v="2">2</button><button class="cbtn" data-v="3">3</button><button class="cbtn cbto" data-v="+">+</button><button class="cbtn" data-v="0" style="grid-column:span 2">0</button><button class="cbtn" data-v=".">.</button><button class="cbtn cbte" data-v="=">=</button></div><div style="font-size:11px;color:var(--muted);background:var(--warm);border-radius:8px;padding:7px 10px;margin-top:10px">💡 例：659 ÷ 8 = 82.375（每罐成本）</div><div class="br"><button class="btn bo" id="m-cancel">關閉</button></div>';
+    const cs={e:'',c:'0',op:'',pv:null,jc:false};
+    function cu(){const d=document.getElementById('cdisp'),x=document.getElementById('cexpr');if(d)d.textContent=cs.c;if(x)x.textContent=cs.e;}
+    bEl.addEventListener('click',e=>{const b=e.target.closest('.cbtn');if(!b)return;const v=b.dataset.v;if(v==='AC'){Object.assign(cs,{e:'',c:'0',op:'',pv:null,jc:false});cu();return;}if(v==='+/-'){cs.c=String(-(parseFloat(cs.c)||0));cu();return;}if(v==='%'){cs.c=String((parseFloat(cs.c)||0)/100);cu();return;}if('÷×−+'.includes(v)){cs.pv=parseFloat(cs.c);cs.op=v;cs.e=cs.c+' '+v;cs.jc=false;cs.c='0';cu();return;}if(v==='='){if(cs.pv==null){cu();return;}const a=cs.pv,b2=parseFloat(cs.c);let r;if(cs.op==='÷')r=b2?a/b2:0;else if(cs.op==='×')r=a*b2;else if(cs.op==='−')r=a-b2;else r=a+b2;cs.e=cs.e+' '+cs.c+' =';cs.c=String(Math.round(r*1000000)/1000000);cs.pv=null;cs.op='';cs.jc=true;cu();return;}if(v==='.'){if(cs.jc){cs.c='0';cs.jc=false;}if(!cs.c.includes('.'))cs.c+='.';cu();return;}if(cs.c==='0'||cs.jc){cs.c=v;cs.jc=false;}else cs.c+=v;cu();});
   }
 
-  const cc = eid('m-cancel'), cf = eid('m-confirm');
-  if (cc) cc.addEventListener('click', closeModal);
-  if (cf) cf.addEventListener('click', confirmModal);
-  eid('ovl').classList.add('open');
-  setTimeout(() => { const f = eid('m0'); if (f) f.focus(); }, 300);
+  const cc=document.getElementById('m-cancel'),cf=document.getElementById('m-confirm');
+  if(cc)cc.addEventListener('click',closeModal);
+  if(cf)cf.addEventListener('click',confirmModal);
+  $('ovl').classList.add('open');
+  setTimeout(()=>{const f=document.getElementById('m0');if(f)f.focus();},300);
 }
 
-function closeModal() { eid('ovl').classList.remove('open'); }
-eid('ovl').addEventListener('click', e => { if (e.target===eid('ovl')) closeModal(); });
+async function confirmModal(){
+  const{type,ctx}=_mc;
 
-const mv = id => { const el = eid(id); return el ? el.value : null; };
-const getSelTog = rowId => { const s = document.querySelector('#'+rowId+' .tog.sel'); return s ? s.dataset : {}; };
+  if(type==='confirmPresets'){closeModal();await doLoadPresets();}
 
-async function confirmModal() {
-  const { type, ctx } = _mc;
+  else if(type==='forgotPw'){const email=mv('m0');if(!email){toast('請填入Email');return;}const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:'https://wedding-snacks.vercel.app'});if(error)toast('寄送失敗：'+error.message);else{toast('✓ 重設密碼信已寄出',3000);closeModal();}}
 
-  if (type==='confirmPresets') {
-    closeModal();
-    await doLoadPresets();
+  else if(type==='newProj'){const n=mv('m0');if(!n){toast('請填入專案名稱');return;}const{data,error}=await sb.from('projects').insert({name:n,owner_id:U.id,wedding_date:mv('m-date')||null,guest_count:parseInt(mv('m-guests'))||150,budget:parseInt(mv('m-budget'))||25000}).select().single();if(error){toast('建立失敗：'+error.message);return;}closeModal();await openProj(data.id,data);}
 
-  } else if (type==='forgotPassword') {
-    const email = mv('m0'); if (!email) { showToast('請填入Email'); return; }
-    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo:'https://wedding-snacks.vercel.app' });
-    if (error) showToast('寄送失敗：'+error.message);
-    else { showToast('✓ 重設密碼信已寄出，請查收Email', 3000); closeModal(); }
+  else if(type==='joinProj'){const code=(mv('m0')||'').trim();if(!code){toast('請填入邀請碼');return;}const{data:proj}=await sb.from('projects').select('*').eq('invite_code',code).single();if(!proj){toast('找不到此邀請碼');return;}if(proj.owner_id===U.id){toast('這是你自己的專案');closeModal();return;}await sb.from('project_members').upsert({project_id:proj.id,user_id:U.id,role:'editor'},{onConflict:'project_id,user_id'});closeModal();toast('✓ 已加入！');await loadProjs();}
 
-  } else if (type==='newProject') {
-    const n = mv('m0'); if (!n) { showToast('請填入專案名稱'); return; }
-    const { data, error } = await sb.from('projects').insert({ name:n, owner_id:currentUser.id, wedding_date:mv('m-date')||null, guest_count:parseInt(mv('m-guests'))||150, budget:parseInt(mv('m-budget'))||25000 }).select().single();
-    if (error) { showToast('建立失敗：'+error.message); return; }
-    closeModal();
-    await openProject(data.id, data);
+  // FIX #1: pickCtr reads from ctr-name-input directly
+  else if(type==='pickCtr'){const eName=document.getElementById('ctr-name-input')?.value?.trim();if(!eName){toast('請填入容器名稱');return;}const selMode=document.querySelector('#ctr-mode-row .tog.sel');const mode=selMode?selMode.dataset.mode:'fixed';const fqty=parseInt(document.getElementById('ctr-fixed-qty')?.value)||1;const dish=D.dishes.find(d=>d.id===ctx);if(!dish)return;if(!dish.containers)dish.containers=[];dish.containers.push({equipName:eName,qtyMode:mode,fixedQty:fqty});await sb.from('dishes').update({containers:dish.containers}).eq('id',ctx);renderEquip();closeModal();}
 
-  } else if (type==='joinProject') {
-    const code = (mv('m0')||'').trim();
-    if (!code) { showToast('請填入邀請碼'); return; }
-    const { data: proj } = await sb.from('projects').select('*').eq('invite_code', code).single();
-    if (!proj) { showToast('找不到此邀請碼'); return; }
-    if (proj.owner_id===currentUser.id) { showToast('這是你自己的專案'); closeModal(); return; }
-    await sb.from('project_members').upsert({ project_id:proj.id, user_id:currentUser.id, role:'editor' }, { onConflict:'project_id,user_id' });
-    closeModal(); showToast('✓ 已加入！'); await loadProjects();
+  else if(type==='dish'){const n=mv('m0');if(!n){toast('請填入名稱');return;}const isH=ctx==='handmade';const{data}=await sb.from('dishes').insert({project_id:P.id,name:n,type:ctx,qty:parseInt(mv('m1'))||1,est_price:isH?0:(parseFloat(mv('m3'))||0),unit_size:isH?1:(parseInt(mv('m-unitsize'))||1),store:isH?'':(mv('m-store')||''),note:mv('m4')||'',containers:[]}).select().single();D.dishes.push(data);renderDishes();closeModal();}
 
-  } else if (type==='pickContainer') {
-    const eName = eid('m-custom-equip')?.value; if (!eName) { showToast('請選擇或填入器具名稱'); return; }
-    const md = getSelTog('qty-mode-row');
-    const mode = md.mode||'fixed';
-    const fqty = parseInt(eid('m-fixed-qty')?.value)||1;
-    const dish = D.dishes.find(d => d.id===ctx); if (!dish) return;
-    if (!dish.containers) dish.containers = [];
-    dish.containers.push({ equipName:eName, qtyMode:mode, fixedQty:fqty });
-    await sb.from('dishes').update({ containers: dish.containers }).eq('id', ctx);
-    renderEquipAssign(); closeModal();
+  else if(type==='ingredient'){const n=mv('m0');if(!n){toast('請填入名稱');return;}const md=getSelTog('ing-mode-row'),mode=md.mode||'count';const isW=mode==='weight',isY=mode==='yield';const payload={project_id:P.id,dish_id:ctx,name:n,use_weight:isW,use_yield:isY,qty_per_item:isW?(parseFloat(mv('m1w'))||10):isY?1:(parseFloat(mv('m1'))||1),unit:isW?'g':isY?(mv('m-yu')||'條'):(mv('m2')||'個'),yields_per_unit:isY?(parseFloat(mv('m-yv'))||20):1,channels:[],selected_channel:null,total_cost:0};const{data}=await sb.from('ingredients').insert(payload).select().single();D.ings.push(data);renderCompare();renderDishes();closeModal();}
 
-  } else if (type==='dish') {
-    const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
-    const isH = ctx==='handmade';
-    const { data } = await sb.from('dishes').insert({ project_id:currentProject.id, name:n, type:ctx, qty:parseInt(mv('m1'))||1, est_price:isH?0:(parseFloat(mv('m3'))||0), unit_size:isH?1:(parseInt(mv('m-unitsize'))||1), store:isH?'':(mv('m-store')||''), note:mv('m4')||'', containers:[] }).select().single();
-    D.dishes.push(data); renderDishes(); closeModal();
+  else if(type==='editIng'){const ing=D.ings.find(i=>i.id===ctx);if(!ing)return;const val=parseFloat(mv('m1'))||1;const update={name:mv('m0')||ing.name};if(ing.use_yield)update.yields_per_unit=val;else update.qty_per_item=val;if(!ing.use_weight&&!ing.use_yield)update.unit=mv('m2')||ing.unit;await sb.from('ingredients').update(update).eq('id',ctx);Object.assign(ing,update);renderCompare();renderDishes();closeModal();}
 
-  } else if (type==='ingredient') {
-    const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
-    const md = getSelTog('ing-mode-row'), mode = md.mode||'count';
-    const isW = mode==='weight', isY = mode==='yield';
-    const payload = { project_id:currentProject.id, dish_id:ctx, name:n, use_weight:isW, use_yield:isY, qty_per_item:isW?(parseFloat(mv('m1w'))||10):isY?1:(parseFloat(mv('m1'))||1), unit:isW?'g':isY?(mv('m-yu')||'條'):(mv('m2')||'個'), yields_per_unit:isY?(parseFloat(mv('m-yv'))||20):1, channels:[], selected_channel:null, total_cost:0 };
-    const { data } = await sb.from('ingredients').insert(payload).select().single();
-    D.ingredients.push(data); renderCompare(); renderDishes(); closeModal();
+  else if(type==='channel'){const n=mv('m0');if(!n){toast('請填入通路名稱');return;}const ing=D.ings.find(i=>i.id===ctx);if(!ing)return;const isW=ing.use_weight,isY=ing.use_yield;const ch={store:n,pkgPrice:parseFloat(mv('m1'))||0,pkgQty:isY?1:(parseFloat(mv('m2'))||1),pkgWeight:isW?(parseFloat(mv('m2'))||500):0};const chs=[...(ing.channels||[]),ch];await sb.from('ingredients').update({channels:chs}).eq('id',ctx);ing.channels=chs;renderCompare();closeModal();}
 
-  } else if (type==='editIng') {
-    const ing = D.ingredients.find(i => i.id===ctx); if (!ing) return;
-    const val = parseFloat(mv('m1'))||1;
-    const update = { name: mv('m0')||ing.name };
-    if (ing.use_yield) update.yields_per_unit = val; else update.qty_per_item = val;
-    if (!ing.use_weight && !ing.use_yield) update.unit = mv('m2')||ing.unit;
-    await sb.from('ingredients').update(update).eq('id', ctx);
-    Object.assign(ing, update); renderCompare(); renderDishes(); closeModal();
+  else if(type==='supply'){const n=mv('m0');if(!n){toast('請填入名稱');return;}const sd=getSelTog('src-row');const{data}=await sb.from('equip_custom').insert({project_id:P.id,name:n,src_type:sd.src||'buy',src_name:mv('m-src')||'',price:parseFloat(mv('m3'))||0,qty:parseInt(mv('m2'))||1}).select().single();D.equip.push(data);renderProcure();recalc();closeModal();}
 
-  } else if (type==='channel') {
-    const n = mv('m0'); if (!n) { showToast('請填入通路名稱'); return; }
-    const ing = D.ingredients.find(i => i.id===ctx); if (!ing) return;
-    const isW = ing.use_weight, isY = ing.use_yield;
-    const ch = { store:n, pkgPrice:parseFloat(mv('m1'))||0, pkgQty:isY?1:(parseFloat(mv('m2'))||1), pkgWeight:isW?(parseFloat(mv('m2'))||500):0 };
-    const chs = [...(ing.channels||[]), ch];
-    await sb.from('ingredients').update({ channels:chs }).eq('id', ctx);
-    ing.channels = chs; renderCompare(); closeModal();
+  else if(type==='person'||type==='contact'){const n=mv('m0');if(!n){toast('請填入姓名');return;}const{data}=await sb.from('persons').insert({project_id:P.id,name:n,role:mv('m-role')||'',phone:mv('m-phone')||null}).select().single();D.persons.push(data);if(type==='person')renderTeam();else renderSettings();closeModal();}
 
-  } else if (type==='supply') {
-    const n = mv('m0'); if (!n) { showToast('請填入名稱'); return; }
-    const sd = getSelTog('src-row');
-    const { data } = await sb.from('equip_custom').insert({ project_id:currentProject.id, name:n, src_type:sd.src||'buy', src_name:mv('m-src')||'', price:parseFloat(mv('m3'))||0, qty:parseInt(mv('m2'))||1 }).select().single();
-    D.equipCustom.push(data); renderProcure(); recalcBudget(); closeModal();
+  else if(type==='todo'){const n=mv('m0');if(!n){toast('請填入待辦內容');return;}const pd=getSelTog('phase-row'),cd=getSelTog('cat-row');const{data}=await sb.from('todos').insert({project_id:P.id,phase:pd.phase||'w1',cat:cd.cat||'check',text:n,date:mv('m-date')||null,done:false}).select().single();D.todos.push(data);renderTodos();closeModal();}
 
-  } else if (type==='person' || type==='contact') {
-    const n = mv('m0'); if (!n) { showToast('請填入姓名'); return; }
-    const { data } = await sb.from('persons').insert({ project_id:currentProject.id, name:n, role:mv('m-role')||'', phone:mv('m-phone')||null }).select().single();
-    D.persons.push(data);
-    if (type==='person') renderTasks(); else renderSettings();
-    closeModal();
-
-  } else if (type==='todo') {
-    const n = mv('m0'); if (!n) { showToast('請填入待辦內容'); return; }
-    const pd = getSelTog('phase-row'), cd = getSelTog('cat-row');
-    const { data } = await sb.from('todos').insert({ project_id:currentProject.id, phase:pd.phase||'w1', cat:cd.cat||'check', text:n, date:mv('m-date')||null, done:false }).select().single();
-    D.todos.push(data); renderTimeline(); closeModal();
-
-  } else if (type==='dayTask') {
-    const n = mv('m0'); if (!n) { showToast('請填入工作內容'); return; }
-    const { data } = await sb.from('day_tasks').insert({ project_id:currentProject.id, text:n, time_note:mv('m-time')||'', done:false, sort_order:D.dayTasks.length }).select().single();
-    D.dayTasks.push(data); renderDayMode(); closeModal();
-  }
+  else if(type==='dayTask'){const n=mv('m0');if(!n){toast('請填入工作內容');return;}const{data}=await sb.from('day_tasks').insert({project_id:P.id,text:n,time_note:mv('m-time')||'',done:false,sort_order:D.dayTasks.length}).select().single();D.dayTasks.push(data);renderDay();closeModal();}
 }
 
-eid('btn-open-calc').addEventListener('click', () => openModal('calc', null));
+$('btn-calc').addEventListener('click',()=>openModal('calc',null));
 
-// CHECK INVITE URL
-async function checkInviteUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('join');
-  if (code && currentUser) {
-    const { data: proj } = await sb.from('projects').select('*').eq('invite_code', code).single();
-    if (proj && proj.owner_id!==currentUser.id) {
-      await sb.from('project_members').upsert({ project_id:proj.id, user_id:currentUser.id, role:'editor' }, { onConflict:'project_id,user_id' });
-      window.history.replaceState({}, '', window.location.pathname);
-      showToast('✓ 已加入：'+proj.name);
-      await loadProjects();
-    }
-  }
-}
+// INVITE URL
+async function checkInvite(){const p=new URLSearchParams(location.search);const code=p.get('join');if(code&&U){const{data:proj}=await sb.from('projects').select('*').eq('invite_code',code).single();if(proj&&proj.owner_id!==U.id){await sb.from('project_members').upsert({project_id:proj.id,user_id:U.id,role:'editor'},{onConflict:'project_id,user_id'});history.replaceState({},'',location.pathname);toast('✓ 已加入：'+proj.name);await loadProjs();}}}
 
-// AUTH STATE CHANGE
-sb.auth.onAuthStateChange(async (event, session) => {
-  if (event==='SIGNED_IN' && session) {
-    currentUser = session.user;
-    await gotoHome();
-    checkInviteUrl();
-  }
-  if (event==='SIGNED_OUT') {
-    currentUser = null; currentProject = null;
-    showScreen('screen-auth');
-  }
-});
+// AUTH STATE
+sb.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_IN'&&session){U=session.user;await gotoHome();checkInvite();}if(event==='SIGNED_OUT'){U=null;P=null;showScreen('screen-auth');}});
 
 // START
-const loadTimeout = setTimeout(() => {
-  eid('loading').style.display = 'none';
-  showScreen('screen-auth');
-}, 5000);
-
-try {
-  const { data: { session } } = await sb.auth.getSession();
-  clearTimeout(loadTimeout);
-  if (session) { currentUser = session.user; await gotoHome(); checkInviteUrl(); }
-  else showScreen('screen-auth');
-} catch(e) {
-  clearTimeout(loadTimeout);
-  showScreen('screen-auth');
-}
-eid('loading').style.display = 'none';
+const lt=setTimeout(()=>{$('loading').style.display='none';showScreen('screen-auth');},5000);
+try{const{data:{session}}=await sb.auth.getSession();clearTimeout(lt);if(session){U=session.user;await gotoHome();checkInvite();}else showScreen('screen-auth');}catch(e){clearTimeout(lt);showScreen('screen-auth');}
+$('loading').style.display='none';
 </script>
 </body>
 </html>
